@@ -7,6 +7,20 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
+it('does not repaint identical lighting preferences while other preferences synchronize', () => {
+  const updateLight = vi.fn();
+  const scene: TownScene = Object.create(TownScene.prototype);
+  Object.assign(scene, { lighting: 'auto', updateLight });
+  scene.setLighting('auto');
+  expect(updateLight).not.toHaveBeenCalled();
+  scene.setLighting('night');
+  expect(updateLight).toHaveBeenCalledOnce();
+  scene.setLighting('night');
+  expect(updateLight).toHaveBeenCalledOnce();
+  scene.setLighting('auto');
+  expect(updateLight).toHaveBeenCalledTimes(2);
+});
+
 it('limits construction shadow refreshes and stops submitting unchanged settled frames', () => {
   let frame: FrameRequestCallback = () => {},
     requests = 0,

@@ -164,6 +164,7 @@ export class TownScene {
     if (notify) animation.done();
   }
   setLighting(value: Lighting) {
+    if (this.lighting === value) return;
     this.lighting = value;
     this.updateLight();
   }

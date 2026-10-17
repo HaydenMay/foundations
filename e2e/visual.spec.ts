@@ -56,32 +56,37 @@ test('all three house appearances are free, selectable and retained after reload
   }
 });
 
-test('legacy v1 town keeps archived history, roof design and twelve stars through house and yard changes', async ({
-  page,
-}) => {
-  let state = initialState('2026-09-01');
-  for (const date of ['2026-09-01', '2026-09-02'])
-    for (const h of state.habits) state = completeHabit(state, h.id, date);
-  state.habits[0].archived = true;
-  state.designs = { home: 'blue', backyard: 'fort', exterior: 'moss' };
-  state.preferences.lighting = 'night';
-  const legacy: Record<string, unknown> = { ...state, version: 1 };
-  delete legacy['onboarding'];
-  await openTown(page, legacy);
-  for (const home of ['Classic Cottage', 'Modern Craftsman', 'Traditional Brick']) {
-    await choose(page, 'Your First Home', home);
+for (const [house, houseId] of [
+  ['Classic Cottage', 'sage'],
+  ['Modern Craftsman', 'cream'],
+  ['Traditional Brick', 'blue'],
+])
+  test(`legacy v1 town keeps history, roof and twelve stars with ${house} and every backyard`, async ({
+    page,
+  }) => {
+    let state = initialState('2026-09-01');
+    for (const date of ['2026-09-01', '2026-09-02'])
+      for (const h of state.habits) state = completeHabit(state, h.id, date);
+    state.habits[0].archived = true;
+    state.designs = { home: 'blue', backyard: 'fort', exterior: 'moss' };
+    state.preferences.lighting = 'night';
+    const legacy: Record<string, unknown> = { ...state, version: 1 };
+    delete legacy['onboarding'];
+    await openTown(page, legacy);
+    await choose(page, 'Your First Home', house);
     for (const yard of ['Quiet waters', 'Woodland fort', 'A little lift'])
       await choose(page, 'Your backyard retreat', yard);
-  }
-  await page.reload();
-  await expect(page.locator('app-town')).toHaveAttribute('data-lighting', 'night');
-  const restored = await saved(page);
-  expect(restored.version).toBe(2);
-  expect(restored.habits).toEqual(state.habits);
-  expect(restored.completions).toEqual(state.completions);
-  expect(restored.completions.reduce((n: number, c: { stars: number }) => n + c.stars, 0)).toBe(12);
-  expect(restored.designs).toEqual({ home: 'blue', backyard: 'trampoline', exterior: 'moss' });
-});
+    await page.reload();
+    await expect(page.locator('app-town')).toHaveAttribute('data-lighting', 'night');
+    const restored = await saved(page);
+    expect(restored.version).toBe(2);
+    expect(restored.habits).toEqual(state.habits);
+    expect(restored.completions).toEqual(state.completions);
+    expect(restored.completions.reduce((n: number, c: { stars: number }) => n + c.stars, 0)).toBe(
+      12,
+    );
+    expect(restored.designs).toEqual({ home: houseId, backyard: 'trampoline', exterior: 'moss' });
+  });
 
 test('device local clock follows four moods and manual override survives clock changes and reload', async ({
   page,

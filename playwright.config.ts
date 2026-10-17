@@ -3,6 +3,7 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: false,
   workers: 1,
+  reporter: 'list',
   timeout: 30000,
   use: {
     baseURL: process.env['BASE_URL'] || 'http://127.0.0.1:4200/foundations/',
