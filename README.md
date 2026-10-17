@@ -30,7 +30,7 @@ npx playwright install chromium
 npm run test:e2e                # Production build must already exist
 ```
 
-The browser suite starts its own preview server when one is not running. It uses Chromium at 390×844 portrait, 844×390 landscape, and 1440×1000 desktop, plus a Pacific/Auckland timezone case. Touch gestures are tested in phone projects; the desktop touch-only case is explicitly skipped. Tests use synthetic data and write ignored screenshots/traces into `test-results/`.
+The browser suite starts its own preview server when one is not running. It uses Chromium at a 390×664 portrait viewport (390×844 emulated screen), 844×390 landscape, and 1440×1000 desktop, plus a Pacific/Auckland timezone case. Touch gestures are tested in phone projects; the desktop touch-only case is explicitly skipped. Tests use synthetic data and write ignored screenshots/traces into `test-results/`.
 
 If the host Node is older, a temporary runtime works without upgrading the machine:
 

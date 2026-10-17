@@ -35,3 +35,23 @@ After the fixes, `npm test` passed **41/41** and the production build passed wit
 ## Final local result before publication
 
 All final changes verified: **41 unit tests passed; 35 browser tests passed; 1 desktop touch-only test explicitly skipped; 0 failures**. Browser run: 53.9 seconds. Production build passed without warnings. `git diff --check` passed. Production dependency audit reported **0 vulnerabilities**. A repository token/private-key pattern scan found no matches (exit 1 means no matches). Committed screenshots use synthetic test progress, not personal wellness records.
+
+## Verified deployment
+
+Application commit: `77447c99f975959319561201eca56e53c01f13e7`.
+
+- Public repository verified through GitHub API: https://github.com/HaydenMay/foundations (`isPrivate: false`, default branch `main`).
+- Pages configured as `build_type: workflow`, HTTPS enforced, at https://haydenmay.github.io/foundations/.
+- [GitHub Actions run 39015467506](https://github.com/HaydenMay/foundations/actions/runs/39015467506): **success**, both build and deploy jobs successful. Ubuntu runner: npm install audit **0 vulnerabilities**, unit tests **41 passed**, production build succeeded, browser tests **35 passed / 1 skipped** (1.9 minutes).
+- Live HTTPS response: **200**, title `Foundations`, `<base href="/foundations/">`.
+- Executed `BASE_URL=https://haydenmay.github.io/foundations/ npx playwright test --grep 'renders the town|supports lighting'` (PowerShell equivalent used locally). **6/6 passed** in 15.5 seconds across portrait, landscape and desktop: WebGL canvas rendered, completion persisted after reload, panel preference persisted, lighting override and camera buttons worked, no horizontal overflow, no page errors in load/persistence checks.
+- Additional live load at **390×844**: rendered canvas, **no page errors**, all observed request hosts limited to `haydenmay.github.io`. This is a runtime network observation in addition to source inspection; no wellness data transmission was implemented.
+- Browser suite phone profile viewport is **390×664** with a 390×844 emulated screen; the separate manual visual and live checks used a 390×844 viewport. Landscape is 844×390; desktop is 1440×1000.
+
+GitHub emitted upstream notices about older action runtime declarations being forced onto Node 24 and an upcoming ubuntu-latest image transition. Both jobs succeeded. These are CI maintenance notices, not application build warnings; revisit official action versions on the next CI maintenance pass.
+
+Final evidence is committed separately from application code with `[skip ci]`: only documentation changed after the verified application deployment. No application code is left uncommitted.
+
+## Remaining limits and mitigations
+
+No known unresolved functional defect from the review. Physical iOS/Android hardware, actual Safari, low-memory devices and screen-reader sessions remain unverified: perform those checks before treating the slice as a general release. Art remains provisional pending owner references. Local-only data needs user-kept JSON backups; storage conflicts preserve both versions but require an explicit restore choice. Fixed-hour solar lighting can be manually overridden. Long history virtualization and a larger storage backend remain future work rather than part of this slice.
