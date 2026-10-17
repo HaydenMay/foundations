@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { initialState } from '../src/app/domain/state';
+import { completeHabit } from '../src/app/domain/habits';
 const saved = (page: Page) =>
   page.evaluate(() => JSON.parse(localStorage.getItem('foundations.v1')!));
 async function firstStep(page: Page, name = 'Make a moment to unwind') {
@@ -148,4 +149,57 @@ test('a failed durable home save leaves the reward pending across reload', async
   expect((await saved(page)).completions).toHaveLength(1);
   await page.getByRole('button', { name: 'Choose later', exact: true }).click();
   await expect(page.locator('app-town')).toHaveAttribute('data-home-visible', 'false');
+});
+
+test('startup migration waits for another tab and preserves its newer completion', async ({
+  page,
+  context,
+}) => {
+  await page.goto('./');
+  await expect(page.locator('canvas[data-rendered="true"]')).toBeVisible();
+  await page.waitForTimeout(350);
+  const base = initialState('2026-09-01');
+  const legacy: Record<string, unknown> = { ...base, version: 1, designs: { home: 'blue' } };
+  delete legacy['onboarding'];
+  const latest = completeHabit(
+    { ...base, onboarding: { firstHomeUnlocked: true }, designs: { home: 'blue' } },
+    base.habits[0].id,
+    '2026-10-17',
+  );
+  const original = JSON.stringify(legacy);
+  await page.evaluate(
+    ({ original, latest }) => {
+      const gate = window as unknown as {
+        startupLockHeld: boolean;
+        releaseStartupLock: () => void;
+      };
+      localStorage.setItem('foundations.v1', original);
+      void navigator.locks.request('foundations-state', async () => {
+        gate.startupLockHeld = true;
+        await new Promise<void>((resolve) => {
+          gate.releaseStartupLock = resolve;
+        });
+        localStorage.setItem('foundations.pre-v2', original);
+        localStorage.setItem('foundations.v1', JSON.stringify(latest));
+      });
+    },
+    { original, latest },
+  );
+  await expect
+    .poll(() =>
+      page.evaluate(() => (window as unknown as { startupLockHeld: boolean }).startupLockHeld),
+    )
+    .toBe(true);
+  const other = await context.newPage();
+  await other.goto('./');
+  await expect(other.locator('canvas[data-rendered="true"]')).toBeVisible();
+  expect(await other.evaluate(() => localStorage.getItem('foundations.v1'))).toBe(original);
+  await page.evaluate(() =>
+    (window as unknown as { releaseStartupLock: () => void }).releaseStartupLock(),
+  );
+  await expect(other.locator('.lifetime strong')).toHaveText('2');
+  await expect.poll(async () => (await saved(other)).completions.length).toBe(1);
+  expect((await saved(other)).designs.home).toBe('blue');
+  expect(await other.evaluate(() => localStorage.getItem('foundations.pre-v2'))).toBe(original);
+  await other.close();
 });

@@ -78,8 +78,8 @@ export class FoundationsStore implements OnDestroy {
     try {
       if (saved) {
         this.real.set(importState(saved));
-        if (JSON.parse(saved).version === 1) this.persist(this.real());
-      } else if (!this.storageBlocked) this.persist(this.real());
+        if (JSON.parse(saved).version === 1) this.initializeStorage();
+      } else if (!this.storageBlocked) this.initializeStorage();
     } catch {
       this.corrupt = true;
       this.warning.set(
@@ -89,6 +89,16 @@ export class FoundationsStore implements OnDestroy {
     this.clock = setInterval(this.focus, 30000);
     window.addEventListener('focus', this.focus);
     window.addEventListener('storage', this.storage);
+  }
+  private initializeStorage() {
+    const epoch = this.epoch();
+    // Startup creation/migration is a genuine transaction: re-read under the same tab lock.
+    void this.commit((state) => state).catch(() => {
+      if (epoch === this.epoch() && !this.corrupt) {
+        this.unsaved = true;
+        this.storageWarning();
+      }
+    });
   }
   private storageWarning() {
     this.warning.set(

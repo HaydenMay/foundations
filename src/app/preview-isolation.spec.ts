@@ -131,8 +131,10 @@ describe('disposable Developer Preview boundary', () => {
       },
     });
     try {
-      const s = make(),
-        raw = localStorage.getItem(STORAGE_KEY);
+      const s = make();
+      held!(); // Grant startup its serialized turn before holding the user's next action.
+      await Promise.resolve();
+      const raw = localStorage.getItem(STORAGE_KEY);
       const pending = s.preferences({ lighting: 'night' });
       s.enterPreview();
       held!();

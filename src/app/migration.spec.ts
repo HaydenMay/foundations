@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FoundationsStore } from './state.service';
 import { initialState, STORAGE_KEY, MIGRATION_BACKUP_KEY } from './domain/state';
+import { importState, exportState } from './domain/state';
+import { completeHabit } from './domain/habits';
 
 describe('safe v2 upgrade and durable first house', () => {
   const stores: FoundationsStore[] = [];
@@ -83,4 +85,65 @@ describe('safe v2 upgrade and durable first house', () => {
     expect(results).toEqual([true, false]);
     expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).completions).toHaveLength(1);
   });
+  it('preserves a newer completion saved between the initial read and startup write', () => {
+    const original = old();
+    localStorage.setItem(STORAGE_KEY, original);
+    const parsed = importState(original),
+      latest = completeHabit(parsed, parsed.habits[0].id, '2026-10-17');
+    const read = Storage.prototype.getItem,
+      write = Storage.prototype.setItem;
+    let first = true;
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(function (this: Storage, key) {
+      const value = read.call(this, key);
+      if (key === STORAGE_KEY && first) {
+        first = false;
+        write.call(this, MIGRATION_BACKUP_KEY, original);
+        write.call(this, STORAGE_KEY, exportState(latest));
+      }
+      return value;
+    });
+    const s = make();
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).completions).toEqual(latest.completions);
+    expect(s.realState().completions).toEqual(latest.completions);
+  });
+  it.each([false, true])(
+    'serializes startup with the shared state lock, legacy=%s',
+    async (legacy) => {
+      const original = legacy ? old() : null;
+      if (original) localStorage.setItem(STORAGE_KEY, original);
+      const descriptor = Object.getOwnPropertyDescriptor(navigator, 'locks');
+      let release: (() => void) | undefined;
+      const request = vi.fn(
+        (_name: string, apply: () => void) =>
+          new Promise<void>((resolve, reject) => {
+            release = () => {
+              try {
+                apply();
+                resolve();
+              } catch (e) {
+                reject(e);
+              }
+            };
+          }),
+      );
+      Object.defineProperty(navigator, 'locks', { configurable: true, value: { request } });
+      try {
+        const s = make();
+        expect(request).toHaveBeenCalledWith('foundations-state', expect.any(Function));
+        expect(localStorage.getItem(STORAGE_KEY)).toBe(original);
+        const current = s.realState();
+        const latest = completeHabit(current, current.habits[0].id, '2026-10-17');
+        // A lock owner finishes its genuine completion before startup's queued turn is granted.
+        if (original) localStorage.setItem(MIGRATION_BACKUP_KEY, original);
+        localStorage.setItem(STORAGE_KEY, exportState(latest));
+        release!();
+        await Promise.resolve();
+        expect(s.realState()).toEqual(latest);
+        expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toEqual(latest);
+      } finally {
+        if (descriptor) Object.defineProperty(navigator, 'locks', descriptor);
+        else Reflect.deleteProperty(navigator, 'locks');
+      }
+    },
+  );
 });
