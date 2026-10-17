@@ -7,6 +7,8 @@ A private, portrait-first wellness companion. Healthy habits earn permanent star
 **Live app:** https://haydenmay.github.io/foundations/  
 **Source:** https://github.com/HaydenMay/foundations
 
+![The provisional Foundations cul-de-sac, built with synthetic test progress](docs/screenshots/town-day.png)
+
 This is the initial vertical slice. The eight-project cul-de-sac and procedural art are provisional; finalized visual references will follow.
 
 ## Run locally
@@ -70,6 +72,8 @@ Lighting follows the **device's local time**, blending sunrise, daylight, sunset
 Habits, schedules, completion snapshots, stars, designs, camera and interface preferences live in browser **localStorage**, under `foundations.v1`. The versioned state is validated on load and import. Multiple same-origin tabs synchronize; browsers with Web Locks serialize updates to prevent duplicate rewards.
 
 **Clearing browser/site storage, private browsing cleanup, changing browser profiles or moving devices can lose progress.** Settings → Export backup downloads a JSON file. Import validates the file and shows a confirmation before replacing current progress. Export your current town first if you want to keep both. Backups contain habit names and history: keep them private and never commit them to this public repository.
+
+If an unsaved tab and another tab diverge during a storage failure, both versions are preserved and automatic writes stop. Export the unsaved session, reload to inspect the saved version, and explicitly import the backup you choose to keep. There is no automatic merge.
 
 Malformed saved data is preserved for recovery and never silently reset. Settings can export the original storage. Blocked/full storage triggers a visible warning and permits tracking in the open tab; export before closing. There is no cloud sync, automatic backup or cross-device recovery. Browser storage is not encrypted, and other people using the same browser profile can access it. GitHub hosts application files and receives ordinary hosting requests; the application does not transmit wellness records.
 

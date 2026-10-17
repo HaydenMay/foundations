@@ -253,6 +253,7 @@
             <button
               class="design-card"
               [class.selected]="store.state().designs[selectedProject().id] === c.id"
+              [attr.aria-pressed]="store.state().designs[selectedProject().id] === c.id"
               (click)="select(c.id)"
               [disabled]="busy()"
             >

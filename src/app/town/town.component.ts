@@ -172,6 +172,7 @@ export class TownComponent implements OnDestroy {
   private scene?: TownScene;
   private lastDesigns = '';
   private lastCamera = '';
+  private incomingCamera = '';
   private timer?: ReturnType<typeof setTimeout>;
   constructor(private readonly zone: NgZone) {
     afterNextRender(() =>
@@ -179,6 +180,7 @@ export class TownComponent implements OnDestroy {
         try {
           const { TownScene } = await import('./scene');
           this.lastCamera = JSON.stringify(this.preferences().camera);
+          this.incomingCamera = this.lastCamera;
           this.scene = new TownScene(
             this.viewport().nativeElement,
             this.designs(),
@@ -215,9 +217,13 @@ export class TownComponent implements OnDestroy {
         this.scene.setDesigns(designs);
       }
       const cameraKey = JSON.stringify(preferences.camera);
-      if (cameraKey !== this.lastCamera) {
-        this.lastCamera = cameraKey;
-        this.scene.camera.set(preferences.camera);
+      if (cameraKey !== this.incomingCamera) {
+        this.incomingCamera = cameraKey;
+        if (cameraKey !== this.lastCamera) {
+          clearTimeout(this.timer);
+          this.lastCamera = cameraKey;
+          this.scene.camera.set(preferences.camera);
+        }
       }
       this.scene.setLighting(preferences.lighting);
     });

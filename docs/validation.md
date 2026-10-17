@@ -19,3 +19,19 @@ Final browser suite, independent review and live deployment verification will be
 2026-10-17: `npm test` passed **37/37**; `npm run build` passed with no warnings. The expanded browser suite passed **32**, skipped **1** desktop touch-only case, with no failures in 49.4 seconds. It exercised portrait, landscape and desktop, real mouse drag/wheel, emulated touch pan/pinch, backup preview/restore, two tabs racing one completion, Auckland calendar labels/midnight rollover, and all built projects in four lighting modes. Actual phone hardware and Safari are not covered by this evidence.
 
 Final screenshot inspection found dark text over the night scene; the shell now changes the scene heading colors with the renderer palette. Mobile camera targets were enlarged and habit text increased. These final presentation adjustments are included in the next browser run.
+
+## Independent review and fixes
+
+A separate read-only reviewer inspected commit `ea4aad7`. Three material issues were reproduced with failing regression tests and fixed:
+
+1. Storage recovery after a failed write could overwrite a newer tab's history. The store now tracks the exact persisted baseline. Divergent versions remain preserved; the unsaved session warns and blocks automatic replacement until an explicit backup import. There is no automatic conflict merge.
+2. Unreadable data discovered during an existing session could bypass constructor protection. Read failures and invalid saved data are now separate paths; direct discoveries and storage events protect the original from writes.
+3. A habit action during the 200 ms camera-save debounce could restore an old view. Incoming persisted camera state is tracked separately from pending renderer state. A real-browser regression now rotates and completes a habit in the same turn, then checks the saved angle. Backup restore also exercises an actual external camera change.
+
+Two small findings were addressed in this delivery pass: import now rejects any completion dated after a one-time completion for the same goal, while retaining earlier recurring history; design-choice buttons expose `aria-pressed` for the current selection. Their regression checks failed before the changes.
+
+After the fixes, `npm test` passed **41/41** and the production build passed without warnings. The preceding browser run passed **35**, skipped **1** desktop touch-only case (54.7 seconds); a final run including all fixes follows. No second independent review was dispatched; the original author's fix verification consists of the regression tests and full suites.
+
+## Final local result before publication
+
+All final changes verified: **41 unit tests passed; 35 browser tests passed; 1 desktop touch-only test explicitly skipped; 0 failures**. Browser run: 53.9 seconds. Production build passed without warnings. `git diff --check` passed. Production dependency audit reported **0 vulnerabilities**. A repository token/private-key pattern scan found no matches (exit 1 means no matches). Committed screenshots use synthetic test progress, not personal wellness records.

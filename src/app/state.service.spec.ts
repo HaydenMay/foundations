@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FoundationsStore } from './state.service';
-import { STORAGE_KEY } from './domain/state';
+import { exportState, importState, STORAGE_KEY } from './domain/state';
+import { completeHabit } from './domain/habits';
 describe('local storage resilience', () => {
   const stores: FoundationsStore[] = [];
   function makeStore() {
@@ -42,5 +43,35 @@ describe('local storage resilience', () => {
     const store = makeStore();
     await expect(store.complete(store.state().habits[0].id)).rejects.toThrow('Import');
     expect(localStorage.getItem(STORAGE_KEY)).toBe('{bad data');
+  });
+  it('does not overwrite data that becomes unreadable during an open session', async () => {
+    const store = makeStore();
+    localStorage.setItem(STORAGE_KEY, '{broken while open');
+    await expect(store.complete(store.state().habits[0].id)).rejects.toThrow('Import');
+    expect(localStorage.getItem(STORAGE_KEY)).toBe('{broken while open');
+  });
+  it('protects newer tab progress when an unsaved tab recovers storage access', async () => {
+    const store = makeStore();
+    const original = importState(localStorage.getItem(STORAGE_KEY)!);
+    const write = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('quota');
+    });
+    await store.complete(store.state().habits[0].id);
+    write.mockRestore();
+    const other = completeHabit(original, original.habits[1].id, store.today());
+    localStorage.setItem(STORAGE_KEY, exportState(other));
+    await store.complete(store.state().habits[2].id);
+    expect(importState(localStorage.getItem(STORAGE_KEY)!)).toEqual(other);
+    expect(store.stars()).toBe(5);
+    expect(store.warning()).toContain('Another tab');
+  });
+  it('protects unreadable storage received from another tab', async () => {
+    const store = makeStore();
+    localStorage.setItem(STORAGE_KEY, '{invalid external data');
+    window.dispatchEvent(
+      new StorageEvent('storage', { key: STORAGE_KEY, newValue: '{invalid external data' }),
+    );
+    await expect(store.preferences({ panelOpen: false })).rejects.toThrow('Import');
+    expect(localStorage.getItem(STORAGE_KEY)).toBe('{invalid external data');
   });
 });

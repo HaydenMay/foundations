@@ -83,6 +83,8 @@ export function importState(json: string): AppState {
     periods = new Set<string>(),
     dates = new Set<string>();
   const daily = new Map<string, number>();
+  const onceDates = new Map<string, string>(),
+    latestDates = new Map<string, string>();
   for (const c of s.completions) {
     requireValid(
       c &&
@@ -112,7 +114,13 @@ export function importState(json: string): AppState {
     dates.add(dk);
     daily.set(c.date, (daily.get(c.date) ?? 0) + c.stars);
     requireValid(daily.get(c.date)! <= 10);
+    latestDates.set(
+      c.habitId,
+      c.date > (latestDates.get(c.habitId) || '') ? c.date : latestDates.get(c.habitId)!,
+    );
+    if (c.period === 'once') onceDates.set(c.habitId, c.date);
   }
+  for (const [id, date] of onceDates) requireValid(latestDates.get(id) === date);
   const p = s.preferences,
     camera = p?.camera;
   requireValid(

@@ -18,19 +18,22 @@ export class FoundationsStore implements OnDestroy {
   private unsaved = false;
   private corrupt = false;
   private storageBlocked = false;
+  private conflict = false;
+  private persistedBaseline: string | null = null;
   private readonly clock: ReturnType<typeof setInterval>;
   private readonly focus = () => this.today.set(localDate());
   private readonly storage = (event: StorageEvent) => {
     if (event.key !== STORAGE_KEY || !event.newValue) return;
     if (this.unsaved) {
-      this.warning.set(
-        'Another tab changed your town. This tab has unsaved progress; export a backup before reloading.',
-      );
+      if (event.newValue !== this.persistedBaseline) this.conflict = true;
+      this.conflictWarning();
       return;
     }
     try {
       this.state.set(importState(event.newValue));
+      this.persistedBaseline = event.newValue;
     } catch {
+      this.corrupt = true;
       this.warning.set(
         'Another tab saved unreadable data. Your current session is still available to export.',
       );
@@ -40,6 +43,7 @@ export class FoundationsStore implements OnDestroy {
     let saved: string | null = null;
     try {
       saved = localStorage.getItem(STORAGE_KEY);
+      this.persistedBaseline = saved;
     } catch {
       this.storageBlocked = true;
       this.unsaved = true;
@@ -63,14 +67,26 @@ export class FoundationsStore implements OnDestroy {
       'Browser storage is unavailable or full. Progress is only in this open tab. Export a backup before closing.',
     );
   }
+  private conflictWarning() {
+    this.warning.set(
+      'Another tab saved a different town while this tab had unsaved progress. Both versions are preserved. Export this session before reloading to open the saved town. Automatic saving is paused until you explicitly import a backup.',
+    );
+  }
   private persist(state: AppState): void {
+    if (this.conflict) {
+      this.unsaved = true;
+      this.conflictWarning();
+      return;
+    }
     if (this.storageBlocked) {
       this.unsaved = true;
       this.storageWarning();
       return;
     }
     try {
-      localStorage.setItem(STORAGE_KEY, exportState(state));
+      const serialized = exportState(state);
+      localStorage.setItem(STORAGE_KEY, serialized);
+      this.persistedBaseline = serialized;
       this.unsaved = false;
       this.warning.set('');
     } catch {
@@ -85,18 +101,45 @@ export class FoundationsStore implements OnDestroy {
           'Import a valid backup in Settings first. Your original saved data is untouched.',
         );
       let current = this.state();
-      if (!this.unsaved && !replace) {
+      if (!replace) {
+        let raw: string | null = null;
+        let readable = true;
         try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if (raw) current = importState(raw);
+          raw = localStorage.getItem(STORAGE_KEY);
         } catch {
-          /* Retain the in-memory session if storage becomes inaccessible. */
+          readable = false;
+          this.storageBlocked = true;
+          this.unsaved = true;
+        }
+        if (readable) {
+          this.storageBlocked = false;
+          let disk: AppState | null = null;
+          try {
+            if (raw) disk = importState(raw);
+          } catch {
+            this.corrupt = true;
+            this.warning.set(
+              'Saved data became unreadable. The original is protected. Export this session and the original storage in Settings, then import a valid backup.',
+            );
+            throw new Error(
+              'Import a valid backup in Settings first. Your original saved data is untouched.',
+            );
+          }
+          if (this.unsaved) {
+            if (raw !== this.persistedBaseline) this.conflict = true;
+          } else {
+            current = disk || current;
+            this.persistedBaseline = raw;
+          }
         }
       }
       const next = change(current);
       this.state.set(next);
       this.corrupt = false;
-      if (replace) this.storageBlocked = false;
+      if (replace) {
+        this.storageBlocked = false;
+        this.conflict = false;
+      }
       this.persist(next);
     };
     if (navigator.locks) await navigator.locks.request('foundations-state', apply);

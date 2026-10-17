@@ -134,6 +134,19 @@ describe('permanent rewards', () => {
   });
 });
 describe('construction and backups', () => {
+  it('rejects later completions after a one-time record while preserving earlier recurring history', () => {
+    let s = earn(1);
+    s.habits[0].schedule = { kind: 'once', days: [] };
+    s = completeHabit(s, s.habits[0].id, '2026-10-20');
+    expect(importState(exportState(s)).completions).toHaveLength(2);
+    s.completions.push({
+      ...s.completions[0],
+      id: 'invalid-later-completion',
+      date: '2026-10-21',
+      period: '2026-10-21',
+    });
+    expect(() => importState(exportState(s))).toThrow();
+  });
   it('keeps every unlocked project pending until a choice is made', () => {
     const s = earn(4);
     expect(unlockedProjects(s).map((p) => p.id)).toEqual(['home', 'backyard']);

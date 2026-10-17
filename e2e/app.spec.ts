@@ -72,6 +72,10 @@ test('preserves queued projects and changes designs freely', async ({ page }) =>
   await expect(page.getByRole('heading', { name: 'Your growing town' })).toBeVisible();
   await expect(page.getByText('Quiet waters', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Design Your backyard retreat' }).click();
+  await expect(page.getByRole('button', { name: /Quiet waters/ })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
   await page.getByRole('button', { name: /Woodland fort/ }).click();
   await expect(page.getByRole('heading', { name: 'Your growing town' })).toBeVisible();
   await expect(page.getByText('Woodland fort', { exact: true })).toBeVisible();
@@ -110,16 +114,37 @@ test('exports a backup and rejects invalid imports without losing progress', asy
   const download = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Export backup' }).click();
   expect((await download).suggestedFilename()).toMatch(/^foundations-.*\.json$/);
-  await page
-    .getByLabel('Import backup file')
-    .setInputFiles({
-      name: 'bad.json',
-      mimeType: 'application/json',
-      buffer: Buffer.from('{"version":99}'),
-    });
+  await page.getByLabel('Import backup file').setInputFiles({
+    name: 'bad.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from('{"version":99}'),
+  });
   await expect(page.getByRole('alert')).toContainText('backup');
   await page.getByRole('button', { name: 'Close dialog' }).click();
   await expect(page.getByTestId('daily-stars')).toHaveText('0 / 10');
+});
+
+test('keeps a camera change when a habit is completed before its debounced save', async ({
+  page,
+}) => {
+  await page.goto('./');
+  await expect(page.locator('canvas[data-rendered="true"]')).toBeVisible();
+  await page.evaluate(() => {
+    (document.querySelector('[aria-label="Rotate town clockwise"]') as HTMLButtonElement).click();
+    (
+      document.querySelector(
+        '[aria-label="Complete Step outside for a little walk"]',
+      ) as HTMLButtonElement
+    ).click();
+  });
+  await expect(page.getByTestId('daily-stars')).toHaveText('2 / 10');
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => JSON.parse(localStorage.getItem('foundations.v1')!).preferences.camera.angle,
+      ),
+    )
+    .toBeCloseTo(Math.PI / 2);
 });
 
 test('pans with a drag, zooms with the wheel and restores home', async ({ page }) => {
@@ -217,19 +242,26 @@ test('restores a validated backup after an explicit preview', async ({ page }) =
   const date = localDate();
   let s = initialState(date);
   s = completeHabit(s, s.habits[2].id, date);
+  s.preferences.camera = { x: 1, z: 2, zoom: 0.8, angle: Math.PI };
   await page.goto('./');
   await page.getByRole('button', { name: 'Settings' }).click();
-  await page
-    .getByLabel('Import backup file')
-    .setInputFiles({
-      name: 'backup.json',
-      mimeType: 'application/json',
-      buffer: Buffer.from(JSON.stringify(s)),
-    });
+  await page.getByLabel('Import backup file').setInputFiles({
+    name: 'backup.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify(s)),
+  });
   await expect(page.getByRole('heading', { name: 'Restore this town?' })).toBeVisible();
   await page.getByRole('button', { name: 'Replace local data with this backup' }).click();
   await expect(page.getByRole('dialog')).not.toBeVisible();
   await expect(page.getByTestId('daily-stars')).toHaveText('3 / 10');
+  await page.getByRole('button', { name: 'Zoom in' }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => JSON.parse(localStorage.getItem('foundations.v1')!).preferences.camera.zoom,
+      ),
+    )
+    .toBeCloseTo(0.96);
   await page.reload();
   await expect(page.getByTestId('daily-stars')).toHaveText('3 / 10');
 });
