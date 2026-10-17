@@ -7,9 +7,9 @@ A private, portrait-first wellness companion. Healthy habits earn permanent star
 **Live app:** https://haydenmay.github.io/foundations/  
 **Source:** https://github.com/HaydenMay/foundations
 
-![The provisional Foundations cul-de-sac, built with synthetic test progress](docs/screenshots/town-day.png)
+![Classic Cottage in the starting residential lot, with synthetic test progress](docs/evidence/visual-pass-1/final/house-cottage-desktop.png)
 
-This is the initial vertical slice. The eight-project cul-de-sac and procedural art are provisional; finalized visual references will follow.
+Visual Production Pass 1 refines the starting residential lot using the approved cozy miniature references: three house styles, detailed gardens, interchangeable backyards and four lighting moods. The existing eight-project progression remains intact. See the [visual report and screenshot gallery](docs/visual-pass-1-results.md).
 
 ## Run locally
 
@@ -50,7 +50,7 @@ npm exec --yes --package=node@24.15.0 -- npm run build
 
 | Lifetime stars | Project               | Design choices                          |
 | -------------: | --------------------- | --------------------------------------- |
-|              0 | Starting home         | Sage, linen, coastal blue               |
+|              0 | Starting home         | Classic Cottage, Craftsman, Brick       |
 |              5 | Backyard retreat      | Pool, wooden fort, trampoline           |
 |             12 | Exterior improvements | Terracotta, slate, moss roof            |
 |             24 | Neighboring house     | Buttercream, rosewood, bluebell         |
@@ -65,7 +65,7 @@ All available projects remain in **Your town** until you choose a design. Nothin
 
 Drag with a mouse or one finger to pan. Pinch with two fingers or use the mouse wheel to zoom. Home, rotate, zoom-in and zoom-out controls are available on screen. Focus the canvas for arrow-key pan, `+` / `-` zoom, `R` rotation and `Home`. Movement and zoom are bounded; camera preferences and the habit panel state survive reloads.
 
-Lighting follows the **device's local time**, blending sunrise, daylight, sunset and night. Settings has manual overrides for each. Sunrise/sunset use approximate fixed local hours (around 6 am / 6 pm); no location is requested. Windows and street lamps become warm at night. Rendering is event-driven rather than an endless animation loop, and the pixel ratio is capped at two.
+Lighting follows the **device's local time**, blending morning, afternoon, sunset and night colors, sun direction, ambient fill and window light. Settings has manual overrides for each. Sunrise/sunset use approximate fixed local hours (around 6 am / 6 pm); no location is requested. Windows and street lamps become warm at night. Rendering is event-driven rather than an endless animation loop, the pixel ratio is capped at two, and static shadows are refreshed only when the world or light changes. Clock lighting updates each minute while open; no perpetual foliage/water animation is enabled.
 
 ## Privacy and backups
 
@@ -83,7 +83,9 @@ Malformed saved data is preserved for recovery and never silently reset. Setting
 - `src/app/state.service.ts`: Angular signals, local persistence, multi-tab synchronization, storage failures and backups.
 - `src/app/components/`: reusable habit editor and local SVG icons.
 - `src/app/app.*` and `src/ui.css`: responsive shell, habit sheet, project inspector, history and settings; native dialogs provide focus trapping and Escape dismissal.
-- `src/app/town/assets.ts`: replaceable procedural house, landscaping, furniture and materials. Models use metre-scale coordinates. The gabled cottage includes weatherboard siding, dormer, porch, doors, windows and chimney.
+- `src/app/town/assets.ts`: shared material, geometry, texture and disposal ownership; legacy factories for later projects.
+- `src/app/town/residential.ts`, `landscaping.ts`, `backyards.ts`: replaceable metre-scale starting-house and yard factories, organic tree variants, gardens and furnishings. All three starting houses share their entrance, garage and backyard anchors.
+- `src/app/town/surfaces.ts`, `batching.ts`: small original generated surface maps and static material batches with baked transforms and world-scale UVs. See [asset conventions](docs/visual-assets.md).
 - `src/app/town/world.ts`: project-ID → asset-factory registry and composed terrain. Add or replace a factory without changing habits or persistence. A future GLTF asset loader can implement the same factory boundary.
 - `src/app/town/camera.ts`, `lighting.ts`, `scene.ts`: bounded map controls, clock palettes, renderer lifecycle and shadows. Three.js loads as a separate chunk. Habits remain usable if WebGL initialization fails.
 
@@ -105,10 +107,10 @@ See [validation notes](docs/validation.md) for executed results and deployment e
 
 ## Known limits and next review
 
-- Art is provisional procedural geometry. Palette, architecture, lighting and proportions should be reviewed against the owners' forthcoming references before expanding the town.
+- Art remains procedural and replaceable. It follows the approved cozy miniature boards, but uses faceted leaf sprays, small repeating maps and one shadowed sun. It does not reproduce their offline-render foliage, reflections, soft global illumination or photographic depth of field. Later milestone houses retain the earlier models; this pass deliberately stops at the starting lot.
 - WebGL and hardware acceleration are required for the town. Habits/settings/backups continue without it. Actual Safari, Android hardware, low-memory devices and screen-reader sessions have not been certified; Chromium viewport and touch emulation are initial evidence only.
 - Very long history lists are not virtualized. Local storage has browser-dependent limits; backup import is capped at 5 MB. No browser-only system can guarantee retention after storage cleanup.
 - Web Locks are used when available. Older browsers without them retain single-tab duplicate protection but cannot guarantee simultaneous multi-tab writes; use one tab there.
 - Fixed-hour solar lighting is atmospheric rather than geographically accurate. Motion is deliberately minimal, and future art assets can replace the procedural factories.
 
-Recommended next work: review art references, try the live build on real iOS/Android devices, tune milestone pacing through normal play, and evaluate IndexedDB/history virtualization if long-term usage demands it. Keep this release within the initial cul-de-sac boundary.
+Recommended next work: owner review of the three styles and four moods, followed by real iOS/Android performance and Safari checks. If closer reference fidelity is required, replace individual factories with optimized authored models and foliage atlases, preserving the documented lot contract. Keep further neighborhood work out of this visual pass.

@@ -1,0 +1,47 @@
+{
+  "url": "https://haydenmay.github.io/foundations/",
+  "deployedCommit": "932ac69571e95aca59d5f23b3f123b1fae184876",
+  "actionRun": 39044066377,
+  "verifiedAt": "2026-10-17T15:21:34.221Z",
+  "liveBrowserTests": {
+    "passed": 12,
+    "failed": 0,
+    "skipped": 0
+  },
+  "results": [
+    {
+      "name": "portrait",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "status": 200,
+      "title": "Foundations",
+      "base": "/foundations/",
+      "rendered": "true",
+      "script": "main-JYVXGBJF.js",
+      "overflow": false,
+      "hosts": [
+        "haydenmay.github.io"
+      ],
+      "errors": []
+    },
+    {
+      "name": "landscape",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "status": 200,
+      "title": "Foundations",
+      "base": "/foundations/",
+      "rendered": "true",
+      "script": "main-JYVXGBJF.js",
+      "overflow": false,
+      "hosts": [
+        "haydenmay.github.io"
+      ],
+      "errors": []
+    }
+  ]
+}
