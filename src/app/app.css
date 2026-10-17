@@ -1117,3 +1117,118 @@ app-town {
     letter-spacing: 0.6px;
   }
 }
+
+/* First-home and preview sheets share the existing city, with no unrelated UI redesign. */
+.selecting-home app-town {
+  left: 370px;
+}
+.preview-mode app-town {
+  left: 350px;
+}
+.preview-mode.preview-collapsed app-town {
+  left: 0;
+}
+.preview-mode .place-tag,
+.selecting-home .place-tag {
+  display: none;
+}
+.preview-banner {
+  position: absolute;
+  right: 18px;
+  top: 12px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  background: #2e5145;
+  color: #f6f4e8;
+  border: 1px solid #78927c;
+  border-radius: 25px;
+  box-shadow: 0 3px 16px #29473e18;
+}
+.preview-banner button {
+  min-height: 40px;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  padding: 0 14px;
+}
+.preview-banner button + button {
+  border-left: 1px solid #78927c;
+  letter-spacing: 0;
+  font-size: 12px;
+}
+.construction-status {
+  position: absolute;
+  top: 16px;
+  left: calc(50% + 50px);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #faf9f4e8;
+  border: 1px solid #dfd6b9;
+  border-radius: 25px;
+  padding: 0 6px 0 16px;
+  font-size: 12px;
+  box-shadow: 0 4px 15px #29473e12;
+}
+.construction-status button {
+  min-height: 40px;
+  min-width: 50px;
+  font-size: 12px;
+  text-decoration: underline;
+}
+.developer-entry {
+  font-size: 12px;
+  opacity: 0.85;
+}
+@media (max-width: 650px) and (orientation: portrait) {
+  .selecting-home {
+    --sheet: 43%;
+  }
+  .preview-mode {
+    --sheet: 42%;
+  }
+  .preview-mode.preview-collapsed:not(.selecting-home) {
+    --sheet: 65px;
+  }
+  .selecting-home app-town,
+  .preview-mode app-town,
+  .preview-mode.preview-collapsed app-town {
+    left: 0;
+    bottom: calc(var(--sheet) - 9px);
+  }
+  .construction-status {
+    left: 18px;
+    top: 12px;
+    font-size: 11px;
+  }
+  .preview-banner {
+    right: 12px;
+    top: 12px;
+  }
+  .preview-banner button {
+    font-size: 9px;
+    padding: 0 10px;
+  }
+}
+@media (orientation: landscape) and (max-height: 550px) {
+  .selecting-home app-town,
+  .preview-mode app-town {
+    left: 320px;
+  }
+  .preview-mode.preview-collapsed app-town {
+    left: 0;
+  }
+  .preview-banner {
+    top: 6px;
+    right: 12px;
+  }
+  .preview-banner button {
+    min-height: 36px;
+  }
+  .construction-status {
+    left: auto;
+    right: 12px;
+    top: 48px;
+  }
+}

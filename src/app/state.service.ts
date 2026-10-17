@@ -228,12 +228,21 @@ export class FoundationsStore implements OnDestroy {
       habits: s.habits.map((h) => (h.id === id ? { ...h, archived: !h.archived } : h)),
     }));
   }
-  design(project: string, choice: string): Promise<void> {
+  async design(project: string, choice: string): Promise<boolean> {
+    let first = project === 'home' && !this.state().designs['home'];
     if (this.preview()) {
       this.previewDesign(project, choice);
-      return Promise.resolve();
+      return first;
     }
-    return this.commit((s) => selectDesign(s, project, choice), false, project === 'home');
+    await this.commit(
+      (s) => {
+        first = project === 'home' && !s.designs['home'];
+        return selectDesign(s, project, choice);
+      },
+      false,
+      project === 'home',
+    );
+    return first;
   }
   preferences(patch: Partial<Preferences>): Promise<void> {
     return this.commit((s) => ({ ...s, preferences: { ...s.preferences, ...patch } }));
@@ -259,6 +268,13 @@ export class FoundationsStore implements OnDestroy {
     const text = localStorage.getItem(MIGRATION_BACKUP_KEY);
     if (!text) throw new Error('No pre-upgrade backup is stored in this browser.');
     this.download(text, 'pre-upgrade-');
+  }
+  migrationBackupAvailable(): boolean {
+    try {
+      return !!localStorage.getItem(MIGRATION_BACKUP_KEY);
+    } catch {
+      return false;
+    }
   }
   private download(text: string, prefix: string) {
     const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));

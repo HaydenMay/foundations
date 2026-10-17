@@ -20,6 +20,7 @@ import type { TownScene } from './scene';
   host: {
     '[attr.data-lighting]': 'lightLabel()',
     '[attr.data-construction]': "building() ? 'active' : 'idle'",
+    '[attr.data-home-visible]': "designs()['home'] ? 'true' : 'false'",
   },
   template: ` <div #viewport class="viewport"></div>
     @if (failed()) {
@@ -223,7 +224,11 @@ export class TownComponent implements OnDestroy {
   readonly sessionKey = input(0);
   readonly construction = input(0);
   readonly constructionFinished = output<{ id: number; sessionKey: number }>();
-  readonly cameraChange = output<{ camera: CameraState; sessionKey: number }>();
+  readonly cameraChange = output<{
+    camera: CameraState;
+    sessionKey: number;
+    position: { x: number; y: number; z: number } | null;
+  }>();
   readonly lightChange = output<string>();
   readonly lightLabel = signal('day');
   readonly failed = signal(false);
@@ -255,8 +260,14 @@ export class TownComponent implements OnDestroy {
               this.timer = setTimeout(
                 () =>
                   this.zone.run(() => {
-                    if (sessionKey === this.sessionKey())
-                      this.cameraChange.emit({ camera: state, sessionKey });
+                    if (sessionKey === this.sessionKey()) {
+                      const p = this.scene?.camera.camera.position;
+                      this.cameraChange.emit({
+                        camera: state,
+                        sessionKey,
+                        position: p ? { x: p.x, y: p.y, z: p.z } : null,
+                      });
+                    }
                   }),
                 200,
               );

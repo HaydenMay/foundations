@@ -1,0 +1,139 @@
+:host {
+  position: absolute;
+  left: 18px;
+  bottom: 20px;
+  width: 330px;
+  max-height: calc(100% - 75px);
+  display: flex;
+  z-index: 4;
+  background: var(--cream);
+  border: 1px solid #cdd9c6;
+  border-radius: 18px;
+  box-shadow: 0 8px 30px #233d3218;
+  overflow: hidden;
+}
+aside {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+}
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  min-height: 52px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+  font-size: 13px;
+}
+.content {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 18px 18px;
+  scrollbar-width: thin;
+}
+.intro,
+.hint {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 12px 0;
+}
+section {
+  border-top: 1px solid var(--line);
+  padding: 14px 0 5px;
+}
+h3 {
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: #4c6854;
+  margin-bottom: 10px;
+}
+label {
+  display: block;
+  font-size: 11px;
+  margin: 10px 0 5px;
+}
+input,
+select {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+}
+button:not(.toggle) {
+  border: 1px solid #ccd7c3;
+  border-radius: 8px;
+  background: #f0f3e9;
+  padding: 8px 10px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.row {
+  display: flex;
+  gap: 8px;
+}
+.row input {
+  flex: 1;
+}
+.wide {
+  width: 100%;
+  margin-top: 9px;
+}
+.two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 9px;
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+}
+.check input {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  accent-color: var(--green);
+}
+output {
+  font-size: 11px;
+  line-height: 1.9;
+  display: block;
+  font-variant-numeric: tabular-nums;
+}
+.error {
+  font-size: 12px;
+  color: #8c4d38;
+}
+@media (max-width: 650px) and (orientation: portrait) {
+  :host {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: var(--sheet);
+    max-height: none;
+    border-radius: 22px 22px 0 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+@media (orientation: landscape) and (max-height: 550px) {
+  :host {
+    left: 14px;
+    top: 54px;
+    bottom: 13px;
+    width: 300px;
+    max-height: none;
+  }
+  :host(.collapsed) {
+    top: auto;
+    height: 52px;
+  }
+  .toggle {
+    min-height: 48px;
+  }
+}

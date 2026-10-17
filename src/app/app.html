@@ -20,14 +20,21 @@
   </nav>
 </header>
 <main
-  [class.panel-collapsed]="!store.state().preferences.panelOpen"
+  [class.panel-collapsed]="
+    !store.state().preferences.panelOpen && !choosingHome() && !store.preview()
+  "
   [class.night]="sceneLight() === 'night'"
+  [class.selecting-home]="choosingHome()"
+  [class.preview-mode]="!!store.preview()"
+  [class.preview-collapsed]="!previewPanelOpen()"
 >
   <section class="town-area" aria-label="Your miniature neighborhood">
     <app-town
-      [designs]="store.state().designs"
+      [designs]="renderDesigns()"
       [preferences]="store.state().preferences"
       [sessionKey]="store.sessionKey()"
+      [construction]="construction()"
+      (constructionFinished)="constructionFinished($event)"
       (cameraChange)="cameraChanged($event)"
       (lightChange)="sceneLight.set($event)"
     />
@@ -51,122 +58,161 @@
       <app-icon name="leaf" /><span>Room to grow. Time to breathe.</span>
     </div>
   </section>
-  <aside
-    class="habit-panel"
-    [class.collapsed]="!store.state().preferences.panelOpen"
-    aria-label="Habit panel"
-  >
-    <button
-      class="panel-toggle"
-      (click)="togglePanel()"
-      [attr.aria-expanded]="store.state().preferences.panelOpen"
-      [attr.aria-label]="store.state().preferences.panelOpen ? 'Collapse habits' : 'Expand habits'"
+  @if (store.preview()) {
+    <div class="preview-banner">
+      <button data-testid="preview-badge" (click)="showPreviewControls()">DEVELOPER PREVIEW</button
+      ><button aria-label="Exit Developer Preview" (click)="exitPreview()">Exit</button>
+    </div>
+    @if (!choosingHome()) {
+      <app-developer-panel
+        [class.collapsed]="!previewPanelOpen()"
+        [open]="previewPanelOpen()"
+        [position]="cameraPosition()"
+        (toggle)="previewPanelOpen.set(!previewPanelOpen())"
+        (construct)="previewConstruction()"
+        (home)="town()?.command('home')"
+      />
+    }
+  }
+  @if (choosingHome()) {
+    <app-home-selection
+      [first]="firstSelection()"
+      [choice]="draftHome()"
+      [busy]="busy()"
+      (preview)="draftHome.set($event)"
+      (confirm)="confirmHome()"
+      (cancel)="cancelHome()"
+    />
+  }
+  @if (construction()) {
+    <div class="construction-status" role="status">
+      <span>A home, built by you.</span
+      ><button aria-label="Skip construction" (click)="skipConstruction()">Skip</button>
+    </div>
+  }
+  @if (!store.preview() && !choosingHome()) {
+    <aside
+      class="habit-panel"
+      [class.collapsed]="!store.state().preferences.panelOpen"
+      aria-label="Habit panel"
     >
-      <span class="grabber"></span
-      ><span class="collapsed-title"
-        >Your daily foundations
-        <strong>{{ store.daily() }} / 10 <app-icon name="star" /></strong></span
-      ><app-icon name="chevron" />
-    </button>
-    <div class="panel-content" [hidden]="!store.state().preferences.panelOpen">
-      <div class="panel-heading">
-        <div>
-          <span class="eyebrow">{{
-            store.today() + 'T12:00:00Z' | date: 'EEEE, MMMM d' : 'UTC'
-          }}</span>
-          <h2>Today’s foundations</h2>
-        </div>
-        <span class="sprout"><app-icon name="leaf" /></span>
-      </div>
-      <p class="panel-intro">A little care for you. A little growth for your town.</p>
-      <div class="daily-progress">
-        <span>Today’s stars</span><strong data-testid="daily-stars">{{ store.daily() }} / 10</strong
-        ><app-icon name="star" />
-      </div>
-      <div
-        class="progress-track"
-        role="progressbar"
-        aria-label="Daily stars"
-        [attr.aria-valuenow]="store.daily()"
-        aria-valuemin="0"
-        aria-valuemax="10"
+      <button
+        class="panel-toggle"
+        (click)="togglePanel()"
+        [attr.aria-expanded]="store.state().preferences.panelOpen"
+        [attr.aria-label]="
+          store.state().preferences.panelOpen ? 'Collapse habits' : 'Expand habits'
+        "
       >
-        <span [style.width.%]="store.daily() * 10"></span>
-      </div>
-      <div class="habit-list">
-        @for (h of due(); track h.id) {
-          <div class="habit-row" [class.is-done]="done(h)">
-            <button
-              class="complete-button"
-              [disabled]="done(h) || busy()"
-              [attr.aria-label]="(done(h) ? 'Completed ' : 'Complete ') + h.name"
-              (click)="complete(h)"
-            >
-              @if (done(h)) {
-                <app-icon name="check" />
-              }
-            </button>
-            <div class="habit-copy">
-              <strong>{{ h.name }}</strong
-              ><span>{{
-                done(h)
-                  ? h.schedule.kind === 'weekly'
-                    ? 'Done this week'
-                    : 'A little promise kept'
-                  : scheduleLabel(h)
-              }}</span>
-            </div>
-            <span class="habit-stars">{{ values[h.difficulty] }}<app-icon name="star" /></span>
+        <span class="grabber"></span
+        ><span class="collapsed-title"
+          >Your daily foundations
+          <strong>{{ store.daily() }} / 10 <app-icon name="star" /></strong></span
+        ><app-icon name="chevron" />
+      </button>
+      <div class="panel-content" [hidden]="!store.state().preferences.panelOpen">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">{{
+              store.today() + 'T12:00:00Z' | date: 'EEEE, MMMM d' : 'UTC'
+            }}</span>
+            <h2>Today’s foundations</h2>
           </div>
-        } @empty {
-          <p class="empty-state">
-            A little breathing room today.<br />Your town is right where you left it.
+          <span class="sprout"><app-icon name="leaf" /></span>
+        </div>
+        <p class="panel-intro">A little care for you. A little growth for your town.</p>
+        <div class="daily-progress">
+          <span>Today’s stars</span
+          ><strong data-testid="daily-stars">{{ store.daily() }} / 10</strong
+          ><app-icon name="star" />
+        </div>
+        <div
+          class="progress-track"
+          role="progressbar"
+          aria-label="Daily stars"
+          [attr.aria-valuenow]="store.daily()"
+          aria-valuemin="0"
+          aria-valuemax="10"
+        >
+          <span [style.width.%]="store.daily() * 10"></span>
+        </div>
+        <div class="habit-list">
+          @for (h of due(); track h.id) {
+            <div class="habit-row" [class.is-done]="done(h)">
+              <button
+                class="complete-button"
+                [disabled]="done(h) || busy()"
+                [attr.aria-label]="(done(h) ? 'Completed ' : 'Complete ') + h.name"
+                (click)="complete(h)"
+              >
+                @if (done(h)) {
+                  <app-icon name="check" />
+                }
+              </button>
+              <div class="habit-copy">
+                <strong>{{ h.name }}</strong
+                ><span>{{
+                  done(h)
+                    ? h.schedule.kind === 'weekly'
+                      ? 'Done this week'
+                      : 'A little promise kept'
+                    : scheduleLabel(h)
+                }}</span>
+              </div>
+              <span class="habit-stars">{{ values[h.difficulty] }}<app-icon name="star" /></span>
+            </div>
+          } @empty {
+            <p class="empty-state">
+              A little breathing room today.<br />Your town is right where you left it.
+            </p>
+          }
+        </div>
+        @if (scheduledTomorrow()) {
+          <p class="hint tomorrow">
+            {{ scheduledTomorrow() }} new
+            {{ scheduledTomorrow() === 1 ? 'habit begins' : 'habits begin' }} tomorrow.
           </p>
         }
-      </div>
-      @if (scheduledTomorrow()) {
-        <p class="hint tomorrow">
-          {{ scheduledTomorrow() }} new
-          {{ scheduledTomorrow() === 1 ? 'habit begins' : 'habits begin' }} tomorrow.
-        </p>
-      }
-      <button class="add-habit" (click)="add()"><app-icon name="plus" /> Add a habit</button>
-      <div class="panel-links">
-        <button (click)="show('manage')">Manage habits</button><span>·</span
-        ><button (click)="show('history')">View history</button>
-      </div>
-      <div class="next-project">
-        <span class="project-icon"
-          ><app-icon [name]="store.pending().length ? 'paint' : 'home'"
-        /></span>
-        <div>
-          <span class="eyebrow">{{
-            store.pending().length ? 'READY WHEN YOU ARE' : 'GROWING TOWARD'
-          }}</span
-          ><strong>{{
-            store.pending().length
-              ? store.pending()[0].name
-              : store.next()?.name || 'Your little cul-de-sac'
-          }}</strong
-          ><span>{{
-            store.pending().length
-              ? 'Choose a design. Make it yours.'
-              : store.next()
-                ? store.next()!.threshold - store.stars() + ' more lifetime stars'
-                : 'Every healthy step still counts.'
-          }}</span>
+        <button class="add-habit" (click)="add()"><app-icon name="plus" /> Add a habit</button>
+        <div class="panel-links">
+          <button (click)="show('manage')">Manage habits</button><span>·</span
+          ><button (click)="show('history')">View history</button>
         </div>
-        <button
-          class="icon-button"
-          aria-label="View construction projects"
-          (click)="show('projects')"
-        >
-          <app-icon name="arrow" />
-        </button>
+        <div class="next-project">
+          <span class="project-icon"
+            ><app-icon [name]="store.pending().length ? 'paint' : 'home'"
+          /></span>
+          <div>
+            <span class="eyebrow">{{
+              store.pending().length ? 'READY WHEN YOU ARE' : 'GROWING TOWARD'
+            }}</span
+            ><strong>{{
+              store.pending().length
+                ? store.pending()[0].name
+                : store.next()?.name || 'Your little cul-de-sac'
+            }}</strong
+            ><span>{{
+              store.pending().length
+                ? 'Choose a design. Make it yours.'
+                : store.next()
+                  ? store.next()!.id === 'home'
+                    ? 'One healthy step, whenever you are ready.'
+                    : store.next()!.threshold - store.stars() + ' more lifetime stars'
+                  : 'Every healthy step still counts.'
+            }}</span>
+          </div>
+          <button
+            class="icon-button"
+            aria-label="View construction projects"
+            (click)="show('projects')"
+          >
+            <app-icon name="arrow" />
+          </button>
+        </div>
+        <p class="gentle-note"><app-icon name="leaf" /> No streaks. No rush. Just you, growing.</p>
       </div>
-      <p class="gentle-note"><app-icon name="leaf" /> No streaks. No rush. Just you, growing.</p>
-    </div>
-  </aside>
+    </aside>
+  }
 </main>
 @if (store.warning()) {
   <div class="storage-warning" role="alert">
@@ -215,7 +261,7 @@
               <span class="project-icon"><app-icon [name]="unlocked(p) ? p.icon : 'lock'" /></span>
               <div>
                 <span class="eyebrow">{{
-                  p.threshold === 0 ? 'YOUR BEGINNING' : p.threshold + ' LIFETIME STARS'
+                  p.id === 'home' ? 'YOUR FIRST HEALTHY STEP' : p.threshold + ' LIFETIME STARS'
                 }}</span>
                 <h3>{{ p.name }}</h3>
                 <p>
@@ -235,7 +281,9 @@
                       ? 'Change design'
                       : unlocked(p)
                         ? 'Make it yours'
-                        : p.threshold - store.stars() + ' stars to go'
+                        : p.id === 'home'
+                          ? 'Complete your first habit'
+                          : p.threshold - store.stars() + ' stars to go'
                   }}
                   @if (unlocked(p)) {
                     <app-icon name="arrow" />
@@ -347,6 +395,16 @@
         <p class="hint">
           Sunrise around 6 am, sunset around 6 pm. Uses your device clock, without location access.
         </p>
+        @if (!store.preview()) {
+          <button class="text-button developer-entry" (click)="show('preview-entry')">
+            Developer Preview
+          </button>
+        } @else {
+          <p class="hint note">
+            Developer Preview is active. Exports below contain your genuine progress. Exit preview
+            before importing a backup.
+          </p>
+        }
         <hr />
         <h3>Your progress, on this device</h3>
         <p class="muted">
@@ -360,6 +418,7 @@
           id="backup-file"
           type="file"
           accept=".json,application/json"
+          [disabled]="!!store.preview()"
           (change)="importFile($event)"
         />
         @if (backup(); as b) {
@@ -381,6 +440,11 @@
         <button class="text-button" (click)="store.exportBackup(true)">
           Export original storage for recovery
         </button>
+        @if (store.migrationBackupAvailable()) {
+          <button class="text-button" (click)="exportUpgradeBackup()">
+            Export pre-upgrade backup
+          </button>
+        }
         <hr />
         <h3>Small steps, lasting foundations</h3>
         <p class="muted">
@@ -395,6 +459,17 @@
           Foundations is a personal habit companion, not medical advice. Choose habits that suit
           your own needs.
         </p>
+      }
+      @case ('preview-entry') {
+        <p class="muted">Explore houses, projects and lighting in a disposable working copy.</p>
+        <p class="hint note">
+          Your genuine habits, stars, city and backups stay separate. Reloading or exiting returns
+          to real progress. This is a development tool, available locally without an account.
+        </p>
+        <button class="primary full" [disabled]="busy()" (click)="enterPreview()">
+          Enter Developer Preview
+        </button>
+        <button class="text-button" (click)="show('settings')">Back to Settings</button>
       }
     }
   </div>

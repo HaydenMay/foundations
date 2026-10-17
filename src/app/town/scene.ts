@@ -127,10 +127,19 @@ export class TownScene {
       animation.request = requestAnimationFrame(frame);
       if (now - animation.last < 1000 / 30) return;
       animation.last = now;
+      // Cache shadows during the small reveal; refresh only at visibility changes and settlement.
+      const visibilityChanged = home.visible !== phase.visible;
+      if (
+        !visibilityChanged &&
+        home.scale.x === phase.scale &&
+        home.position.y === animation.baseY + phase.rise &&
+        phase.homeT === 1
+      )
+        return;
       home.visible = phase.visible;
       home.scale.setScalar(phase.scale);
       home.position.y = animation.baseY + phase.rise;
-      this.renderer.shadowMap.needsUpdate = true;
+      if (visibilityChanged) this.renderer.shadowMap.needsUpdate = true;
       this.camera.set(homeTransition(animation.from, phase.homeT));
     };
     animation.request = requestAnimationFrame(frame);

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { initialState } from '../src/app/domain/state';
+import { existingState as initialState, openTown } from './support';
 import { completeHabit, createHabit } from '../src/app/domain/habits';
 import { localDate } from '../src/app/domain/dates';
 import { PROJECTS } from '../src/app/domain/progression';
@@ -7,7 +7,7 @@ import { PROJECTS } from '../src/app/domain/progression';
 test('renders the town and keeps progress and panel preference after reload', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  await page.goto('./');
+  await openTown(page);
   await expect(page.getByRole('heading', { name: 'Today’s foundations' })).toBeVisible();
   await expect(page.locator('canvas[data-rendered="true"]')).toBeVisible();
   await page.getByRole('button', { name: 'Complete Step outside for a little walk' }).click();
@@ -25,7 +25,7 @@ test('renders the town and keeps progress and panel preference after reload', as
 });
 
 test('creates, edits, pauses and archives a next-day habit', async ({ page }) => {
-  await page.goto('./');
+  await openTown(page);
   await page.getByRole('button', { name: 'Add a habit' }).click();
   await page.getByLabel('Habit name').fill('Read a few pages');
   await page.getByLabel('Frequency').selectOption('weekdays');
@@ -65,7 +65,7 @@ test('preserves queued projects and changes designs freely', async ({ page }) =>
     }
   }
   await page.addInitScript((s) => localStorage.setItem('foundations.v1', JSON.stringify(s)), state);
-  await page.goto('./');
+  await openTown(page);
   await page.getByRole('button', { name: /Your town/ }).click();
   await page.getByRole('button', { name: 'Design Your backyard retreat' }).click();
   await page.getByRole('button', { name: /Quiet waters/ }).click();
@@ -88,7 +88,7 @@ test('preserves queued projects and changes designs freely', async ({ page }) =>
 test('supports lighting, camera controls, and fitting portrait or landscape UI', async ({
   page,
 }, info) => {
-  await page.goto('./');
+  await openTown(page);
   await expect(page.locator('canvas[data-rendered="true"]')).toBeVisible();
   await page.getByRole('button', { name: 'Rotate town clockwise' }).click();
   await page.getByRole('button', { name: 'Zoom in' }).click();
@@ -109,7 +109,7 @@ test('supports lighting, camera controls, and fitting portrait or landscape UI',
 });
 
 test('exports a backup and rejects invalid imports without losing progress', async ({ page }) => {
-  await page.goto('./');
+  await openTown(page);
   await page.getByRole('button', { name: 'Settings' }).click();
   const download = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Export backup' }).click();
@@ -127,7 +127,7 @@ test('exports a backup and rejects invalid imports without losing progress', asy
 test('keeps a camera change when a habit is completed before its debounced save', async ({
   page,
 }) => {
-  await page.goto('./');
+  await openTown(page);
   await expect(page.locator('canvas[data-rendered="true"]')).toBeVisible();
   await page.evaluate(() => {
     (document.querySelector('[aria-label="Rotate town clockwise"]') as HTMLButtonElement).click();
@@ -148,7 +148,7 @@ test('keeps a camera change when a habit is completed before its debounced save'
 });
 
 test('pans with a drag, zooms with the wheel and restores home', async ({ page }) => {
-  await page.goto('./');
+  await openTown(page);
   const canvas = page.locator('canvas[data-rendered="true"]');
   await expect(canvas).toBeVisible();
   const rect = (await canvas.boundingBox())!;
@@ -189,7 +189,7 @@ test('supports touch pan and a two-finger pinch on the town', async ({
   isMobile,
 }) => {
   test.skip(!isMobile, 'Touch is exercised in the two phone viewports.');
-  await page.goto('./');
+  await openTown(page);
   const canvas = page.locator('canvas[data-rendered="true"]');
   await expect(canvas).toBeVisible();
   const rect = (await canvas.boundingBox())!,
@@ -243,7 +243,7 @@ test('restores a validated backup after an explicit preview', async ({ page }) =
   let s = initialState(date);
   s = completeHabit(s, s.habits[2].id, date);
   s.preferences.camera = { x: 1, z: 2, zoom: 0.8, angle: Math.PI };
-  await page.goto('./');
+  await openTown(page);
   await page.getByRole('button', { name: 'Settings' }).click();
   await page.getByLabel('Import backup file').setInputFiles({
     name: 'backup.json',
@@ -267,7 +267,7 @@ test('restores a validated backup after an explicit preview', async ({ page }) =
 });
 
 test('does not duplicate a completion from two open tabs', async ({ page, context }) => {
-  await page.goto('./');
+  await openTown(page);
   const other = await context.newPage();
   await other.goto('./');
   const first = await page
@@ -313,7 +313,7 @@ test('renders every built project and each time of day', async ({ page }, info) 
     if (!localStorage.getItem('foundations.v1'))
       localStorage.setItem('foundations.v1', JSON.stringify(state));
   }, s);
-  await page.goto('./');
+  await openTown(page, s);
   await expect(page.locator('canvas[data-rendered="true"]')).toBeVisible();
   await page.screenshot({ path: `test-results/${info.project.name}-complete-day.png` });
   await page.getByRole('button', { name: 'Settings' }).click();

@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { initialState } from '../src/app/domain/state';
+import { existingState as initialState, openTown } from './support';
 import { completeHabit } from '../src/app/domain/habits';
 import type { WebGLRenderer, Scene, Camera } from 'three';
 
@@ -14,6 +14,14 @@ test.use({ timezoneId: 'Pacific/Auckland' });
 async function choose(page: Page, project: string, choice: string) {
   await page.getByRole('button', { name: 'Your town', exact: true }).click();
   await page.getByRole('button', { name: `Design ${project}`, exact: true }).click();
+  if (project === 'Your First Home') {
+    await page.getByRole('button', { name: `Preview ${choice}`, exact: true }).click();
+    await page.getByRole('button', { name: 'Save house style', exact: true }).click();
+    await expect(
+      page.getByRole('button', { name: 'Save house style', exact: true }),
+    ).not.toBeVisible();
+    return;
+  }
   await page.getByRole('button', { name: new RegExp(choice) }).click();
   await expect(page.getByRole('heading', { name: 'Your growing town', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Close dialog' }).click();
@@ -24,13 +32,13 @@ const saved = (page: Page) =>
 test('all three house appearances are free, selectable and retained after reload', async ({
   page,
 }) => {
-  await page.goto('./');
+  await openTown(page);
   for (const [name, id] of [
     ['Classic Cottage', 'sage'],
     ['Modern Craftsman', 'cream'],
     ['Traditional Brick', 'blue'],
   ]) {
-    await choose(page, 'A place to begin', name);
+    await choose(page, 'Your First Home', name);
     await page.reload();
     await expect(page.locator('canvas[data-rendered="true"]')).toBeVisible();
     expect((await saved(page)).designs.home).toBe(id);
@@ -39,12 +47,12 @@ test('all three house appearances are free, selectable and retained after reload
     await expect(
       page.getByRole('button', { name: 'Design Your backyard retreat', exact: true }),
     ).toBeDisabled();
-    await page.getByRole('button', { name: 'Design A place to begin', exact: true }).click();
+    await page.getByRole('button', { name: 'Design Your First Home', exact: true }).click();
     await expect(page.getByRole('button', { name: new RegExp(name) })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
-    await page.getByRole('button', { name: 'Close dialog' }).click();
+    await page.getByRole('button', { name: 'Keep my current home', exact: true }).click();
   }
 });
 
@@ -57,20 +65,18 @@ test('legacy v1 town keeps archived history, roof design and twelve stars throug
   state.habits[0].archived = true;
   state.designs = { home: 'blue', backyard: 'fort', exterior: 'moss' };
   state.preferences.lighting = 'night';
-  await page.addInitScript((s) => {
-    if (!localStorage.getItem('foundations.v1'))
-      localStorage.setItem('foundations.v1', JSON.stringify(s));
-  }, state);
-  await page.goto('./');
+  const legacy: Record<string, unknown> = { ...state, version: 1 };
+  delete legacy['onboarding'];
+  await openTown(page, legacy);
   for (const home of ['Classic Cottage', 'Modern Craftsman', 'Traditional Brick']) {
-    await choose(page, 'A place to begin', home);
+    await choose(page, 'Your First Home', home);
     for (const yard of ['Quiet waters', 'Woodland fort', 'A little lift'])
       await choose(page, 'Your backyard retreat', yard);
   }
   await page.reload();
   await expect(page.locator('app-town')).toHaveAttribute('data-lighting', 'night');
   const restored = await saved(page);
-  expect(restored.version).toBe(1);
+  expect(restored.version).toBe(2);
   expect(restored.habits).toEqual(state.habits);
   expect(restored.completions).toEqual(state.completions);
   expect(restored.completions.reduce((n: number, c: { stars: number }) => n + c.stars, 0)).toBe(12);
@@ -81,7 +87,7 @@ test('device local clock follows four moods and manual override survives clock c
   page,
 }) => {
   await page.clock.install({ time: new Date('2026-10-17T17:00:00Z') }); // 6 am in Auckland, not UTC.
-  await page.goto('./');
+  await openTown(page);
   await expect(page.locator('app-town')).toHaveAttribute('data-lighting', 'sunrise');
   for (const [utc, mood] of [
     ['2026-10-17T23:00:00Z', 'day'],
@@ -123,7 +129,7 @@ test('home stays visible with both panel states, no overlaid headline or WebGL e
       };
     });
   });
-  await page.goto('./');
+  await openTown(page);
   await expect(page.locator('canvas[data-rendered="true"]')).toBeVisible();
   for (const collapsed of [false, true]) {
     if (collapsed) await page.getByRole('button', { name: 'Collapse habits' }).click();

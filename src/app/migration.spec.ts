@@ -75,4 +75,12 @@ describe('safe v2 upgrade and durable first house', () => {
     expect(s.state().designs['home']).toBeUndefined();
     expect(localStorage.getItem(STORAGE_KEY)).toBe(before);
   });
+  it('acknowledges first construction only for the first confirmed writer', async () => {
+    const s = make();
+    await s.complete(s.state().habits[1].id);
+    const other = make();
+    const results = await Promise.all([s.design('home', 'sage'), other.design('home', 'cream')]);
+    expect(results).toEqual([true, false]);
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).completions).toHaveLength(1);
+  });
 });

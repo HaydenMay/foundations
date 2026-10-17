@@ -45,6 +45,14 @@ try {
       });
     });
     await page.goto(url);
+    // This art-review tool inspects an existing homeowner; onboarding has its own capture script.
+    await page.evaluate(() => {
+      const state = JSON.parse(localStorage.getItem('foundations.v1'));
+      state.onboarding.firstHomeUnlocked = true;
+      state.designs.home = 'sage';
+      localStorage.setItem('foundations.v1', JSON.stringify(state));
+    });
+    await page.reload();
     await page.locator('canvas[data-rendered="true"]').waitFor();
     async function lighting(value) {
       await page.getByRole('button', { name: 'Settings', exact: true }).click();
@@ -54,6 +62,14 @@ try {
     async function design(project, name) {
       await page.getByRole('button', { name: 'Your town', exact: true }).click();
       await page.getByRole('button', { name: `Design ${project}`, exact: true }).click();
+      if (project === 'Your First Home') {
+        await page.getByRole('button', { name: `Preview ${name}`, exact: true }).click();
+        await page.getByRole('button', { name: 'Save house style', exact: true }).click();
+        await page
+          .getByRole('button', { name: 'Save house style', exact: true })
+          .waitFor({ state: 'hidden' });
+        return;
+      }
       await page.getByRole('button', { name: new RegExp(name) }).click();
       await page.getByRole('heading', { name: 'Your growing town', exact: true }).waitFor();
       await page.getByRole('button', { name: 'Close dialog' }).click();
@@ -133,10 +149,10 @@ try {
         ['Modern Craftsman', 'craftsman'],
         ['Traditional Brick', 'brick'],
       ]) {
-        await design('A place to begin', name);
+        await design('Your First Home', name);
         await capture(`house-${id}-portrait`);
       }
-      await design('A place to begin', 'Classic Cottage');
+      await design('Your First Home', 'Classic Cottage');
     }
     if (layout === 'desktop') {
       for (const name of [
@@ -151,10 +167,10 @@ try {
         ['Modern Craftsman', 'craftsman'],
         ['Traditional Brick', 'brick'],
       ]) {
-        await design('A place to begin', name);
+        await design('Your First Home', name);
         await capture(`house-${id}-desktop`);
       }
-      await design('A place to begin', 'Classic Cottage');
+      await design('Your First Home', 'Classic Cottage');
     }
     await page.getByRole('button', { name: 'Collapse habits' }).click();
     await page.getByRole('button', { name: 'Expand habits' }).waitFor();
@@ -171,7 +187,7 @@ try {
         ['Modern Craftsman', 'craftsman'],
         ['Traditional Brick', 'brick'],
       ]) {
-        await design('A place to begin', home);
+        await design('Your First Home', home);
         await page.getByRole('button', { name: 'Return to your first home' }).click();
         for (let i = 0; i < 4; i++)
           await page.getByRole('button', { name: 'Rotate town clockwise' }).click();

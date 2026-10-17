@@ -1,0 +1,130 @@
+:host {
+  display: block;
+  position: absolute;
+  left: 28px;
+  bottom: 30px;
+  width: 354px;
+  max-height: calc(100% - 44px);
+  background: var(--cream);
+  border: 1px solid #fff;
+  border-radius: 22px;
+  z-index: 4;
+  box-shadow: 0 12px 36px #344a3215;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+section {
+  padding: 20px 20px 14px;
+}
+h2 {
+  font-size: 26px;
+  line-height: 1.1;
+  margin: 9px 0;
+}
+header p {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 13px;
+}
+.choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+.choices button {
+  border: 1px solid #d7dece;
+  border-radius: 12px;
+  padding: 10px 5px;
+  background: #fdfdf8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 85px;
+}
+.choices button.selected {
+  border: 2px solid #719074;
+  background: #eef2e7;
+  padding: 9px 4px;
+}
+.choices app-icon {
+  width: 24px;
+  height: 24px;
+  filter: drop-shadow(0 1px 1px #314c4140);
+}
+.choices strong {
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 600;
+}
+.description {
+  font-size: 11px;
+  color: #71806d;
+  min-height: 32px;
+  margin: 10px 0;
+  line-height: 1.5;
+}
+footer {
+  display: grid;
+  gap: 3px;
+}
+footer .later {
+  font-size: 12px;
+  min-height: 38px;
+}
+footer > span {
+  font-size: 9px;
+  color: #85917b;
+  text-align: center;
+  line-height: 1.5;
+}
+@media (max-width: 650px) and (orientation: portrait) {
+  :host {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: var(--sheet);
+    max-height: none;
+    border-radius: 24px 24px 0 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  section {
+    padding: 15px 22px 12px;
+  }
+  h2 {
+    font-size: 25px;
+    margin: 7px 0;
+  }
+  .choices button {
+    min-height: 78px;
+  }
+  header p {
+    margin-bottom: 10px;
+  }
+}
+@media (orientation: landscape) and (max-height: 550px) {
+  :host {
+    left: 14px;
+    top: 13px;
+    bottom: 13px;
+    width: 300px;
+    max-height: none;
+  }
+  section {
+    padding: 14px;
+  }
+  h2 {
+    font-size: 23px;
+  }
+  .choices button {
+    min-height: 72px;
+  }
+  .choices strong {
+    font-size: 10px;
+  }
+  .description {
+    font-size: 10px;
+  }
+}
