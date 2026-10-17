@@ -36,7 +36,8 @@ export interface Preferences {
   camera: CameraState;
 }
 export interface AppState {
-  version: 1;
+  version: 2;
+  onboarding: { firstHomeUnlocked: boolean };
   habits: Habit[];
   completions: Completion[];
   designs: Record<string, string>;

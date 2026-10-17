@@ -3,9 +3,11 @@ import { createHabit, STAR_VALUES, validateInput } from './habits';
 import { isDate, weekStart } from './dates';
 import { selectDesign } from './progression';
 export const STORAGE_KEY = 'foundations.v1';
+export const MIGRATION_BACKUP_KEY = 'foundations.pre-v2';
 export function initialState(date: string): AppState {
   return {
-    version: 1,
+    version: 2,
+    onboarding: { firstHomeUnlocked: false },
     habits: [
       createHabit(
         {
@@ -39,7 +41,7 @@ export function initialState(date: string): AppState {
       ),
     ],
     completions: [],
-    designs: { home: 'sage' },
+    designs: {},
     preferences: {
       panelOpen: true,
       lighting: 'auto',
@@ -53,15 +55,16 @@ export function exportState(state: AppState): string {
 function requireValid(condition: unknown): asserts condition {
   if (!condition)
     throw new Error(
-      'This is not a valid Foundations v1 backup. Your current data has not changed.',
+      'This is not a valid supported Foundations backup. Your current data has not changed.',
     );
 }
 export function importState(json: string): AppState {
   requireValid(typeof json === 'string' && json.length <= 5_000_000);
   const s = JSON.parse(json) as AppState;
+  const version = (s as { version: number })?.version;
   requireValid(
     s &&
-      s.version === 1 &&
+      (version === 1 || version === 2) &&
       Array.isArray(s.habits) &&
       s.habits.length <= 10000 &&
       Array.isArray(s.completions) &&
@@ -138,8 +141,21 @@ export function importState(json: string): AppState {
       Math.abs(camera.angle) <= Math.PI * 100,
   );
   requireValid(s.designs && typeof s.designs === 'object' && !Array.isArray(s.designs));
+  if (version === 1) {
+    requireValid(Object.hasOwn(s.designs, 'home'));
+    // Every v1 profile already owned a home, even with no earned stars.
+    s.version = 2;
+    s.onboarding = { ...s.onboarding, firstHomeUnlocked: true };
+  } else {
+    requireValid(
+      s.onboarding &&
+        typeof s.onboarding === 'object' &&
+        !Array.isArray(s.onboarding) &&
+        typeof s.onboarding.firstHomeUnlocked === 'boolean',
+    );
+    if (s.completions.length || s.designs['home']) s.onboarding.firstHomeUnlocked = true;
+  }
   for (const [id, choice] of Object.entries(s.designs)) selectDesign(s, id, choice);
-  requireValid(Object.hasOwn(s.designs, 'home'));
   // Parse into a fresh object so the caller cannot mutate a previously validated backup.
   return structuredClone(s);
 }

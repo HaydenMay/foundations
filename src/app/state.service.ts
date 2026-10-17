@@ -3,7 +3,13 @@ import { localDate } from './domain/dates';
 import { completeHabit, createHabit, dailyStars, editHabit, lifetimeStars } from './domain/habits';
 import { AppState, HabitInput, Preferences } from './domain/models';
 import { PROJECTS, selectDesign, unlockedProjects } from './domain/progression';
-import { exportState, importState, initialState, STORAGE_KEY } from './domain/state';
+import {
+  exportState,
+  importState,
+  initialState,
+  STORAGE_KEY,
+  MIGRATION_BACKUP_KEY,
+} from './domain/state';
 
 @Injectable({ providedIn: 'root' })
 export class FoundationsStore implements OnDestroy {
@@ -50,8 +56,10 @@ export class FoundationsStore implements OnDestroy {
       this.storageWarning();
     }
     try {
-      if (saved) this.state.set(importState(saved));
-      else if (!this.storageBlocked) this.persist(this.state());
+      if (saved) {
+        this.state.set(importState(saved));
+        if (JSON.parse(saved).version === 1) this.persist(this.state());
+      } else if (!this.storageBlocked) this.persist(this.state());
     } catch {
       this.corrupt = true;
       this.warning.set(
@@ -72,29 +80,42 @@ export class FoundationsStore implements OnDestroy {
       'Another tab saved a different town while this tab had unsaved progress. Both versions are preserved. Export this session before reloading to open the saved town. Automatic saving is paused until you explicitly import a backup.',
     );
   }
-  private persist(state: AppState): void {
+  private persist(state: AppState): boolean {
     if (this.conflict) {
       this.unsaved = true;
       this.conflictWarning();
-      return;
+      return false;
     }
     if (this.storageBlocked) {
       this.unsaved = true;
       this.storageWarning();
-      return;
+      return false;
     }
     try {
+      if (
+        this.persistedBaseline &&
+        JSON.parse(this.persistedBaseline).version === 1 &&
+        !localStorage.getItem(MIGRATION_BACKUP_KEY)
+      ) {
+        localStorage.setItem(MIGRATION_BACKUP_KEY, this.persistedBaseline);
+      }
       const serialized = exportState(state);
       localStorage.setItem(STORAGE_KEY, serialized);
       this.persistedBaseline = serialized;
       this.unsaved = false;
       this.warning.set('');
+      return true;
     } catch {
       this.unsaved = true;
       this.storageWarning();
+      return false;
     }
   }
-  private async commit(change: (s: AppState) => AppState, replace = false): Promise<void> {
+  private async commit(
+    change: (s: AppState) => AppState,
+    replace = false,
+    requireDurable = false,
+  ): Promise<void> {
     const apply = () => {
       if (this.corrupt && !replace)
         throw new Error(
@@ -134,13 +155,17 @@ export class FoundationsStore implements OnDestroy {
         }
       }
       const next = change(current);
-      this.state.set(next);
       this.corrupt = false;
       if (replace) {
         this.storageBlocked = false;
         this.conflict = false;
       }
-      this.persist(next);
+      if (requireDurable && !this.persist(next))
+        throw new Error(
+          'Your home could not be saved. Your selection is still pending. Try again when storage is available, or export your progress before closing.',
+        );
+      this.state.set(next);
+      if (!requireDurable) this.persist(next);
     };
     if (navigator.locks) await navigator.locks.request('foundations-state', apply);
     else apply();
@@ -170,7 +195,7 @@ export class FoundationsStore implements OnDestroy {
     }));
   }
   design(project: string, choice: string): Promise<void> {
-    return this.commit((s) => selectDesign(s, project, choice));
+    return this.commit((s) => selectDesign(s, project, choice), false, project === 'home');
   }
   preferences(patch: Partial<Preferences>): Promise<void> {
     return this.commit((s) => ({ ...s, preferences: { ...s.preferences, ...patch } }));

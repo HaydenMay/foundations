@@ -9,10 +9,10 @@ const choice = (id: string, name: string, description: string, color: string): C
 export const PROJECTS: Project[] = [
   {
     id: 'home',
-    name: 'A place to begin',
+    name: 'Your First Home',
     threshold: 0,
     icon: 'home',
-    description: 'Your first home. A small beginning with room to grow.',
+    description: 'Your first healthy step unlocks a home. Choose where your story begins.',
     choices: [
       choice(
         'sage',
@@ -174,8 +174,15 @@ export const PROJECTS: Project[] = [
     ],
   },
 ];
-export function unlockedProjects(state: AppState): Project[] {
-  return PROJECTS.filter((p) => lifetimeStars(state) >= p.threshold);
+export function isProjectUnlocked(
+  state: AppState,
+  project: Project,
+  stars = lifetimeStars(state),
+): boolean {
+  return project.id === 'home' ? state.onboarding.firstHomeUnlocked : stars >= project.threshold;
+}
+export function unlockedProjects(state: AppState, stars = lifetimeStars(state)): Project[] {
+  return PROJECTS.filter((p) => isProjectUnlocked(state, p, stars));
 }
 export function selectDesign(state: AppState, projectId: string, choiceId: string): AppState {
   const p = unlockedProjects(state).find((p) => p.id === projectId);

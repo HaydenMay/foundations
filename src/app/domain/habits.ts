@@ -73,6 +73,9 @@ export function completeHabit(state: AppState, id: string, date: string): AppSta
   );
   return {
     ...state,
+    onboarding: state.onboarding.firstHomeUnlocked
+      ? state.onboarding
+      : { ...state.onboarding, firstHomeUnlocked: true },
     completions: [
       ...state.completions,
       {

@@ -17,7 +17,9 @@ describe('visual production compatibility', () => {
       }
   });
   it('keeps new house appearances free and the backyard reward gated', () => {
-    const state = initialState('2026-10-17');
+    const state = importState(
+      JSON.stringify({ ...initialState('2026-10-17'), version: 1, designs: { home: 'sage' } }),
+    );
     for (const id of ['sage', 'cream', 'blue'])
       expect(lifetimeStars(selectDesign(state, 'home', id))).toBe(0);
     expect(() => selectDesign(state, 'backyard', 'pool')).toThrow();
