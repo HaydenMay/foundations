@@ -16,12 +16,22 @@ export const PROJECTS: Project[] = [
     choices: [
       choice(
         'sage',
-        'Sage cottage',
-        'Soft green siding, a slate roof and warm white trim.',
-        '#8eaa93',
+        'Classic Cottage',
+        'Cream clapboard, dark shingles, twin dormers and a welcoming white porch.',
+        '#d7d0ba',
       ),
-      choice('cream', 'Warm linen', 'Cream siding with a weathered terracotta roof.', '#e0d3b6'),
-      choice('blue', 'Coastal blue', 'Dusty blue siding and a charcoal roof.', '#8da9b6'),
+      choice(
+        'cream',
+        'Modern Craftsman',
+        'Warm timber, layered gables and stone porch supports.',
+        '#ae8b62',
+      ),
+      choice(
+        'blue',
+        'Traditional Brick',
+        'Warm brick, charcoal shingles, white trim and a classic entrance.',
+        '#a66f55',
+      ),
     ],
   },
   {

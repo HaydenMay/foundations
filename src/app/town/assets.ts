@@ -1,4 +1,5 @@
 import * as T from 'three';
+import { plantTree, shrub } from './landscaping';
 
 export interface HouseStyle {
   wall: string;
@@ -18,9 +19,36 @@ export class AssetLibrary {
   readonly lamps: T.PointLight[] = [];
   private readonly materials = new Map<string, T.MeshStandardMaterial>();
   private readonly geometries = new Set<T.BufferGeometry>();
+  private readonly geometryCache = new Map<string, T.BufferGeometry>();
+  private readonly textures = new Set<T.Texture>();
   private readonly cube = this.geometry(new T.BoxGeometry(1, 1, 1));
   private readonly ball = this.geometry(new T.IcosahedronGeometry(1, 1));
   private readonly round = this.geometry(new T.CylinderGeometry(1, 1, 1, 12));
+  namedMaterial(name: string, create: () => T.MeshStandardMaterial): T.MeshStandardMaterial {
+    if (!this.materials.has(name)) this.materials.set(name, create());
+    return this.materials.get(name)!;
+  }
+  texture(texture: T.Texture) {
+    this.textures.add(texture);
+    return texture;
+  }
+  cachedGeometry(name: string, create: () => T.BufferGeometry): T.BufferGeometry {
+    if (!this.geometryCache.has(name)) this.geometryCache.set(name, this.geometry(create()));
+    return this.geometryCache.get(name)!;
+  }
+  glass(): T.MeshStandardMaterial {
+    return this.namedMaterial('warm-window-glass', () => {
+      const m = new T.MeshStandardMaterial({
+        color: '#657f7e',
+        roughness: 0.32,
+        metalness: 0.1,
+        emissive: '#ffbd64',
+        emissiveIntensity: 0,
+      });
+      this.windows.push(m);
+      return m;
+    });
+  }
   material(color: string, extra?: T.MeshStandardMaterialParameters) {
     if (extra) {
       const m = new T.MeshStandardMaterial({ color, roughness: 0.9, ...extra });
@@ -128,8 +156,7 @@ export class AssetLibrary {
   ) {
     const g = this.group(parent, x, y, z, rotation);
     this.box(g, '#f0ebdd', 0, 0, 0, width + 0.2, height + 0.2, 0.13);
-    const glass = this.material('#8facae', { emissive: '#ffc575', emissiveIntensity: 0 });
-    this.windows.push(glass);
+    const glass = this.glass();
     this.box(g, glass, 0, 0, 0.08, width, height, 0.03);
     this.box(g, '#eee8d9', 0, 0, 0.11, 0.045, height, 0.04);
     this.box(g, '#eee8d9', 0, 0, 0.11, width, 0.045, 0.04);
@@ -182,19 +209,19 @@ export class AssetLibrary {
     this.lantern(g, 0.47, 2.3, 2.55, false);
     return g;
   }
-  tree(parent: T.Object3D, x: number, z: number, scale = 1, shade = '#849264') {
-    const g = this.group(parent, x, 0, z);
-    g.scale.setScalar(scale);
-    this.cylinder(g, '#8a7860', 0, 1.4, 0, 0.16, 2.8);
-    const branch = this.cylinder(g, '#8a7860', 0.3, 2.1, 0, 0.08, 1.15);
-    branch.rotation.z = -0.6;
-    this.sphere(g, shade, 0, 3.2, 0, 1.2, 1.5, 1.2);
-    this.sphere(g, shade, -0.65, 2.8, 0.2, 0.9, 1.1, 0.95);
-    this.sphere(g, '#95a172', 0.7, 3, 0.2, 0.85, 1.2, 0.9);
-    return g;
+  tree(parent: T.Object3D, x: number, z: number, scale = 1, _shade = '#849264') {
+    return plantTree(
+      this,
+      parent,
+      x,
+      z,
+      scale,
+      Math.abs(Math.round(x + z)) % 3 === 0 ? 'birch' : 'oak',
+      Math.abs(x * 3 + z) + 1,
+    );
   }
-  shrub(parent: T.Object3D, x: number, z: number, scale = 0.6, color = '#73855f') {
-    return this.sphere(parent, color, x, scale * 0.55 + 0.1, z, scale, scale * 0.65, scale * 0.8);
+  shrub(parent: T.Object3D, x: number, z: number, scale = 0.6, _color = '#73855f') {
+    return shrub(this, parent, x, z, scale, false, Math.abs(x * 2 + z) + 1);
   }
   flowerBox(parent: T.Object3D, x: number, y: number, z: number, color = '#ab8770') {
     this.box(parent, color, x, y, z, 1.1, 0.4, 0.5);
@@ -220,8 +247,7 @@ export class AssetLibrary {
       this.cylinder(parent, '#5d685a', x, y / 2, z, 0.065, y);
       this.cylinder(parent, '#7b8270', x, 0.1, z, 0.18, 0.2);
     }
-    const material = this.material('#dcd0a5', { emissive: '#ffd493', emissiveIntensity: 0 });
-    this.windows.push(material);
+    const material = this.glass();
     this.box(parent, material, x, y + 0.15, z, 0.3, 0.45, 0.3);
     this.box(parent, '#57644f', x, y + 0.42, z, 0.42, 0.1, 0.42);
     const light = new T.PointLight('#ffd39a', 0, 6, 2);
@@ -232,7 +258,12 @@ export class AssetLibrary {
   dispose() {
     this.geometries.forEach((g) => g.dispose());
     this.materials.forEach((m) => m.dispose());
+    this.textures.forEach((t) => t.dispose());
+    this.textures.clear();
+    this.windows.length = 0;
+    this.lamps.length = 0;
     this.materials.clear();
     this.geometries.clear();
+    this.geometryCache.clear();
   }
 }

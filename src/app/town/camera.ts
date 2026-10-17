@@ -1,7 +1,10 @@
 import { CameraState } from '../domain/models';
 import { MOUSE, OrthographicCamera, TOUCH, Vector3 } from 'three';
 import { MapControls } from 'three/addons/controls/MapControls.js';
-const HOME = new Vector3(-5, 0, -3);
+const HOME = new Vector3(-5, 1.8, -4.6);
+export function homeViewHeight(width: number, height: number): number {
+  return Math.max(19, (20.5 * height) / Math.max(1, width));
+}
 export function clampCamera(state: CameraState): CameraState {
   const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
   return {
@@ -75,7 +78,7 @@ export class TownCamera {
     this.controls.target.copy(HOME).add(new Vector3(s.x, 0, s.z));
     this.camera.position
       .copy(this.controls.target)
-      .add(new Vector3(Math.sin(s.angle) * 34, 31, Math.cos(s.angle) * 34));
+      .add(new Vector3(Math.sin(s.angle) * 34, 28, Math.cos(s.angle) * 34));
     this.camera.zoom = s.zoom;
     this.camera.lookAt(this.controls.target);
     this.camera.updateProjectionMatrix();
@@ -86,7 +89,7 @@ export class TownCamera {
   }
   resize(width: number, height: number) {
     const aspect = width / height;
-    const viewHeight = aspect < 1 ? 26 / aspect : 30;
+    const viewHeight = homeViewHeight(width, height);
     this.camera.left = (-viewHeight * aspect) / 2;
     this.camera.right = (viewHeight * aspect) / 2;
     this.camera.top = viewHeight / 2;

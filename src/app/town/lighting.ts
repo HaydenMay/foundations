@@ -1,9 +1,11 @@
 import { Lighting } from '../domain/models';
 import { Color } from 'three';
 export interface LightPalette {
+  direction: [number, number, number];
   sky: string;
   sun: string;
   ambient: string;
+  ground: string;
   sunPower: number;
   ambientPower: number;
   windows: number;
@@ -11,38 +13,46 @@ export interface LightPalette {
 }
 const PALETTES: Record<string, LightPalette> = {
   sunrise: {
-    sky: '#e8dfcf',
-    sun: '#ffd3a1',
+    direction: [-22, 14, 16],
+    sky: '#e6dbc5',
+    sun: '#ffcf91',
     ambient: '#b2c7ce',
-    sunPower: 2.2,
-    ambientPower: 1.5,
+    ground: '#8a7d68',
+    sunPower: 2.5,
+    ambientPower: 1.2,
     windows: 0.2,
     label: 'sunrise',
   },
   day: {
-    sky: '#e8ede4',
+    direction: [-10, 29, 18],
+    sky: '#e2e7d8',
     sun: '#fff0d5',
     ambient: '#c9d9d9',
-    sunPower: 2.8,
-    ambientPower: 1.9,
+    ground: '#95876b',
+    sunPower: 2.4,
+    ambientPower: 1.35,
     windows: 0,
     label: 'day',
   },
   sunset: {
+    direction: [22, 9, 12],
     sky: '#e6d8c9',
-    sun: '#ffc28f',
+    sun: '#ffac64',
     ambient: '#a4b2c3',
-    sunPower: 2.1,
-    ambientPower: 1.3,
+    ground: '#8b6b57',
+    sunPower: 2.6,
+    ambientPower: 1.05,
     windows: 0.45,
     label: 'sunset',
   },
   night: {
-    sky: '#253445',
+    direction: [-8, 20, -14],
+    sky: '#233347',
     sun: '#a7bddd',
     ambient: '#9baccc',
+    ground: '#29394d',
     sunPower: 0.65,
-    ambientPower: 1.05,
+    ambientPower: 1.6,
     windows: 1,
     label: 'night',
   },
@@ -69,9 +79,15 @@ export function lightAt(preference: Lighting, hour: number): LightPalette {
   const label =
     h >= 5 && h < 8 ? 'sunrise' : h >= 8 && h < 17 ? 'day' : h >= 17 && h < 20 ? 'sunset' : 'night';
   return {
+    direction: [
+      mix(a.direction[0], b.direction[0]),
+      mix(a.direction[1], b.direction[1]),
+      mix(a.direction[2], b.direction[2]),
+    ],
     sky: color(a.sky, b.sky),
     sun: color(a.sun, b.sun),
     ambient: color(a.ambient, b.ambient),
+    ground: color(a.ground, b.ground),
     sunPower: mix(a.sunPower, b.sunPower),
     ambientPower: mix(a.ambientPower, b.ambientPower),
     windows: mix(a.windows, b.windows),

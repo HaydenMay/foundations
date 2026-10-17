@@ -14,6 +14,7 @@ export class TownScene {
   private readonly observer: ResizeObserver;
   private readonly ground: T.Mesh<T.PlaneGeometry, T.MeshBasicMaterial>;
   private lighting: Lighting = 'auto';
+  private lightKey = '';
   private readonly timer: ReturnType<typeof setInterval>;
   private active = true;
   private readonly visibility = () => {
@@ -38,6 +39,7 @@ export class TownScene {
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = T.PCFShadowMap;
+    this.renderer.shadowMap.autoUpdate = false;
     this.renderer.toneMapping = T.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.12;
     const canvas = this.renderer.domElement;
@@ -57,7 +59,7 @@ export class TownScene {
     this.sun.shadow.camera.bottom = -30;
     this.sun.shadow.camera.near = 0.5;
     this.sun.shadow.camera.far = 80;
-    this.sun.shadow.normalBias = 0.035;
+    this.sun.shadow.normalBias = 0.025;
     this.sun.shadow.bias = -0.00015;
     this.sun.shadow.radius = 4;
     this.scene.add(this.sun, this.hemi);
@@ -83,6 +85,7 @@ export class TownScene {
       this.world.assets.dispose();
     }
     this.world = buildWorld(designs);
+    this.renderer.shadowMap.needsUpdate = true;
     this.scene.add(this.world.group);
     this.updateLight();
   }
@@ -93,19 +96,24 @@ export class TownScene {
   private updateLight() {
     const now = new Date(),
       palette = lightAt(this.lighting, now.getHours() + now.getMinutes() / 60);
+    const key = JSON.stringify(palette);
+    if (key !== this.lightKey) {
+      this.lightKey = key;
+      this.renderer.shadowMap.needsUpdate = true;
+    }
     this.sun.color.set(palette.sun);
     this.sun.intensity = palette.sunPower;
     this.hemi.color.set(palette.ambient);
     this.hemi.intensity = palette.ambientPower;
     this.ground.material.color.set(palette.sky);
     this.container.style.background = palette.sky;
-    const evening = palette.label === 'sunset' || palette.label === 'night';
-    this.sun.position.set(evening ? 20 : -14, palette.label === 'day' ? 25 : 14, 18);
+    this.sun.position.set(...palette.direction);
+    this.hemi.groundColor.set(palette.ground);
     this.world?.assets.windows.forEach((m) => {
       m.emissiveIntensity = palette.windows * 1.8;
     });
     this.world?.assets.lamps.forEach((l) => {
-      l.intensity = palette.windows * 5;
+      l.intensity = palette.windows * 14;
     });
     this.label(palette.label);
     this.render();

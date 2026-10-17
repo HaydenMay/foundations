@@ -1,0 +1,136 @@
+import { describe, expect, it } from 'vitest';
+import * as T from 'three';
+import { AssetLibrary } from './assets';
+import { buildStartingHouse } from './residential';
+import { batchStatic } from './batching';
+import { buildWorld } from './world';
+import { homeViewHeight } from './camera';
+import { lightAt } from './lighting';
+import { buildBackyard } from './backyards';
+
+describe('residential asset contracts', () => {
+  it('offers distinct architecture in the same usable lot with a shared entrance', () => {
+    const signatures: string[] = [];
+    for (const choice of ['sage', 'cream', 'blue']) {
+      const a = new AssetLibrary(),
+        scene = new T.Group();
+      const home = buildStartingHouse(a, scene, choice);
+      const box = new T.Box3().setFromObject(home),
+        size = box.getSize(new T.Vector3());
+      expect(size.x).toBeGreaterThan(8);
+      expect(size.x).toBeLessThan(10.5);
+      expect(size.y).toBeGreaterThan(5);
+      expect(size.y).toBeLessThan(6.8);
+      expect(box.min.x).toBeGreaterThan(-8.5);
+      expect(box.max.x).toBeLessThan(0.6);
+      const door = home.getObjectByName('front-door');
+      expect(door).toBeDefined();
+      expect(door!.getWorldPosition(new T.Vector3()).x).toBeCloseTo(-5.35);
+      let vertices = 0;
+      home.traverse((o) => {
+        if (o instanceof T.Mesh) {
+          const p = o.geometry.getAttribute('position');
+          vertices += p.count;
+          expect(Array.from(p.array).every(Number.isFinite)).toBe(true);
+        }
+      });
+      signatures.push(`${size.y.toFixed(2)}/${vertices}`);
+      a.dispose();
+    }
+    expect(new Set(signatures).size).toBe(3);
+  });
+  it('preserves nested geometry placement when batching repeated details', () => {
+    const a = new AssetLibrary(),
+      root = new T.Group();
+    const parent = a.group(root, 4, 2, -3, Math.PI / 3);
+    parent.scale.set(1.3, 0.7, 0.9);
+    for (let i = 0; i < 12; i++) a.box(parent, '#eeeecc', i * 0.3, i * 0.1, -0.5, 0.2, 0.4, 0.3);
+    const before = new T.Box3().setFromObject(root);
+    batchStatic(root, (geometry) => a.geometry(geometry));
+    const after = new T.Box3().setFromObject(root);
+    expect(after.min.distanceTo(before.min)).toBeLessThan(0.0001);
+    expect(after.max.distanceTo(before.max)).toBeLessThan(0.0001);
+    let meshes = 0;
+    root.traverse((o) => {
+      if (o instanceof T.Mesh) meshes++;
+    });
+    expect(meshes).toBe(1);
+    a.dispose();
+  });
+  it('fits all backyard choices in the same left/rear zone without crossing the fence', () => {
+    for (const choice of ['pool', 'fort', 'trampoline']) {
+      const a = new AssetLibrary(),
+        root = new T.Group();
+      const yard = buildBackyard(a, root, choice);
+      expect(yard.position.toArray()).toEqual([-10, 0.13, -8.2]);
+      const bounds = new T.Box3().setFromObject(yard);
+      expect(bounds.min.x).toBeGreaterThan(-12.8);
+      expect(bounds.max.x).toBeLessThan(-7.5);
+      expect(bounds.min.z).toBeGreaterThan(-12.2);
+      expect(bounds.max.z).toBeLessThan(-4.6);
+      a.dispose();
+    }
+  });
+  it('keeps the detailed initial scene in a practical draw submission budget', () => {
+    const world = buildWorld({ home: 'sage' });
+    let meshes = 0,
+      triangles = 0;
+    world.group.traverse((o) => {
+      if (o instanceof T.Mesh) {
+        meshes++;
+        triangles += (o.geometry.index?.count || o.geometry.getAttribute('position').count) / 3;
+      }
+    });
+    expect(meshes).toBeLessThan(120);
+    expect(triangles).toBeLessThan(220000);
+    const materials = new Set<T.Material>(),
+      geometries = new Set<T.BufferGeometry>();
+    world.group.traverse((o) => {
+      if (o instanceof T.Mesh) {
+        geometries.add(o.geometry);
+        for (const m of Array.isArray(o.material) ? o.material : [o.material]) materials.add(m);
+      }
+    });
+    const textures = new Set<T.Texture>();
+    materials.forEach((m) => {
+      if (m instanceof T.MeshStandardMaterial)
+        for (const texture of [m.map, m.bumpMap]) if (texture) textures.add(texture);
+    });
+    let released = 0,
+      releasedMaterials = 0,
+      releasedTextures = 0;
+    geometries.forEach((g) => g.addEventListener('dispose', () => released++));
+    materials.forEach((m) => m.addEventListener('dispose', () => releasedMaterials++));
+    textures.forEach((t) => t.addEventListener('dispose', () => releasedTextures++));
+    world.assets.dispose();
+    expect(released).toBe(geometries.size);
+    expect(releasedMaterials).toBe(materials.size);
+    expect(releasedTextures).toBe(textures.size);
+  });
+});
+describe('reference lighting and framing', () => {
+  it('has a lower golden-hour sun and continuous direction at mood boundaries', () => {
+    expect(lightAt('day', 12).direction?.[1]).toBeGreaterThan(
+      lightAt('sunset', 18).direction?.[1] || 0,
+    );
+    for (const hour of [5, 6, 8, 17, 18, 20]) {
+      const a = lightAt('auto', hour - 0.001).direction,
+        b = lightAt('auto', hour + 0.001).direction;
+      expect(a).toBeDefined();
+      expect(b).toBeDefined();
+      expect(new T.Vector3(...a!).distanceTo(new T.Vector3(...b!))).toBeLessThan(0.1);
+      const before = new T.Color(lightAt('auto', hour - 0.001).ground);
+      const after = new T.Color(lightAt('auto', hour + 0.001).ground);
+      expect(
+        Math.abs(before.r - after.r) + Math.abs(before.g - after.g) + Math.abs(before.b - after.b),
+      ).toBeLessThan(0.01);
+    }
+  });
+  it('frames the residential lot consistently across phone panel sizes', () => {
+    const expanded = homeViewHeight(390, 448),
+      collapsed = homeViewHeight(390, 714);
+    expect((expanded * 390) / 448).toBeCloseTo((collapsed * 390) / 714);
+    expect((expanded * 390) / 448).toBeLessThan(23);
+    expect(homeViewHeight(584, 331)).toBeLessThan(24);
+  });
+});
