@@ -42,6 +42,7 @@ export class App {
   );
   private constructionId = 0;
   private offeredSession = -1;
+  private constructionSession = 0;
   readonly sceneLight = signal('day');
   readonly dialog = viewChild.required<ElementRef<HTMLDialogElement>>('dialog');
   readonly overlay = signal('');
@@ -82,6 +83,10 @@ export class App {
       const state = this.store.state(),
         session = this.store.sessionKey();
       untracked(() => {
+        if (this.constructionSession !== session) {
+          this.constructionSession = session;
+          this.construction.set(0);
+        }
         // A constructed home has already been offered in this session, including preview hides.
         if (state.designs['home']) this.offeredSession = session;
         if (this.firstSelection() && state.designs['home']) this.choosingHome.set(false);

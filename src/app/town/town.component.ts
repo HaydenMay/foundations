@@ -307,7 +307,8 @@ export class TownComponent implements OnDestroy {
       this.lastSession = sessionKey;
       this.incomingCamera = '';
       this.lastCamera = '';
-      this.lastConstruction = 0;
+      // Consume a request from the previous view instead of replaying it in the new scenario.
+      this.lastConstruction = construction;
     }
     const key = JSON.stringify(designs);
     if (this.lastDesigns !== key) {

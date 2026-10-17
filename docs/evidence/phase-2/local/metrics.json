@@ -1,0 +1,1320 @@
+{
+  "url": "http://127.0.0.1:4200/foundations/",
+  "sourceCommit": "999b3e3972ba693b80cf287042fd45e4c444794c",
+  "capturedAt": "2026-10-17T21:56:23.339Z",
+  "note": "Windows headless Chromium, synthetic profiles. Emulated viewports, not physical device FPS. Render calls are CPU submissions, not GPU timings. Source commit may have documented uncommitted UI changes in local captures.",
+  "results": [
+    {
+      "name": "portrait-empty-lot",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 447.90625
+      },
+      "calls": 21,
+      "triangles": 80678,
+      "meshes": 21,
+      "resources": {
+        "geometries": 21,
+        "textures": 9,
+        "programs": 4
+      },
+      "home": null,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "portrait-home-selection-cottage",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 447.90625
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "portrait-home-selection-craftsman",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 447.90625
+      },
+      "calls": 87,
+      "triangles": 185132,
+      "meshes": 87,
+      "resources": {
+        "geometries": 87,
+        "textures": 25,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "portrait-home-selection-brick",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 447.90625
+      },
+      "calls": 78,
+      "triangles": 185136,
+      "meshes": 78,
+      "resources": {
+        "geometries": 78,
+        "textures": 23,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "portrait-construction",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 447.90625
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "portrait-animation",
+      "elapsedAfterObservedStartMs": 2458.900000035763,
+      "renderCalls": 9,
+      "durableBeforeAnimation": true
+    },
+    {
+      "name": "portrait-first-home",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 447.90625
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "portrait-preview-entry",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 447.90625
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "portrait-preview-controls",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 455.609375
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "preview-scenario-new",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 455.609375
+      },
+      "calls": 21,
+      "triangles": 80678,
+      "meshes": 21,
+      "resources": {
+        "geometries": 21,
+        "textures": 9,
+        "programs": 4
+      },
+      "home": null,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "preview-scenario-ready",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 455.609375
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "preview-scenario-home",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 455.609375
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "preview-scenario-several",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 455.609375
+      },
+      "calls": 118,
+      "triangles": 217622,
+      "meshes": 118,
+      "resources": {
+        "geometries": 118,
+        "textures": 29,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        22.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 0.8,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "preview-scenario-all",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 455.609375
+      },
+      "calls": 125,
+      "triangles": 237662,
+      "meshes": 125,
+      "resources": {
+        "geometries": 125,
+        "textures": 29,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        22.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 0.6,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "portrait-preview-backyard-lighting",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 455.609375
+      },
+      "calls": 193,
+      "triangles": 414386,
+      "meshes": 121,
+      "resources": {
+        "geometries": 121,
+        "textures": 27,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        22.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 0.6,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "portrait-preview-camera-controls",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 455.609375
+      },
+      "calls": 193,
+      "triangles": 414386,
+      "meshes": 121,
+      "resources": {
+        "geometries": 121,
+        "textures": 27,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        22.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 0.6,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "portrait-preview-collapsed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 714
+      },
+      "calls": 121,
+      "triangles": 237074,
+      "meshes": 121,
+      "resources": {
+        "geometries": 121,
+        "textures": 27,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        22.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 0.6,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "portrait-idle",
+      "rendersOver700ms": 0
+    },
+    {
+      "name": "compact-portrait-empty-lot",
+      "viewport": {
+        "width": 390,
+        "height": 664
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 345.3125
+      },
+      "calls": 21,
+      "triangles": 80678,
+      "meshes": 21,
+      "resources": {
+        "geometries": 21,
+        "textures": 9,
+        "programs": 4
+      },
+      "home": null,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "compact-portrait-home-selection-cottage",
+      "viewport": {
+        "width": 390,
+        "height": 664
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 345.3125
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "compact-portrait-animation",
+      "elapsedAfterObservedStartMs": 2298.900000035763,
+      "renderCalls": 9,
+      "durableBeforeAnimation": true
+    },
+    {
+      "name": "compact-portrait-first-home",
+      "viewport": {
+        "width": 390,
+        "height": 664
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 345.3125
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "compact-portrait-preview-entry",
+      "viewport": {
+        "width": 390,
+        "height": 664
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 345.3125
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "compact-portrait-preview-controls",
+      "viewport": {
+        "width": 390,
+        "height": 664
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 351.203125
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "compact-portrait-preview-collapsed",
+      "viewport": {
+        "width": 390,
+        "height": 664
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 534
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "compact-portrait-idle",
+      "rendersOver700ms": 0
+    },
+    {
+      "name": "landscape-empty-lot",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 260,
+        "y": 59,
+        "width": 584,
+        "height": 331
+      },
+      "calls": 21,
+      "triangles": 80678,
+      "meshes": 21,
+      "resources": {
+        "geometries": 21,
+        "textures": 9,
+        "programs": 4
+      },
+      "home": null,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "landscape-home-selection-cottage",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 320,
+        "y": 59,
+        "width": 524,
+        "height": 331
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "landscape-animation",
+      "elapsedAfterObservedStartMs": 2204.699999988079,
+      "renderCalls": 8,
+      "durableBeforeAnimation": true
+    },
+    {
+      "name": "landscape-first-home",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 260,
+        "y": 59,
+        "width": 584,
+        "height": 331
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "landscape-preview-entry",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 260,
+        "y": 59,
+        "width": 584,
+        "height": 331
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "landscape-preview-controls",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 320,
+        "y": 59,
+        "width": 524,
+        "height": 331
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "landscape-preview-collapsed",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 59,
+        "width": 844,
+        "height": 331
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "landscape-idle",
+      "rendersOver700ms": 0
+    },
+    {
+      "name": "desktop-empty-lot",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 370,
+        "y": 92,
+        "width": 1070,
+        "height": 908
+      },
+      "calls": 21,
+      "triangles": 80678,
+      "meshes": 21,
+      "resources": {
+        "geometries": 21,
+        "textures": 9,
+        "programs": 4
+      },
+      "home": null,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "desktop-home-selection-cottage",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 370,
+        "y": 92,
+        "width": 1070,
+        "height": 908
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "desktop-animation",
+      "elapsedAfterObservedStartMs": 2484.7999999523163,
+      "renderCalls": 6,
+      "durableBeforeAnimation": true
+    },
+    {
+      "name": "desktop-first-home",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 370,
+        "y": 92,
+        "width": 1070,
+        "height": 908
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "desktop-preview-entry",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 370,
+        "y": 92,
+        "width": 1070,
+        "height": 908
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "desktop-preview-controls",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 350,
+        "y": 92,
+        "width": 1090,
+        "height": 908
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "desktop-preview-collapsed",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 92,
+        "width": 1440,
+        "height": 908
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "desktop-idle",
+      "rendersOver700ms": 0
+    }
+  ]
+}

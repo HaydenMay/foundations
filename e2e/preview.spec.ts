@@ -35,7 +35,7 @@ test('preview changes, real backup export and a late camera event cannot change 
   await page.getByLabel('Preview backyard').selectOption('trampoline');
   await page.getByLabel('Preview lighting').selectOption('night');
   await page.getByRole('button', { name: 'Preview construction', exact: true }).click();
-  await page.getByRole('button', { name: 'Skip construction', exact: true }).click();
+  // Isolation also holds if construction is still running as Settings is opened.
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   const download = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Export backup', exact: true }).click();
@@ -66,7 +66,15 @@ test('reload discards preview and another tab stays genuine while real updates s
     .getByRole('button', { name: 'Complete Make a moment to unwind', exact: true })
     .click();
   await expect.poll(async () => JSON.parse((await raw(page))!).completions.length).toBe(2);
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export backup', exact: true }).click();
+  const backup = JSON.parse(await readFile((await (await download).path())!, 'utf8'));
+  expect(backup.completions).toHaveLength(2);
+  expect(backup.designs).toEqual({ home: 'blue' });
+  await page.getByRole('button', { name: 'Close dialog' }).click();
   await page.getByRole('button', { name: 'Exit Developer Preview', exact: true }).click();
+  await expect(page.locator('.lifetime strong')).toHaveText('3');
   expect(JSON.parse((await raw(page))!).designs).toEqual({ home: 'blue' });
   await enter(page);
   await page.getByLabel('Preview house style').selectOption('sage');

@@ -13,17 +13,24 @@ async function firstStep(page: Page, name = 'Make a moment to unwind') {
 test('new players preview three houses and save before a skippable first construction', async ({
   page,
 }) => {
+  await page.clock.install({ time: new Date('2026-10-17T09:00:00') });
   await firstStep(page);
   expect((await saved(page)).completions[0].stars).toBe(1);
   for (const name of ['Classic Cottage', 'Traditional Brick', 'Modern Craftsman']) {
     await page.getByRole('button', { name: `Preview ${name}`, exact: true }).click();
     expect((await saved(page)).designs.home).toBeUndefined();
   }
+  // Own the short animation's clock so software rendering cannot expire Skip before a click.
+  await page.clock.pauseAt(new Date('2026-10-17T12:00:00'));
   await page.getByRole('button', { name: 'Build my home', exact: true }).click();
+  await expect.poll(async () => (await saved(page)).designs.home).toBe('cream');
+  await page.clock.runFor(50);
   await expect(page.getByRole('button', { name: 'Skip construction', exact: true })).toBeVisible();
   expect((await saved(page)).designs.home).toBe('cream');
   await page.getByRole('button', { name: 'Skip construction', exact: true }).click();
+  await page.clock.runFor(50);
   await expect(page.locator('app-town')).toHaveAttribute('data-construction', 'idle');
+  await page.clock.resume();
   await page.reload();
   await expect(page.locator('app-town')).toHaveAttribute('data-home-visible', 'true');
   await expect(page.getByRole('heading', { name: 'Your first home is ready!' })).not.toBeVisible();
@@ -112,4 +119,33 @@ test('two tabs record one first completion and synchronize the confirmed house',
   await expect(other.getByRole('button', { name: 'Build my home', exact: true })).not.toBeVisible();
   expect((await saved(page)).completions).toHaveLength(1);
   await other.close();
+});
+
+test('a failed durable home save leaves the reward pending across reload', async ({ page }) => {
+  await page.addInitScript(() => {
+    const write = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (key, value) {
+      if (key === 'foundations.v1' && JSON.parse(value).designs.home)
+        throw new DOMException('Synthetic quota failure', 'QuotaExceededError');
+      return write.call(this, key, value);
+    };
+  });
+  await firstStep(page);
+  await page.getByRole('button', { name: 'Build my home', exact: true }).click();
+  await expect(
+    page.getByRole('alert').filter({ hasText: 'Your home could not be saved' }),
+  ).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Build my home', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Skip construction', exact: true }),
+  ).not.toBeVisible();
+  expect((await saved(page)).designs.home).toBeUndefined();
+  await page.reload();
+  await expect(
+    page.getByRole('heading', { name: 'Your first home is ready!', exact: true }),
+  ).toBeVisible();
+  expect((await saved(page)).onboarding.firstHomeUnlocked).toBe(true);
+  expect((await saved(page)).completions).toHaveLength(1);
+  await page.getByRole('button', { name: 'Choose later', exact: true }).click();
+  await expect(page.locator('app-town')).toHaveAttribute('data-home-visible', 'false');
 });

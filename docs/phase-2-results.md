@@ -39,13 +39,34 @@ Additional captures cover compact 390×664 portrait, 1440×1000 desktop, five pr
 
 Final counts, review outcome, commit and deployment verification are pending. Do not interpret this work-in-progress report as publication evidence.
 
+## Review and implementation decisions
+
+One independent read-only whole-change review found a scenario-transition bug: an old construction request could replay after a preview reset/jump and replace its overview camera with Home. Two failing regressions exercised the actual App effect and Town input synchronizer. The fix clears old construction status and consumes the previous request across session changes; a new request within the same session still works. The resulting full unit suite is81/81PASS. No additional material code findings were reported; no second reviewer was dispatched.
+
+| Decision                                                        | Reason and tradeoff                                                                                                                                                                |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Preserve every valid v1 homeowner, including zero-star profiles | Prevents loss of visible construction; legacy users deliberately bypass the new-player sequence.                                                                                   |
+| Separate real and disposable preview signals                    | Prevents rollback/export/tab leakage; preview work is intentionally discarded on reload.                                                                                           |
+| Batch the home separately inside the existing world             | Enables its reveal without replacing the renderer; modest extra material draw calls remain to measure on phones.                                                                   |
+| Treat a constructed home as already offered in its session      | Deliberately hiding a preview house no longer reopens onboarding; a fresh pending/scenario session can still offer selection.                                                      |
+| Cache shadows during the small reveal                           | Keeps the short animation lighter; the transient shadow is approximate until final settlement.                                                                                     |
+| Strengthen other-tab validation                                 | Actual preview-tab backup export and visible genuine stars after exit complement the storage-event unit test; shared-storage assertions alone do not prove the visible real state. |
+| Exercise a failed durable save through reload                   | Synthetic quota injection verifies the pending reward, error and no celebration; unit tests separately preserve original bytes.                                                    |
+| Report background/GPU/Safari evidence limits                    | Elapsed-time settlement and reload tests protect saved progress, but do not certify real browser background throttling or physical-device timing.                                  |
+
+No minor code findings were deferred. Follow-up device/performance checks below remain explicit validation limits.
+
 ## Performance and architectural limits
 
-Rendering remains event-driven when idle. Construction temporarily uses a bounded animation, limited to 30 updates/second, with one existing shadowed sun and the same pixel-ratio cap. Skip/disposal cancels the animation request and restores the house. Captured measurements will distinguish draw calls and emulator observations from physical-phone frame rates.
+The 34 local captures at `999b3e3` passed all scripted checks: no horizontal overflow, console/page/WebGL errors or lost contexts, no external request hosts, and byte-identical genuine storage during preview and after exit. The author inspected empty-lot, all three house previews, construction, completed-home and developer controls in portrait, compact portrait, landscape and desktop. Short sheets scroll vertically; compact portrait deliberately retains city space rather than fitting every action above the fold.
+
+Rendering remains event-driven when idle. All four 700ms idle samples recorded **zero renders** after construction. The empty lot uses21draw calls/80,678triangles; the completed Cottage uses76/186,792; Craftsman87/185,132; the all-project daytime preview125/237,662. These are rendering counts, not a mobile frame-rate claim. Construction is capped at30updates/second but the Windows software-rendered capture observed only6–9render submissions after its first observation over approximately2.2–2.5seconds. It is not evidence of smooth physical-phone animation. Test real devices; if needed, add adaptive pixel ratio/shadow resolution or reduced-detail foliage within the current factories.
+
+Construction now reuses cached shadows during its small rise/scale, refreshing at visibility changes and settlement; it avoids unchanged settled3Dframes while the short DOM accent finishes. This preserves responsiveness but gives the tiny transient rise an approximate shadow until settlement. Skip/disposal cancels the animation request and restores the house. The existing pixel-ratio cap and one shadowed sun remain. No perpetual animation or expensive new effect is introduced.
 
 The current 36×29 terrain, bounded camera and world-wide static material batches fit the existing eight projects. Future continuous-city growth should extend terrain/camera bounds and introduce spatial lot/chunk batches and level of detail. Home must continue targeting the original lot; no separate scenes or level map have been introduced.
 
-Procedural art retains the previous visual compromises against the approved boards: simpler leaf sprays, repeating surface maps, approximate shadows/reflections, no offline global illumination or photographic depth of field. This phase adds no art regression by design; starting-lot and completed-home captures must still be checked before publication. Optimized authored models and foliage atlases can later replace the existing asset factories.
+Procedural art retains the previous visual compromises against the approved boards: simpler leaf sprays, repeating surface maps, approximate shadows/reflections, no offline global illumination or photographic depth of field. The inspected starting-lot and completed-home captures preserve the previous detailed miniature appearance. Optimized authored models and foliage atlases can later replace the existing asset factories.
 
 Browser-local storage can be cleared or blocked. Keep private JSON backups; storage failure permits in-tab habit tracking but blocks an unsaved first-home confirmation. Old tabs should be closed after upgrade. Older browsers without Web Locks cannot guarantee simultaneous real writes; use one tab there. Physical iOS/Android, actual Safari, screen-reader and low-memory hardware checks are not performed by Chromium viewport emulation and remain necessary follow-up work.
 
