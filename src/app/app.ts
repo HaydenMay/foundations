@@ -4,7 +4,7 @@ import { FoundationsStore } from './state.service';
 import { HabitEditor } from './components/habit-editor';
 import { Icon } from './components/icon';
 import { TownComponent } from './town/town.component';
-import { AppState, Habit, HabitInput, Lighting, Project } from './domain/models';
+import { AppState, Habit, HabitInput, Lighting, Project, CameraState } from './domain/models';
 import { isCompleted, isScheduled, scheduleLabel, STAR_VALUES } from './domain/habits';
 import { PROJECTS } from './domain/progression';
 import { importState } from './domain/state';
@@ -51,6 +51,12 @@ export class App {
       })[this.overlay()] || 'Foundations',
   );
   private toastTimer?: ReturnType<typeof setTimeout>;
+  cameraChanged(event: { camera: CameraState; sessionKey: number }) {
+    if (event.sessionKey !== this.store.sessionKey()) return;
+    this.store.preferences({ camera: event.camera }).catch((e) => {
+      if (event.sessionKey === this.store.sessionKey()) this.error.set((e as Error).message);
+    });
+  }
   done(habit: Habit) {
     return isCompleted(this.store.state(), habit, this.store.today());
   }

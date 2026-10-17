@@ -17,7 +17,10 @@ import type { TownScene } from './scene';
 @Component({
   selector: 'app-town',
   imports: [Icon],
-  host: { '[attr.data-lighting]': 'lightLabel()' },
+  host: {
+    '[attr.data-lighting]': 'lightLabel()',
+    '[attr.data-construction]': "building() ? 'active' : 'idle'",
+  },
   template: ` <div #viewport class="viewport"></div>
     @if (failed()) {
       <div class="render-error">
@@ -26,6 +29,13 @@ import type { TownScene } from './scene';
           The town needs WebGL to render. Try a recent browser with graphics acceleration enabled.
           Habits and backups still work.
         </p>
+      </div>
+    }
+    @if (building()) {
+      <div class="construction-glow" aria-hidden="true">
+        @for (i of [0, 1, 2, 3, 4, 5, 6, 7]; track i) {
+          <span [style.--i]="i"></span>
+        }
       </div>
     }
     <div class="camera-controls" role="group" aria-label="Town camera">
@@ -115,6 +125,52 @@ import type { TownScene } from './scene';
     .camera-hint span {
       margin: 0 8px;
     }
+    .construction-glow {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(ellipse at 50% 52%, #f6d99a38, transparent 55%);
+      animation: warmth 2.8s ease-out both;
+    }
+    .construction-glow span {
+      position: absolute;
+      left: calc(27% + var(--i) * 6%);
+      top: 55%;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #edcf86;
+      animation: sprinkle 1.7s 0.5s ease-out both;
+      transform: translateY(0);
+    }
+    @keyframes warmth {
+      0%,
+      100% {
+        opacity: 0;
+      }
+      25%,
+      65% {
+        opacity: 1;
+      }
+    }
+    @keyframes sprinkle {
+      0% {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      30% {
+        opacity: 0.8;
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(calc(-20px - var(--i) * 5px));
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .construction-glow {
+        display: none;
+      }
+    }
     .render-error {
       position: absolute;
       inset: 30% 10%;
@@ -164,15 +220,21 @@ import type { TownScene } from './scene';
 export class TownComponent implements OnDestroy {
   readonly designs = input.required<Record<string, string>>();
   readonly preferences = input.required<Preferences>();
-  readonly cameraChange = output<CameraState>();
+  readonly sessionKey = input(0);
+  readonly construction = input(0);
+  readonly constructionFinished = output<{ id: number; sessionKey: number }>();
+  readonly cameraChange = output<{ camera: CameraState; sessionKey: number }>();
   readonly lightChange = output<string>();
   readonly lightLabel = signal('day');
   readonly failed = signal(false);
+  readonly building = signal(false);
   readonly viewport = viewChild.required<ElementRef<HTMLElement>>('viewport');
   private scene?: TownScene;
   private lastDesigns = '';
   private lastCamera = '';
   private incomingCamera = '';
+  private lastSession = 0;
+  private lastConstruction = 0;
   private timer?: ReturnType<typeof setTimeout>;
   constructor(private readonly zone: NgZone) {
     afterNextRender(() =>
@@ -181,15 +243,21 @@ export class TownComponent implements OnDestroy {
           const { TownScene } = await import('./scene');
           this.lastCamera = JSON.stringify(this.preferences().camera);
           this.incomingCamera = this.lastCamera;
+          this.lastSession = this.sessionKey();
           this.scene = new TownScene(
             this.viewport().nativeElement,
             this.designs(),
             this.preferences().camera,
             (state) => {
+              const sessionKey = this.sessionKey();
               this.lastCamera = JSON.stringify(state);
               clearTimeout(this.timer);
               this.timer = setTimeout(
-                () => this.zone.run(() => this.cameraChange.emit(state)),
+                () =>
+                  this.zone.run(() => {
+                    if (sessionKey === this.sessionKey())
+                      this.cameraChange.emit({ camera: state, sessionKey });
+                  }),
                 200,
               );
             },
@@ -201,6 +269,7 @@ export class TownComponent implements OnDestroy {
           );
           this.lastDesigns = JSON.stringify(this.designs());
           this.scene.setLighting(this.preferences().lighting);
+          this.sync(this.designs(), this.preferences(), this.sessionKey(), this.construction());
         } catch (e) {
           console.warn('Town renderer unavailable:', e);
           this.zone.run(() => this.failed.set(true));
@@ -210,25 +279,59 @@ export class TownComponent implements OnDestroy {
     effect(() => {
       const designs = this.designs(),
         preferences = this.preferences();
-      if (!this.scene) return;
-      const key = JSON.stringify(designs);
-      if (this.lastDesigns !== key) {
-        this.lastDesigns = key;
-        this.scene.setDesigns(designs);
-      }
-      const cameraKey = JSON.stringify(preferences.camera);
-      if (cameraKey !== this.incomingCamera) {
-        this.incomingCamera = cameraKey;
-        if (cameraKey !== this.lastCamera) {
-          clearTimeout(this.timer);
-          this.lastCamera = cameraKey;
-          this.scene.camera.set(preferences.camera);
-        }
-      }
-      this.scene.setLighting(preferences.lighting);
+      this.sync(designs, preferences, this.sessionKey(), this.construction());
     });
   }
+  private sync(
+    designs: Record<string, string>,
+    preferences: Preferences,
+    sessionKey: number,
+    construction: number,
+  ) {
+    if (!this.scene) return;
+    if (sessionKey !== this.lastSession) {
+      clearTimeout(this.timer);
+      this.scene.finishConstruction();
+      this.building.set(false);
+      this.lastSession = sessionKey;
+      this.incomingCamera = '';
+      this.lastCamera = '';
+      this.lastConstruction = 0;
+    }
+    const key = JSON.stringify(designs);
+    if (this.lastDesigns !== key) {
+      this.lastDesigns = key;
+      this.scene.setDesigns(designs);
+    }
+    const cameraKey = JSON.stringify(preferences.camera);
+    if (cameraKey !== this.incomingCamera) {
+      this.incomingCamera = cameraKey;
+      if (cameraKey !== this.lastCamera) {
+        clearTimeout(this.timer);
+        this.lastCamera = cameraKey;
+        this.scene.camera.set(preferences.camera);
+      }
+    }
+    this.scene.setLighting(preferences.lighting);
+    if (construction && construction !== this.lastConstruction) {
+      this.lastConstruction = construction;
+      this.building.set(true);
+      this.scene.celebrate(() =>
+        this.zone.run(() => {
+          if (this.sessionKey() === sessionKey && this.construction() === construction) {
+            this.building.set(false);
+            this.constructionFinished.emit({ id: construction, sessionKey });
+          }
+        }),
+      );
+    }
+  }
+  skipConstruction() {
+    this.scene?.finishConstruction();
+    this.building.set(false);
+  }
   command(command: string) {
+    if (this.building()) this.skipConstruction();
     const camera = this.scene?.camera;
     if (!camera) return;
     if (command === 'home') camera.home();

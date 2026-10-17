@@ -10,6 +10,7 @@ import { batchStatic } from './batching';
 export interface TownWorld {
   group: T.Group;
   assets: AssetLibrary;
+  home?: T.Group;
 }
 type ProjectFactory = (a: AssetLibrary, g: T.Group, choice: string) => void;
 
@@ -121,22 +122,33 @@ export function buildWorld(designs: Record<string, string>): TownWorld {
   }
   for (let x = -16; x < 18; x += 4) a.box(group, '#d1cdb2', x, 0.29, 5, 1.75, 0.012, 0.07);
   for (const z of [2.73, 7.27]) a.box(group, '#bbc0a9', 0, 0.29, z, 35.8, 0.012, 0.045);
-  a.box(group, '#c8c7b5', -0.8, 0.19, -1.6, 2.6, 0.14, 7.8);
-  for (let z = -4; z < 2; z += 1.55) a.box(group, '#b9bda7', -0.8, 0.27, z, 2.58, 0.008, 0.025);
-  a.box(group, '#d4d0b9', -5.35, 0.2, 0.65, 1.3, 0.15, 2.2);
-  buildStartingHouse(a, group, designs['home'], designs['exterior']);
-  a.fence(group, -6.1, -12.2, 13.3);
-  a.fence(group, -12.8, -5.6, 13.2, Math.PI / 2);
-  for (const x of [-10.8, -9.6, -8.4]) a.shrub(group, x, -0.1, 0.65);
-  for (const z of [-9.8, -8.6, -7.4]) a.shrub(group, -1.6, z, 0.6);
-  // Mailbox, front-garden stepping stones, shrubs and a small birdbath.
-  a.box(group, '#857b61', -2.6, 0.65, 1.25, 0.11, 1.1, 0.11);
-  a.box(group, '#63735e', -2.6, 1.22, 1.25, 0.45, 0.28, 0.6);
-  a.box(group, '#b5ab84', -2.35, 1.3, 1.28, 0.02, 0.16, 0.1);
-  for (let i = 0; i < 5; i++)
-    a.box(group, '#c2c1a8', -8.7 + i * 0.65, 0.16, -1.1 + i * 0.22, 0.43, 0.09, 0.48);
-  a.cylinder(group, '#babaa3', -10.5, 0.62, -3, 0.14, 0.9);
-  a.cylinder(group, '#cac8b0', -10.5, 1.08, -3, 0.53, 0.12);
+  let home: T.Group | undefined;
+  if (designs['home']) {
+    a.box(group, '#c8c7b5', -0.8, 0.19, -1.6, 2.6, 0.14, 7.8);
+    for (let z = -4; z < 2; z += 1.55) a.box(group, '#b9bda7', -0.8, 0.27, z, 2.58, 0.008, 0.025);
+    a.box(group, '#d4d0b9', -5.35, 0.2, 0.65, 1.3, 0.15, 2.2);
+    home = buildStartingHouse(a, group, designs['home'], designs['exterior']);
+    home.userData['staticBatchBoundary'] = true;
+    a.fence(group, -6.1, -12.2, 13.3);
+    a.fence(group, -12.8, -5.6, 13.2, Math.PI / 2);
+    for (const x of [-10.8, -9.6, -8.4]) a.shrub(group, x, -0.1, 0.65);
+    for (const z of [-9.8, -8.6, -7.4]) a.shrub(group, -1.6, z, 0.6);
+    // Mailbox, front-garden stepping stones, shrubs and a small birdbath.
+    a.box(group, '#857b61', -2.6, 0.65, 1.25, 0.11, 1.1, 0.11);
+    a.box(group, '#63735e', -2.6, 1.22, 1.25, 0.45, 0.28, 0.6);
+    a.box(group, '#b5ab84', -2.35, 1.3, 1.28, 0.02, 0.16, 0.1);
+    for (let i = 0; i < 5; i++)
+      a.box(group, '#c2c1a8', -8.7 + i * 0.65, 0.16, -1.1 + i * 0.22, 0.43, 0.09, 0.48);
+    a.cylinder(group, '#babaa3', -10.5, 0.62, -3, 0.14, 0.9);
+    a.cylinder(group, '#cac8b0', -10.5, 1.08, -3, 0.53, 0.12);
+  } else {
+    // A quiet plot marker and modest verge planting mark the same future residential lot.
+    a.box(group, '#857b61', -2.6, 0.65, 1.25, 0.11, 1.1, 0.11);
+    a.box(group, '#63735e', -2.6, 1.22, 1.25, 0.45, 0.28, 0.6);
+    for (const x of [-12.4, 0.3])
+      for (const z of [-11.8, 0.5]) a.box(group, '#b6b29c', x, 0.2, z, 0.18, 0.3, 0.18);
+    for (const z of [-3.5, -4.8]) a.shrub(group, -12, z, 0.5);
+  }
   const trees: [number, number, number, string][] = [
     [-15.2, -13, 1.1, '#88956d'],
     [-15, -4, 1.15, '#7e9066'],
@@ -147,13 +159,14 @@ export function buildWorld(designs: Record<string, string>): TownWorld {
     [8, -14, 1.2, '#839268'],
   ];
   for (const [x, z, scale, color] of trees) a.tree(group, x, z, scale, color);
-  for (let i = 0; i < 26; i++) {
+  for (let i = 0; i < (home ? 26 : 8); i++) {
     const x = Math.sin(i * 4.37) * 16,
       z = -13.6 + (i % 4) * 0.35;
     a.shrub(group, x, z, 0.3 + (i % 3) * 0.12, i % 2 ? '#9ba47a' : '#8b9c71');
   }
-  startingLandscape(a, group);
+  if (home) startingLandscape(a, group);
   for (const [id, choice] of Object.entries(designs)) PROJECT_ASSETS[id]?.(a, group, choice);
+  if (home) batchStatic(home, (geometry) => a.geometry(geometry));
   batchStatic(group, (geometry) => a.geometry(geometry));
-  return { group, assets: a };
+  return { group, assets: a, home };
 }

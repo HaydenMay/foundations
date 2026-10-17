@@ -3,6 +3,7 @@ import { CameraState, Lighting } from '../domain/models';
 import { TownCamera } from './camera';
 import { lightAt } from './lighting';
 import { buildWorld, TownWorld } from './world';
+import { constructionFrame, homeTransition } from './construction';
 
 export class TownScene {
   readonly renderer: T.WebGLRenderer;
@@ -17,6 +18,14 @@ export class TownScene {
   private lightKey = '';
   private readonly timer: ReturnType<typeof setInterval>;
   private active = true;
+  private construction?: {
+    request: number;
+    started: number;
+    last: number;
+    from: CameraState;
+    baseY: number;
+    done: () => void;
+  };
   private readonly visibility = () => {
     this.active = !document.hidden;
     if (this.active) {
@@ -80,6 +89,7 @@ export class TownScene {
     document.addEventListener('visibilitychange', this.visibility);
   }
   setDesigns(designs: Record<string, string>) {
+    this.finishConstruction();
     if (this.world) {
       this.scene.remove(this.world.group);
       this.world.assets.dispose();
@@ -88,6 +98,61 @@ export class TownScene {
     this.renderer.shadowMap.needsUpdate = true;
     this.scene.add(this.world.group);
     this.updateLight();
+  }
+  celebrate(done: () => void) {
+    this.finishConstruction();
+    const home = this.world?.home;
+    if (!home || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      this.camera.home();
+      done();
+      return;
+    }
+    const animation = {
+      request: 0,
+      started: performance.now(),
+      last: -100,
+      from: this.camera.state(),
+      baseY: home.position.y,
+      done,
+    };
+    this.construction = animation;
+    this.camera.controls.enabled = false;
+    const frame = (now: number) => {
+      if (this.construction !== animation) return;
+      const phase = constructionFrame(now - animation.started);
+      if (phase.done) {
+        this.finishConstruction();
+        return;
+      }
+      animation.request = requestAnimationFrame(frame);
+      if (now - animation.last < 1000 / 30) return;
+      animation.last = now;
+      home.visible = phase.visible;
+      home.scale.setScalar(phase.scale);
+      home.position.y = animation.baseY + phase.rise;
+      this.renderer.shadowMap.needsUpdate = true;
+      this.camera.set(homeTransition(animation.from, phase.homeT));
+    };
+    animation.request = requestAnimationFrame(frame);
+  }
+  finishConstruction() {
+    this.stopConstruction(true, true);
+  }
+  private stopConstruction(notify: boolean, resetCamera: boolean) {
+    const animation = this.construction;
+    if (!animation) return;
+    cancelAnimationFrame(animation.request);
+    this.construction = undefined;
+    const home = this.world?.home;
+    if (home) {
+      home.visible = true;
+      home.scale.setScalar(1);
+      home.position.y = animation.baseY;
+    }
+    this.camera.controls.enabled = true;
+    this.renderer.shadowMap.needsUpdate = true;
+    if (resetCamera) this.camera.home();
+    if (notify) animation.done();
   }
   setLighting(value: Lighting) {
     this.lighting = value;
@@ -131,6 +196,7 @@ export class TownScene {
     this.renderer.domElement.dataset['rendered'] = 'true';
   }
   dispose() {
+    this.stopConstruction(false, false);
     clearInterval(this.timer);
     document.removeEventListener('visibilitychange', this.visibility);
     this.observer.disconnect();

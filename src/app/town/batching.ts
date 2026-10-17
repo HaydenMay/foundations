@@ -1,4 +1,13 @@
-import { BufferAttribute, BufferGeometry, Group, Material, Matrix4, Mesh, Vector3 } from 'three';
+import {
+  BufferAttribute,
+  BufferGeometry,
+  Group,
+  Material,
+  Matrix4,
+  Mesh,
+  Object3D,
+  Vector3,
+} from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 /** Bake static factory parts into material batches, retaining nested lights and their transforms. */
@@ -10,9 +19,12 @@ export function batchStatic(root: Group, own: (geometry: BufferGeometry) => Buff
     { material: Material; cast: boolean; receive: boolean; parts: BufferGeometry[] }
   >();
   const meshes: Mesh[] = [];
-  root.traverse((object) => {
+  const visit = (object: Object3D) => {
+    if (object !== root && object.userData['staticBatchBoundary']) return;
     if (object instanceof Mesh && !Array.isArray(object.material)) meshes.push(object);
-  });
+    object.children.forEach(visit);
+  };
+  visit(root);
   const scale = new Vector3(),
     matrix = new Matrix4();
   for (const mesh of meshes) {

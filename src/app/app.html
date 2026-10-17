@@ -27,7 +27,8 @@
     <app-town
       [designs]="store.state().designs"
       [preferences]="store.state().preferences"
-      (cameraChange)="store.preferences({ camera: $event })"
+      [sessionKey]="store.sessionKey()"
+      (cameraChange)="cameraChanged($event)"
       (lightChange)="sceneLight.set($event)"
     />
     <div class="scene-heading">
