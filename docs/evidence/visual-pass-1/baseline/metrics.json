@@ -1,0 +1,506 @@
+[
+  {
+    "name": "portrait-day-expanded",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "pixelRatio": 2,
+    "canvas": {
+      "x": 0,
+      "y": 74,
+      "width": 390,
+      "height": 447.90625
+    },
+    "headline": {
+      "x": 24,
+      "y": 96,
+      "width": 152.875,
+      "height": 120.4375
+    },
+    "panel": {
+      "x": 0,
+      "y": 512.90625,
+      "width": 390,
+      "height": 331.09375
+    },
+    "renderer": {
+      "calls": 645,
+      "triangles": 18438,
+      "geometries": 8,
+      "textures": 3,
+      "programs": 3
+    },
+    "meshes": 338,
+    "shadowCasters": 337,
+    "lights": 3,
+    "webglError": 0,
+    "renderSubmissionCpuMs": {
+      "samples": 6,
+      "median": 2.399999976158142,
+      "p95": 33.69999998807907
+    },
+    "note": "Short Windows Chromium headless sample; CPU renderer submission timings include warmup and are not GPU or physical-phone FPS measurements.",
+    "errors": []
+  },
+  {
+    "name": "portrait-day-collapsed",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "pixelRatio": 2,
+    "canvas": {
+      "x": 0,
+      "y": 74,
+      "width": 390,
+      "height": 714
+    },
+    "headline": {
+      "x": 24,
+      "y": 96,
+      "width": 152.875,
+      "height": 120.4375
+    },
+    "panel": {
+      "x": 0,
+      "y": 779,
+      "width": 390,
+      "height": 65
+    },
+    "renderer": {
+      "calls": 645,
+      "triangles": 18438,
+      "geometries": 8,
+      "textures": 3,
+      "programs": 3
+    },
+    "meshes": 338,
+    "shadowCasters": 337,
+    "lights": 3,
+    "webglError": 0,
+    "renderSubmissionCpuMs": {
+      "samples": 8,
+      "median": 2.399999976158142,
+      "p95": 33.69999998807907
+    },
+    "note": "Short Windows Chromium headless sample; CPU renderer submission timings include warmup and are not GPU or physical-phone FPS measurements.",
+    "errors": []
+  },
+  {
+    "name": "portrait-sunrise-collapsed",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "pixelRatio": 2,
+    "canvas": {
+      "x": 0,
+      "y": 74,
+      "width": 390,
+      "height": 714
+    },
+    "headline": {
+      "x": 24,
+      "y": 96,
+      "width": 152.875,
+      "height": 120.4375
+    },
+    "panel": {
+      "x": 0,
+      "y": 779,
+      "width": 390,
+      "height": 65
+    },
+    "renderer": {
+      "calls": 645,
+      "triangles": 18438,
+      "geometries": 8,
+      "textures": 3,
+      "programs": 3
+    },
+    "meshes": 338,
+    "shadowCasters": 337,
+    "lights": 3,
+    "webglError": 0,
+    "renderSubmissionCpuMs": {
+      "samples": 9,
+      "median": 1.600000023841858,
+      "p95": 33.69999998807907
+    },
+    "note": "Short Windows Chromium headless sample; CPU renderer submission timings include warmup and are not GPU or physical-phone FPS measurements.",
+    "errors": []
+  },
+  {
+    "name": "portrait-sunset-collapsed",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "pixelRatio": 2,
+    "canvas": {
+      "x": 0,
+      "y": 74,
+      "width": 390,
+      "height": 714
+    },
+    "headline": {
+      "x": 24,
+      "y": 96,
+      "width": 152.875,
+      "height": 120.4375
+    },
+    "panel": {
+      "x": 0,
+      "y": 779,
+      "width": 390,
+      "height": 65
+    },
+    "renderer": {
+      "calls": 645,
+      "triangles": 18438,
+      "geometries": 8,
+      "textures": 3,
+      "programs": 3
+    },
+    "meshes": 338,
+    "shadowCasters": 337,
+    "lights": 3,
+    "webglError": 0,
+    "renderSubmissionCpuMs": {
+      "samples": 10,
+      "median": 1.7000000476837158,
+      "p95": 33.69999998807907
+    },
+    "note": "Short Windows Chromium headless sample; CPU renderer submission timings include warmup and are not GPU or physical-phone FPS measurements.",
+    "errors": []
+  },
+  {
+    "name": "portrait-night-collapsed",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "pixelRatio": 2,
+    "canvas": {
+      "x": 0,
+      "y": 74,
+      "width": 390,
+      "height": 714
+    },
+    "headline": {
+      "x": 24,
+      "y": 96,
+      "width": 152.875,
+      "height": 120.4375
+    },
+    "panel": {
+      "x": 0,
+      "y": 779,
+      "width": 390,
+      "height": 65
+    },
+    "renderer": {
+      "calls": 645,
+      "triangles": 18438,
+      "geometries": 8,
+      "textures": 3,
+      "programs": 3
+    },
+    "meshes": 338,
+    "shadowCasters": 337,
+    "lights": 3,
+    "webglError": 0,
+    "renderSubmissionCpuMs": {
+      "samples": 11,
+      "median": 1.600000023841858,
+      "p95": 33.69999998807907
+    },
+    "note": "Short Windows Chromium headless sample; CPU renderer submission timings include warmup and are not GPU or physical-phone FPS measurements.",
+    "errors": []
+  },
+  {
+    "name": "portrait-idle",
+    "framesOver700ms": 0,
+    "errors": []
+  },
+  {
+    "name": "compact-portrait-day-expanded",
+    "viewport": {
+      "width": 390,
+      "height": 664
+    },
+    "pixelRatio": 2,
+    "canvas": {
+      "x": 0,
+      "y": 74,
+      "width": 390,
+      "height": 345.3125
+    },
+    "headline": {
+      "x": 24,
+      "y": 96,
+      "width": 152.875,
+      "height": 120.4375
+    },
+    "panel": {
+      "x": 0,
+      "y": 410.3125,
+      "width": 390,
+      "height": 253.6875
+    },
+    "renderer": {
+      "calls": 662,
+      "triangles": 19466,
+      "geometries": 8,
+      "textures": 3,
+      "programs": 3
+    },
+    "meshes": 338,
+    "shadowCasters": 337,
+    "lights": 3,
+    "webglError": 0,
+    "renderSubmissionCpuMs": {
+      "samples": 6,
+      "median": 2.300000011920929,
+      "p95": 23.5
+    },
+    "note": "Short Windows Chromium headless sample; CPU renderer submission timings include warmup and are not GPU or physical-phone FPS measurements.",
+    "errors": []
+  },
+  {
+    "name": "compact-portrait-day-collapsed",
+    "viewport": {
+      "width": 390,
+      "height": 664
+    },
+    "pixelRatio": 2,
+    "canvas": {
+      "x": 0,
+      "y": 74,
+      "width": 390,
+      "height": 534
+    },
+    "headline": {
+      "x": 24,
+      "y": 96,
+      "width": 152.875,
+      "height": 120.4375
+    },
+    "panel": {
+      "x": 0,
+      "y": 599,
+      "width": 390,
+      "height": 65
+    },
+    "renderer": {
+      "calls": 645,
+      "triangles": 18438,
+      "geometries": 8,
+      "textures": 3,
+      "programs": 3
+    },
+    "meshes": 338,
+    "shadowCasters": 337,
+    "lights": 3,
+    "webglError": 0,
+    "renderSubmissionCpuMs": {
+      "samples": 8,
+      "median": 2.300000011920929,
+      "p95": 23.5
+    },
+    "note": "Short Windows Chromium headless sample; CPU renderer submission timings include warmup and are not GPU or physical-phone FPS measurements.",
+    "errors": []
+  },
+  {
+    "name": "compact-portrait-idle",
+    "framesOver700ms": 0,
+    "errors": []
+  },
+  {
+    "name": "landscape-day-expanded",
+    "viewport": {
+      "width": 844,
+      "height": 390
+    },
+    "pixelRatio": 2,
+    "canvas": {
+      "x": 260,
+      "y": 59,
+      "width": 584,
+      "height": 331
+    },
+    "headline": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "panel": {
+      "x": 14,
+      "y": 72,
+      "width": 265,
+      "height": 305
+    },
+    "renderer": {
+      "calls": 675,
+      "triangles": 20442,
+      "geometries": 8,
+      "textures": 3,
+      "programs": 3
+    },
+    "meshes": 338,
+    "shadowCasters": 337,
+    "lights": 3,
+    "webglError": 0,
+    "renderSubmissionCpuMs": {
+      "samples": 6,
+      "median": 3.099999964237213,
+      "p95": 23.69999998807907
+    },
+    "note": "Short Windows Chromium headless sample; CPU renderer submission timings include warmup and are not GPU or physical-phone FPS measurements.",
+    "errors": []
+  },
+  {
+    "name": "landscape-day-collapsed",
+    "viewport": {
+      "width": 844,
+      "height": 390
+    },
+    "pixelRatio": 2,
+    "canvas": {
+      "x": 0,
+      "y": 59,
+      "width": 844,
+      "height": 331
+    },
+    "headline": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "panel": {
+      "x": 14,
+      "y": 319,
+      "width": 265,
+      "height": 58
+    },
+    "renderer": {
+      "calls": 675,
+      "triangles": 20442,
+      "geometries": 8,
+      "textures": 3,
+      "programs": 3
+    },
+    "meshes": 338,
+    "shadowCasters": 337,
+    "lights": 3,
+    "webglError": 0,
+    "renderSubmissionCpuMs": {
+      "samples": 8,
+      "median": 3,
+      "p95": 23.69999998807907
+    },
+    "note": "Short Windows Chromium headless sample; CPU renderer submission timings include warmup and are not GPU or physical-phone FPS measurements.",
+    "errors": []
+  },
+  {
+    "name": "landscape-idle",
+    "framesOver700ms": 0,
+    "errors": []
+  },
+  {
+    "name": "desktop-day-expanded",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "pixelRatio": 1,
+    "canvas": {
+      "x": 370,
+      "y": 92,
+      "width": 1070,
+      "height": 908
+    },
+    "headline": {
+      "x": 46,
+      "y": 136,
+      "width": 241.625,
+      "height": 188.25
+    },
+    "panel": {
+      "x": 28,
+      "y": 318.015625,
+      "width": 354,
+      "height": 651.984375
+    },
+    "renderer": {
+      "calls": 664,
+      "triangles": 19594,
+      "geometries": 8,
+      "textures": 3,
+      "programs": 3
+    },
+    "meshes": 338,
+    "shadowCasters": 337,
+    "lights": 3,
+    "webglError": 0,
+    "renderSubmissionCpuMs": {
+      "samples": 6,
+      "median": 2.899999976158142,
+      "p95": 22.599999964237213
+    },
+    "note": "Short Windows Chromium headless sample; CPU renderer submission timings include warmup and are not GPU or physical-phone FPS measurements.",
+    "errors": []
+  },
+  {
+    "name": "desktop-day-collapsed",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "pixelRatio": 1,
+    "canvas": {
+      "x": 370,
+      "y": 92,
+      "width": 1070,
+      "height": 908
+    },
+    "headline": {
+      "x": 46,
+      "y": 136,
+      "width": 241.625,
+      "height": 188.25
+    },
+    "panel": {
+      "x": 28,
+      "y": 908,
+      "width": 354,
+      "height": 62
+    },
+    "renderer": {
+      "calls": 664,
+      "triangles": 19594,
+      "geometries": 8,
+      "textures": 3,
+      "programs": 3
+    },
+    "meshes": 338,
+    "shadowCasters": 337,
+    "lights": 3,
+    "webglError": 0,
+    "renderSubmissionCpuMs": {
+      "samples": 7,
+      "median": 2.5,
+      "p95": 22.599999964237213
+    },
+    "note": "Short Windows Chromium headless sample; CPU renderer submission timings include warmup and are not GPU or physical-phone FPS measurements.",
+    "errors": []
+  },
+  {
+    "name": "desktop-idle",
+    "framesOver700ms": 0,
+    "errors": []
+  }
+]
