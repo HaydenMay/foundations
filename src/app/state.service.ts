@@ -10,17 +10,37 @@ import {
   STORAGE_KEY,
   MIGRATION_BACKUP_KEY,
 } from './domain/state';
+import {
+  copyPreview,
+  jumpPreview,
+  previewDesign,
+  previewStars,
+  previewVisible,
+  PreviewScenario,
+  PreviewSession,
+  scenarioPreview,
+} from './domain/preview';
 
 @Injectable({ providedIn: 'root' })
 export class FoundationsStore implements OnDestroy {
   readonly today = signal(localDate());
   readonly warning = signal('');
-  readonly state = signal<AppState>(initialState(this.today()));
-  readonly stars = computed(() => lifetimeStars(this.state()));
+  private readonly real = signal<AppState>(initialState(this.today()));
+  readonly realState = this.real.asReadonly();
+  private readonly previewSession = signal<PreviewSession | null>(null);
+  readonly preview = this.previewSession.asReadonly();
+  private readonly epoch = signal(0);
+  readonly sessionKey = this.epoch.asReadonly();
+  readonly state = computed(() => this.previewSession()?.state || this.real());
+  readonly stars = computed(() => this.previewSession()?.stars ?? lifetimeStars(this.real()));
   readonly daily = computed(() => dailyStars(this.state(), this.today()));
-  readonly unlocked = computed(() => unlockedProjects(this.state()));
+  readonly unlocked = computed(() => unlockedProjects(this.state(), this.stars()));
   readonly pending = computed(() => this.unlocked().filter((p) => !this.state().designs[p.id]));
-  readonly next = computed(() => PROJECTS.find((p) => p.threshold > this.stars()));
+  readonly next = computed(() =>
+    !this.state().onboarding.firstHomeUnlocked
+      ? PROJECTS[0]
+      : PROJECTS.find((p) => p.threshold > this.stars()),
+  );
   private unsaved = false;
   private corrupt = false;
   private storageBlocked = false;
@@ -36,7 +56,7 @@ export class FoundationsStore implements OnDestroy {
       return;
     }
     try {
-      this.state.set(importState(event.newValue));
+      this.real.set(importState(event.newValue));
       this.persistedBaseline = event.newValue;
     } catch {
       this.corrupt = true;
@@ -57,9 +77,9 @@ export class FoundationsStore implements OnDestroy {
     }
     try {
       if (saved) {
-        this.state.set(importState(saved));
-        if (JSON.parse(saved).version === 1) this.persist(this.state());
-      } else if (!this.storageBlocked) this.persist(this.state());
+        this.real.set(importState(saved));
+        if (JSON.parse(saved).version === 1) this.persist(this.real());
+      } else if (!this.storageBlocked) this.persist(this.real());
     } catch {
       this.corrupt = true;
       this.warning.set(
@@ -116,12 +136,26 @@ export class FoundationsStore implements OnDestroy {
     replace = false,
     requireDurable = false,
   ): Promise<void> {
+    const session = this.previewSession(),
+      epoch = this.epoch();
+    if (session) {
+      if (replace) throw new Error('Exit Developer Preview before restoring a real backup.');
+      const next = change(session.state);
+      this.previewSession.set({
+        ...session,
+        state: next,
+        stars: session.stars + lifetimeStars(next) - lifetimeStars(session.state),
+      });
+      return;
+    }
     const apply = () => {
+      if (epoch !== this.epoch())
+        throw new Error('The view changed before this action finished. Please try again.');
       if (this.corrupt && !replace)
         throw new Error(
           'Import a valid backup in Settings first. Your original saved data is untouched.',
         );
-      let current = this.state();
+      let current = this.real();
       if (!replace) {
         let raw: string | null = null;
         let readable = true;
@@ -164,7 +198,7 @@ export class FoundationsStore implements OnDestroy {
         throw new Error(
           'Your home could not be saved. Your selection is still pending. Try again when storage is available, or export your progress before closing.',
         );
-      this.state.set(next);
+      this.real.set(next);
       if (!requireDurable) this.persist(next);
     };
     if (navigator.locks) await navigator.locks.request('foundations-state', apply);
@@ -195,6 +229,10 @@ export class FoundationsStore implements OnDestroy {
     }));
   }
   design(project: string, choice: string): Promise<void> {
+    if (this.preview()) {
+      this.previewDesign(project, choice);
+      return Promise.resolve();
+    }
     return this.commit((s) => selectDesign(s, project, choice), false, project === 'home');
   }
   preferences(patch: Partial<Preferences>): Promise<void> {
@@ -204,7 +242,10 @@ export class FoundationsStore implements OnDestroy {
     return this.commit(() => importState(exportState(state)), true);
   }
   exportBackup(recovery = false): void {
-    let text = exportState(this.state());
+    this.download(this.backupJSON(recovery), recovery ? 'recovery-' : '');
+  }
+  backupJSON(recovery = false): string {
+    let text = exportState(this.real());
     if (recovery) {
       try {
         text = localStorage.getItem(STORAGE_KEY) || text;
@@ -212,12 +253,54 @@ export class FoundationsStore implements OnDestroy {
         /* Export the in-memory session when storage cannot be read. */
       }
     }
+    return text;
+  }
+  exportMigrationBackup(): void {
+    const text = localStorage.getItem(MIGRATION_BACKUP_KEY);
+    if (!text) throw new Error('No pre-upgrade backup is stored in this browser.');
+    this.download(text, 'pre-upgrade-');
+  }
+  private download(text: string, prefix: string) {
     const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
     const link = document.createElement('a');
     link.href = url;
-    link.download = `foundations-${recovery ? 'recovery-' : ''}${localDate()}.json`;
+    link.download = `foundations-${prefix}${localDate()}.json`;
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  enterPreview(): void {
+    if (this.previewSession()) return;
+    this.epoch.update((n) => n + 1);
+    this.previewSession.set(copyPreview(this.real()));
+  }
+  exitPreview(): void {
+    this.epoch.update((n) => n + 1);
+    this.previewSession.set(null);
+  }
+  private changePreview(change: (s: PreviewSession) => PreviewSession, resetCamera = false): void {
+    const session = this.previewSession();
+    if (!session) throw new Error('Enter Developer Preview first.');
+    const next = change(session);
+    if (resetCamera) this.epoch.update((n) => n + 1);
+    this.previewSession.set(next);
+  }
+  resetPreview(): void {
+    this.changePreview(() => copyPreview(this.real()), true);
+  }
+  previewScenario(kind: PreviewScenario): void {
+    this.changePreview(() => scenarioPreview(kind, this.today()), true);
+  }
+  previewStars(stars: number): void {
+    this.changePreview((s) => previewStars(s, stars));
+  }
+  previewJump(project: string): void {
+    this.changePreview((s) => jumpPreview(s, project), true);
+  }
+  previewDesign(project: string, choice: string): void {
+    this.changePreview((s) => previewDesign(s, project, choice));
+  }
+  previewVisible(project: 'home' | 'backyard', visible: boolean): void {
+    this.changePreview((s) => previewVisible(s, project, visible));
   }
   ngOnDestroy() {
     clearInterval(this.clock);
