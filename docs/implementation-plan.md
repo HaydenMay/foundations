@@ -20,3 +20,5 @@ No backend/accounts/tracking; stars never spent/decreased; 10/day; local dates; 
 ## Progress ledger
 
 2026-10-17: GitHub CLI authenticated as HaydenMay; target repository does not yet exist. Angular CLI 22 requires Node >=24.15; scaffold uses a task-local npm Node runtime rather than modifying the host installation. No changes made to Ember Bastion.
+
+2026-10-17: Tasks 1–3 complete. Domain/persistence/lighting/camera: 37 tests pass. Production build passes with strict checks. Browser integration: 32 pass / 1 explicitly skipped. Native dialogs, backups, eight reversible construction projects and the procedural town implemented. Final delivery and independent read-only review in progress. Ruling: use GitHub Pages as requested; the Sites hosting workflow is superseded by the explicit Angular/GitHub deployment requirements.

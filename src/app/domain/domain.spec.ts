@@ -1,12 +1,23 @@
 import { describe, expect, it } from 'vitest';
 import { localDate, nextDate, weekStart } from './dates';
-import { completeHabit, createHabit, dailyStars, editHabit, isCompleted, isScheduled, lifetimeStars } from './habits';
+import {
+  completeHabit,
+  createHabit,
+  dailyStars,
+  editHabit,
+  isCompleted,
+  isScheduled,
+  lifetimeStars,
+} from './habits';
 import { AppState, Difficulty, HabitInput, Schedule } from './models';
 import { PROJECTS, selectDesign, unlockedProjects } from './progression';
 import { exportState, importState, initialState } from './state';
 
 const MON = '2026-10-19';
-function input(difficulty: Difficulty = 'hard', schedule: Schedule = { kind: 'daily', days: [] }): HabitInput {
+function input(
+  difficulty: Difficulty = 'hard',
+  schedule: Schedule = { kind: 'daily', days: [] },
+): HabitInput {
   return { name: 'A little movement', difficulty, schedule, active: true };
 }
 function fixture(count = 1, difficulty: Difficulty = 'hard'): AppState {
@@ -20,7 +31,8 @@ function earn(count: number): AppState {
   return state;
 }
 describe('calendar and scheduling', () => {
-  it('uses the device calendar rather than a UTC timestamp', () => expect(localDate(new Date(2026, 9, 19, 23, 59))).toBe(MON));
+  it('uses the device calendar rather than a UTC timestamp', () =>
+    expect(localDate(new Date(2026, 9, 19, 23, 59))).toBe(MON));
   it('advances a calendar day over DST and year boundaries', () => {
     expect(nextDate('2026-12-31')).toBe('2027-01-01');
     expect(nextDate('2026-03-08')).toBe('2026-03-09');
@@ -35,7 +47,8 @@ describe('calendar and scheduling', () => {
     expect(isScheduled(h, MON)).toBe(false);
     expect(isScheduled(h, '2026-10-20')).toBe(true);
   });
-  it('makes starter goals eligible immediately', () => expect(isScheduled(createHabit(input(), MON, true), MON)).toBe(true));
+  it('makes starter goals eligible immediately', () =>
+    expect(isScheduled(createHabit(input(), MON, true), MON)).toBe(true));
   it('respects selected weekdays', () => {
     const h = createHabit(input('easy', { kind: 'weekdays', days: [1, 3] }), MON, true);
     expect(isScheduled(h, MON)).toBe(true);
@@ -53,13 +66,17 @@ describe('calendar and scheduling', () => {
   });
 });
 describe('permanent rewards', () => {
-  it.each([['easy', 1], ['moderate', 2], ['hard', 3]] as const)('awards %s difficulty %i stars', (difficulty, expected) => {
+  it.each([
+    ['easy', 1],
+    ['moderate', 2],
+    ['hard', 3],
+  ] as const)('awards %s difficulty %i stars', (difficulty, expected) => {
     const s = fixture(1, difficulty);
     expect(dailyStars(completeHabit(s, s.habits[0].id, MON), MON)).toBe(expected);
   });
   it('partially rewards a hard goal when only one star remains', () => {
     const s = earn(4);
-    expect(s.completions.map(c => c.stars)).toEqual([3, 3, 3, 1]);
+    expect(s.completions.map((c) => c.stars)).toEqual([3, 3, 3, 1]);
     expect(lifetimeStars(s)).toBe(10);
   });
   it('records completion after the cap with zero additional stars', () => {
@@ -107,7 +124,10 @@ describe('permanent rewards', () => {
   });
   it('retains immutable history and lifetime stars after edits and archival', () => {
     const s = earn(1);
-    s.habits[0] = { ...editHabit(s.habits[0], { ...input('easy'), name: 'Changed' }), archived: true };
+    s.habits[0] = {
+      ...editHabit(s.habits[0], { ...input('easy'), name: 'Changed' }),
+      archived: true,
+    };
     expect(s.completions[0].name).toBe('A little movement');
     expect(s.completions[0].stars).toBe(3);
     expect(lifetimeStars(s)).toBe(3);
@@ -116,7 +136,7 @@ describe('permanent rewards', () => {
 describe('construction and backups', () => {
   it('keeps every unlocked project pending until a choice is made', () => {
     const s = earn(4);
-    expect(unlockedProjects(s).map(p => p.id)).toEqual(['home', 'backyard']);
+    expect(unlockedProjects(s).map((p) => p.id)).toEqual(['home', 'backyard']);
     expect(s.designs['backyard']).toBeUndefined();
   });
   it('allows free reversible customization without spending stars', () => {
@@ -133,7 +153,7 @@ describe('construction and backups', () => {
   });
   it('ships eight distinct projects with three choices each', () => {
     expect(PROJECTS).toHaveLength(8);
-    expect(PROJECTS.every(p => p.choices.length === 3)).toBe(true);
+    expect(PROJECTS.every((p) => p.choices.length === 3)).toBe(true);
   });
   it('round-trips habits, history, stars, designs and preferences', () => {
     const s = selectDesign(earn(4), 'backyard', 'pool');
@@ -143,7 +163,10 @@ describe('construction and backups', () => {
     expect(restored).toEqual(s);
     expect(lifetimeStars(restored)).toBe(10);
   });
-  it.each(['{}', '{', '{"version":99}', '{"version":1,"habits":[]}'])('rejects malformed or unsupported backup %s', json => expect(() => importState(json)).toThrow());
+  it.each(['{}', '{', '{"version":99}', '{"version":1,"habits":[]}'])(
+    'rejects malformed or unsupported backup %s',
+    (json) => expect(() => importState(json)).toThrow(),
+  );
   it('rejects invalid dates, excessive rewards and duplicate completions', () => {
     const s = earn(1);
     s.completions[0].date = '2026-02-30';

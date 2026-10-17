@@ -1,12 +1,14 @@
 {
   "name": "foundations",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --base-href=/foundations/",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test --watch=false",
+    "test:e2e": "playwright test",
+    "preview": "node scripts/serve.mjs"
   },
   "private": true,
   "packageManager": "npm@11.8.0",
@@ -31,5 +33,13 @@
     "prettier": "^3.8.1",
     "typescript": "~6.0.2",
     "vitest": "^5.0.0"
+  },
+  "description": "A private wellness companion where every small step builds a peaceful miniature town.",
+  "engines": {
+    "node": "^22.22.3 || ^24.15.0 || >=26.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HaydenMay/foundations.git"
   }
 }
