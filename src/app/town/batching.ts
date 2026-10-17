@@ -19,7 +19,6 @@ export function batchStatic(root: Group, own: (geometry: BufferGeometry) => Buff
     const material = mesh.material as Material;
     matrix.multiplyMatrices(inverseRoot, mesh.matrixWorld);
     const geometry = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone();
-    geometry.applyMatrix4(matrix);
     geometry.clearGroups();
     for (const key of Object.keys(geometry.attributes))
       if (!['position', 'normal', 'uv'].includes(key)) geometry.deleteAttribute(key);
@@ -29,7 +28,13 @@ export function batchStatic(root: Group, own: (geometry: BufferGeometry) => Buff
     if (!geometry.getAttribute('uv'))
       geometry.setAttribute('uv', new BufferAttribute(new Float32Array(position.count * 2), 2));
     const uv = geometry.getAttribute('uv'),
-      density = material.userData['uvMeters'];
+      density = material.userData['uvMeters'],
+      localGrain = material.userData['uvSpace'] === 'asset';
+    if (localGrain) mesh.getWorldScale(scale);
+    else {
+      scale.set(1, 1, 1);
+      geometry.applyMatrix4(matrix);
+    }
     if (density)
       for (let i = 0; i < position.count; i++) {
         const nx = Math.abs(normal.getX(i)),
@@ -37,10 +42,11 @@ export function batchStatic(root: Group, own: (geometry: BufferGeometry) => Buff
           nz = Math.abs(normal.getZ(i));
         uv.setXY(
           i,
-          (nx > ny && nx > nz ? position.getZ(i) : position.getX(i)) * density,
-          (ny > nx && ny > nz ? position.getZ(i) : position.getY(i)) * density,
+          (nx > ny && nx > nz ? position.getZ(i) * scale.z : position.getX(i) * scale.x) * density,
+          (ny > nx && ny > nz ? position.getZ(i) * scale.z : position.getY(i) * scale.y) * density,
         );
       }
+    if (localGrain) geometry.applyMatrix4(matrix);
     mesh.geometry.computeBoundingBox();
     mesh.geometry.boundingBox!.getSize(scale);
     scale.multiply(mesh.getWorldScale(new Vector3()));

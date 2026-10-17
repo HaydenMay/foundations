@@ -7,6 +7,7 @@ import { buildWorld } from './world';
 import { homeViewHeight } from './camera';
 import { lightAt } from './lighting';
 import { buildBackyard } from './backyards';
+import { surface } from './surfaces';
 
 describe('residential asset contracts', () => {
   it('offers distinct architecture in the same usable lot with a shared entrance', () => {
@@ -70,6 +71,58 @@ describe('residential asset contracts', () => {
       expect(bounds.max.z).toBeLessThan(-4.6);
       a.dispose();
     }
+  });
+  it('keeps shingle courses following each roof ridge when a gable is rotated', () => {
+    const a = new AssetLibrary(),
+      root = new T.Group();
+    const roof = surface(a, 'shingles', '#414b50');
+    for (const [x, rotation] of [
+      [0, 0],
+      [10, Math.PI / 2],
+    ]) {
+      const g = a.group(root, x, 0, 0, rotation);
+      a.box(g, roof, 0, 0, 0, 4, 0.1, 2);
+    }
+    batchStatic(root, (geometry) => a.geometry(geometry));
+    const mesh = root.children.find((o) => o instanceof T.Mesh) as T.Mesh;
+    const uvs = mesh.geometry.getAttribute('uv');
+    for (let i = 0; i < uvs.count / 2; i++) {
+      expect(uvs.getX(i)).toBeCloseTo(uvs.getX(i + uvs.count / 2));
+      expect(uvs.getY(i)).toBeCloseTo(uvs.getY(i + uvs.count / 2));
+    }
+    a.dispose();
+  });
+  it('recesses the pool water under a genuine open coping ring', () => {
+    const a = new AssetLibrary(),
+      root = new T.Group();
+    const yard = buildBackyard(a, root, 'pool');
+    const coping = yard.getObjectByName('pool-coping') as T.Mesh<T.ExtrudeGeometry>;
+    const water = yard.getObjectByName('pool-water')!;
+    const shape = coping.geometry.parameters.shapes as T.Shape;
+    expect(shape.holes).toHaveLength(1);
+    expect(new T.Box3().setFromObject(water).max.y).toBeLessThan(
+      new T.Box3().setFromObject(coping).max.y,
+    );
+    a.dispose();
+  });
+  it('connects each fort support to the sloped canopy', () => {
+    const a = new AssetLibrary(),
+      root = new T.Group();
+    const yard = buildBackyard(a, root, 'fort');
+    root.updateMatrixWorld(true);
+    const roofs = yard.children.filter((o) => o.name === 'fort-canopy');
+    for (const support of yard.children.filter((o) => o.name === 'fort-support')) {
+      const p = support.getWorldPosition(new T.Vector3());
+      const hit = new T.Raycaster(
+        new T.Vector3(p.x, 10, p.z),
+        new T.Vector3(0, -1, 0),
+      ).intersectObjects(roofs)[0];
+      expect(hit).toBeDefined();
+      const top = new T.Box3().setFromObject(support).max.y;
+      expect(top).toBeGreaterThan(hit.point.y - 0.12);
+      expect(top).toBeLessThan(hit.point.y + 0.1);
+    }
+    a.dispose();
   });
   it('keeps the detailed initial scene in a practical draw submission budget', () => {
     const world = buildWorld({ home: 'sage' });

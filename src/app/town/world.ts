@@ -82,9 +82,9 @@ const PROJECT_ASSETS: Record<string, ProjectFactory> = {
   street,
   circle,
   exterior(a, g, choice) {
-    a.bench(g, -7.2, -1.8);
-    a.flowerBox(g, -6.8, 0.4, 0);
-    a.flowerBox(g, -3.6, 0.4, 0);
+    a.bench(g, -10.2, -2);
+    a.flowerBox(g, -7, 0.34, 0.55);
+    a.flowerBox(g, -4.15, 0.34, 0.55);
     if (choice === 'slate') for (const x of [-8.8, -2]) a.shrub(g, x, -1.8, 0.8, '#9991a0');
   },
   neighbor(a, g, choice) {

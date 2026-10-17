@@ -11,6 +11,7 @@ function rounded(
   radius: number,
   y: number,
   material: T.Material,
+  inset?: [number, number, number],
 ) {
   const s = new T.Shape(),
     x = -width / 2,
@@ -24,6 +25,22 @@ function rounded(
   s.quadraticCurveTo(x, z + depth, x, z + depth - radius);
   s.lineTo(x, z + radius);
   s.quadraticCurveTo(x, z, x + radius, z);
+  if (inset) {
+    const [w, d, r] = inset,
+      xx = -w / 2,
+      zz = -d / 2;
+    const hole = new T.Path();
+    hole.moveTo(xx + r, zz);
+    hole.lineTo(xx + w - r, zz);
+    hole.quadraticCurveTo(xx + w, zz, xx + w, zz + r);
+    hole.lineTo(xx + w, zz + d - r);
+    hole.quadraticCurveTo(xx + w, zz + d, xx + w - r, zz + d);
+    hole.lineTo(xx + r, zz + d);
+    hole.quadraticCurveTo(xx, zz + d, xx, zz + d - r);
+    hole.lineTo(xx, zz + r);
+    hole.quadraticCurveTo(xx, zz, xx + r, zz);
+    s.holes.push(hole);
+  }
   const mesh = a.mesh(
     p,
     a.geometry(new T.ExtrudeGeometry(s, { depth: 0.1, bevelEnabled: false, curveSegments: 8 })),
@@ -48,8 +65,10 @@ export function buildBackyard(a: AssetLibrary, parent: T.Group, choice: string) 
   g.name = 'backyard-project';
   if (choice === 'pool') {
     rounded(a, g, 3.8, 4.7, 0.68, 0.02, surface(a, 'paving', '#c5b79d'));
-    rounded(a, g, 3.2, 4.03, 0.9, 0.13, a.material('#d5d6bf'));
-    rounded(a, g, 2.94, 3.76, 0.85, 0.19, surface(a, 'water', '#3994ac'));
+    const coping = rounded(a, g, 3.2, 4.03, 0.9, 0.13, a.material('#d5d6bf'), [2.94, 3.76, 0.85]);
+    coping.name = 'pool-coping';
+    const water = rounded(a, g, 2.94, 3.76, 0.85, 0.1, surface(a, 'water', '#3994ac'));
+    water.name = 'pool-water';
     const chrome = a.namedMaterial(
       'pool-metal',
       () => new T.MeshStandardMaterial({ color: '#bdc3b5', metalness: 0.65, roughness: 0.28 }),
@@ -77,7 +96,8 @@ export function buildBackyard(a: AssetLibrary, parent: T.Group, choice: string) 
     const cedar = surface(a, 'wood', '#aa8052'),
       trim = '#795333';
     for (const x of [-0.95, 0.95])
-      for (const z of [-0.9, 0.9]) a.box(g, cedar, x, 1.14, z, 0.15, 2.25, 0.15);
+      for (const z of [-0.9, 0.9])
+        a.box(g, cedar, x, 1.38, z, 0.15, 2.74, 0.15).name = 'fort-support';
     a.box(g, cedar, 0, 1.2, 0, 2.2, 0.14, 2.15);
     for (const z of [-0.97, 0.97]) {
       a.box(g, cedar, 0, 1.96, z, 2.15, 0.13, 0.1);
@@ -99,6 +119,7 @@ export function buildBackyard(a: AssetLibrary, parent: T.Group, choice: string) 
         2.65,
       );
       roof.rotation.z = -side * angle;
+      roof.name = 'fort-canopy';
     }
     a.box(g, trim, 0, 3.23, 0, 0.12, 0.1, 2.7);
     // The slide stays entirely in the same left/rear zone for every house.

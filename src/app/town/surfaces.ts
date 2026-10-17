@@ -93,6 +93,7 @@ export function surface(a: AssetLibrary, finish: Finish, color: string): T.MeshS
     });
     material.userData['uvMeters'] =
       finish === 'grass' ? 0.42 : finish === 'water' ? 0.6 : finish === 'shingles' ? 0.8 : 0.7;
+    if (finish === 'shingles') material.userData['uvSpace'] = 'asset';
     return material;
   });
 }

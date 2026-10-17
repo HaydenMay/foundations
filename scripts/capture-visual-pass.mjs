@@ -209,6 +209,25 @@ try {
         await design('Your backyard retreat', name);
         await capture(`backyard-${id}-desktop`);
       }
+      // Advance this synthetic profile one local day and earn the existing twelve-star roof project.
+      await page.clock.install({ time: new Date(Date.now() + 24 * 60 * 60 * 1000) });
+      await page.reload();
+      await page.getByRole('button', { name: 'Expand habits' }).click();
+      await page.getByRole('button', { name: 'Return to your first home' }).click();
+      for (const name of [
+        'Step outside for a little walk',
+        'Make a moment to unwind',
+        'Move in a way you enjoy',
+      ])
+        await page.getByRole('button', { name: `Complete ${name}`, exact: true }).click();
+      for (const [name, id] of [
+        ['Terracotta', 'clay'],
+        ['Evening slate', 'slate'],
+        ['Forest green', 'moss'],
+      ]) {
+        await design('A fresh welcome', name);
+        await capture(`exterior-${id}-desktop`);
+      }
     }
     const before = await page.evaluate(() => window.__visual.renderer.info.render.frame);
     await page.waitForTimeout(700);
