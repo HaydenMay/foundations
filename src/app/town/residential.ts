@@ -42,6 +42,7 @@ export function pitchedRoof(
   roof: Paint,
   wall: Paint,
   trim = TRIM,
+  openPositiveEnd = false,
 ) {
   const angle = Math.atan2(rise, depth / 2),
     length = Math.hypot(rise, depth / 2);
@@ -64,7 +65,7 @@ export function pitchedRoof(
     }
   }
   a.box(p, roof, 0, eave + rise + 0.07, 0, width + 0.04, 0.1, 0.16);
-  for (const x of [-width / 2 + 0.17, width / 2 - 0.25]) {
+  for (const x of openPositiveEnd ? [-width / 2 + 0.17] : [-width / 2 + 0.17, width / 2 - 0.25]) {
     const end = a.group(p, x, 0, 0, Math.PI / 2);
     gable(a, end, depth - 0.2, rise - 0.05, eave - 0.03, 0, wall);
   }
@@ -191,8 +192,9 @@ function porch(
 function dormer(a: AssetLibrary, g: T.Object3D, x: number, roof: Paint, wall: Paint) {
   const d = a.group(g, x, 0, 1.4);
   a.box(d, wall, 0, 4.12, 0, 1.25, 1.14, 1.55);
-  const cap = a.group(d, 0, 0, 0, Math.PI / 2);
-  pitchedRoof(a, cap, 1.9, 1.55, 0.65, 4.7, roof, wall);
+  // Bury the rear cap in the main pitch, leaving no detached rear gable above it.
+  const cap = a.group(d, 0, 0, -0.225, Math.PI / 2);
+  pitchedRoof(a, cap, 2.35, 1.55, 0.65, 4.7, roof, wall, TRIM, true);
   window(a, d, 0, 4.12, 0.8, 0.67, 0.88);
   a.flowerBox(d, 0, 3.5, 0.88, '#8b7051');
 }

@@ -48,11 +48,7 @@ export function surface(a: AssetLibrary, finish: Finish, color: string): T.MeshS
           height = edge < 2 ? 0.1 : 0.9;
         }
         if (finish === 'grass') {
-          shade =
-            0.94 +
-            0.07 * noise(x, y) +
-            0.025 * Math.sin(x * 0.22 + Math.sin(y * 0.15)) +
-            0.02 * Math.cos(y * 0.19);
+          shade = 0.96 + 0.07 * noise(x, y);
           height = noise(x, y);
         }
         if (finish === 'paving') {
@@ -87,7 +83,8 @@ export function surface(a: AssetLibrary, finish: Finish, color: string): T.MeshS
       color: '#ffffff',
       map,
       bumpMap: relief,
-      bumpScale: finish === 'brick' || finish === 'stone' ? 0.035 : 0.018,
+      bumpScale:
+        finish === 'grass' ? 0.004 : finish === 'brick' || finish === 'stone' ? 0.035 : 0.018,
       roughness: finish === 'water' ? 0.24 : 0.91,
       metalness: finish === 'water' ? 0.08 : 0,
     });
