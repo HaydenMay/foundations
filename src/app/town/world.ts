@@ -17,6 +17,7 @@ import {
   type FrameworkHomeStyle,
 } from './plot-proof';
 import type { PlotDefinition } from './plot-framework';
+import { createChapterTwoNeighborhoodPlot } from './chapter-two-site-plan';
 
 export interface TownWorld {
   group: T.Group;
@@ -165,15 +166,15 @@ export function buildWorld(
     a = new AssetLibrary();
   const chapterTwo = designs['ch2-neighborhood'] === 'reveal';
   // A shallow rounded terrain slice keeps the whole environment miniature and replaceable.
-  const worldWidth = chapterTwo ? 90 : 36,
-    worldDepth = chapterTwo ? 62 : 29,
-    worldCenterX = chapterTwo ? 18 : 0,
+  const worldWidth = chapterTwo ? 120 : 36,
+    worldDepth = chapterTwo ? 88 : 29,
+    worldCenterX = chapterTwo ? 25 : 0,
     base = a.geometry(new RoundedBoxGeometry(worldWidth, 0.8, worldDepth, 2, 0.35));
-  a.mesh(group, base, '#b9b79a', worldCenterX, -0.52, -1.5);
+  a.mesh(group, base, '#b9b79a', worldCenterX, -0.52, chapterTwo ? -4 : -1.5);
   const turf = a.geometry(
     new RoundedBoxGeometry(worldWidth - 0.2, 0.22, worldDepth - 0.2, 2, 0.28),
   );
-  a.mesh(group, turf, surface(a, 'grass', '#829456'), worldCenterX, -0.04, -1.5);
+  a.mesh(group, turf, surface(a, 'grass', '#829456'), worldCenterX, -0.04, chapterTwo ? -4 : -1.5);
   a.box(group, surface(a, 'grass', '#819852'), -6, 0.085, -5.4, 13.8, 0.08, 13.4);
   // Chapter 2 replaces the straight starter street with one connected residential road.
   if (!chapterTwo) {
@@ -271,12 +272,57 @@ export function buildWorld(
   const homeStyle = (
     ['sage', 'cream', 'blue'].includes(designs['home']) ? designs['home'] : 'sage'
   ) as FrameworkHomeStyle;
-  const plotDefinitions: PlotDefinition[] = [
-    createChapterOnePropertyPlot(
-      { home, homeAssemblies, homeRecipe, projectAssets, legacyAssets },
-      homeStyle,
-    ),
-  ];
+  const chapterOnePlot = createChapterOnePropertyPlot(
+    { home, homeAssemblies, homeRecipe, projectAssets, legacyAssets },
+    homeStyle,
+  );
+  const chapterTwoPlot = chapterTwo ? createChapterTwoNeighborhoodPlot(chapterOnePlot) : undefined;
+  const plotDefinitions: PlotDefinition[] = [chapterTwoPlot ?? chapterOnePlot];
+  if (chapterTwoPlot) {
+    const bind = new Map<string, T.Object3D>();
+    const put = (nodeId: string, object: T.Object3D | undefined) => {
+      if (object) bind.set(nodeId, object);
+    };
+    const road = projectAssets.get('ch2-neighborhood');
+    put('ch2-road', road?.pieces.get('continuous-road'));
+    put('ch2-sidewalk-north', road?.pieces.get('sidewalks-and-curbs'));
+    put('ch2-sidewalk-south', road?.pieces.get('sidewalks-and-curbs'));
+    put('ch2-streetscape', road?.pieces.get('young-street-trees'));
+    for (const projectId of [
+      'ch2-neighbor-1',
+      'ch2-neighbor-2',
+      'ch2-neighbor-3',
+      'ch2-neighbor-4',
+    ]) {
+      const asset = projectAssets.get(projectId);
+      put(`${projectId}-lot`, asset?.root);
+      put(`${projectId}-house`, asset?.pieces.get('house'));
+      put(`${projectId}-yard`, asset?.pieces.get('front-garden'));
+      put(`${projectId}-driveway`, asset?.pieces.get('driveway-and-walk'));
+      put(`${projectId}-walkway`, asset?.pieces.get('driveway-and-walk'));
+      put(`${projectId}-mailbox`, asset?.pieces.get('mailbox-and-yard-tree'));
+    }
+    for (const projectId of ['ch2-entrance', 'ch2-community-park', 'ch2-landmark']) {
+      const asset = projectAssets.get(projectId);
+      const nodeId = projectId;
+      put(nodeId, asset?.root);
+    }
+    const park = projectAssets.get('ch2-community-park');
+    put('ch2-public-walk-to-park', park?.pieces.get('public-neighborhood-paths'));
+    put('ch2-public-promenade', park?.pieces.get('public-neighborhood-paths'));
+    plotDefinitions[0] = {
+      ...chapterTwoPlot,
+      nodes: chapterTwoPlot.nodes.map((node) =>
+        bind.has(node.id)
+          ? {
+              ...node,
+              renderObject: bind.get(node.id),
+              renderCoordinateSystem: 'legacy-world-authored',
+            }
+          : node,
+      ),
+    };
+  }
   if (frameworkProof) plotDefinitions.push(frameworkProof.definition);
   return {
     group,
