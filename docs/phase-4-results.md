@@ -34,7 +34,7 @@ The capture script is optional visual evidence tooling. It is not part of `npm t
 - Production-bundle visual capture: **PASS — 14 property views plus four responsive UI screenshots**. Browser page/console errors: **0**. Observed external hosts: **none** (only the local preview server). WebGL errors: **0**. Context losses: **0**. Horizontal overflow: **none** at the captured 1280×900, 390×844 and 844×390 emulated viewports.
 - Renderer observations across the 12 uniform reference captures: **207–215 draw calls** and **220,742–280,923 triangles**. These are Chromium renderer submissions at an emulated desktop viewport, not GPU frame-time or physical-device performance measurements.
 - Physical iPhone, Android and Safari testing: **SKIPPED**. No physical device was used. Responsive visual inspection used Chromium viewport/touch emulation only.
-- GitHub Pages verification: pending publication of the Phase 4 commits. Do not treat a local build or a configured workflow as a successful deployment.
+- GitHub Pages: **PASS** — [Actions run 39104379276](https://github.com/HaydenMay/foundations/actions/runs/39104379276) completed both unit/build and deploy jobs successfully for commit `96a80fb`. The live app returned HTTP 200, title `Foundations`, and base href `/foundations/`; its main bundle, lazy Three.js scene chunk, shared chunk and stylesheet each returned HTTP 200. The gallery is committed under `docs/evidence/phase-4/` in the repository; Pages publishes only the application bundle. The workflow runs unit tests and the production build; it does not run Playwright or E2E tests.
 
 ## Visual comparison and limitations
 
