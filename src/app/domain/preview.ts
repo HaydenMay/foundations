@@ -3,14 +3,19 @@ import { completeHabit, lifetimeStars } from './habits';
 import { initialState } from './state';
 import {
   CHAPTER_COMPLETE_THRESHOLD,
+  CHAPTER_TWO_COMPLETE_THRESHOLD,
+  CHAPTER_TWO_START_THRESHOLD,
+  ALL_PROJECTS,
   LEGACY_PROJECTS,
   LEGACY_UNLOCK_THRESHOLDS,
   PROJECTS,
   selectDesign,
 } from './progression';
 import { Project } from './models';
+import type { ChapterNotice } from './chapter-notices';
 
-export type PreviewScenario = 'new' | 'ready' | 'home' | 'several' | 'all';
+export type PreviewScenario =
+  'new' | 'ready' | 'home' | 'several' | 'neighborhood' | 'chapter-two' | 'complete' | 'all';
 export interface PreviewSession {
   state: AppState;
   stars: number;
@@ -28,12 +33,24 @@ export function previewStars(session: PreviewSession, stars: number): PreviewSes
     throw new Error('Use a whole simulated star total from 0 to 100,000.');
   return { ...session, stars };
 }
+export function previewNotice(session: PreviewSession, notice: ChapterNotice): PreviewSession {
+  return {
+    ...session,
+    state: {
+      ...session.state,
+      chapterNotices: {
+        ...session.state.chapterNotices,
+        [notice === 'neighborhood' ? 'neighborhoodSeen' : 'completeSeen']: false,
+      },
+    },
+  };
+}
 export function previewDesign(
   session: PreviewSession,
   project: string,
   choice: string,
 ): PreviewSession {
-  const definition = [...PROJECTS, ...LEGACY_PROJECTS].find((p) => p.id === project);
+  const definition = [...ALL_PROJECTS, ...LEGACY_PROJECTS].find((p) => p.id === project);
   if (!definition?.choices.some((c) => c.id === choice))
     throw new Error('Choose an existing preview design.');
   return {
@@ -59,13 +76,20 @@ export function previewVisible(
 ): PreviewSession {
   if (
     project !== 'chapter' &&
-    ![...PROJECTS, ...LEGACY_PROJECTS].some((definition) => definition.id === project)
+    project !== 'ch2-neighborhood' &&
+    ![...ALL_PROJECTS, ...LEGACY_PROJECTS].some((definition) => definition.id === project)
   )
     throw new Error('Choose an existing preview project.');
-  if (project === 'chapter') {
+  if (project === 'chapter' || project === 'ch2-neighborhood') {
     const hiddenDesigns = { ...session.hiddenDesigns };
-    if (visible) delete hiddenDesigns['chapter'];
-    else hiddenDesigns['chapter'] = '__hidden__';
+    if (visible) delete hiddenDesigns[project];
+    else hiddenDesigns[project] = '__hidden__';
+    if (project === 'ch2-neighborhood') {
+      const designs = { ...session.state.designs };
+      if (visible) designs[project] = 'reveal';
+      else delete designs[project];
+      return { ...session, state: { ...session.state, designs }, hiddenDesigns };
+    }
     return { ...session, hiddenDesigns };
   }
   if (visible)
@@ -73,7 +97,7 @@ export function previewVisible(
       session,
       project,
       session.hiddenDesigns[project] ||
-        [...PROJECTS, ...LEGACY_PROJECTS].find((p) => p.id === project)!.choices[0].id,
+        [...ALL_PROJECTS, ...LEGACY_PROJECTS].find((p) => p.id === project)!.choices[0].id,
     );
   const designs = { ...session.state.designs };
   delete designs[project];
@@ -94,18 +118,33 @@ export function jumpPreview(session: PreviewSession, projectId: string): Preview
           icon: 'home',
           choices: [],
         }
-      : [...PROJECTS, ...LEGACY_PROJECTS].find((p) => p.id === projectId);
+      : projectId === 'ch2-neighborhood'
+        ? {
+            id: 'ch2-neighborhood',
+            name: 'Chapter 2 · Neighborhood',
+            threshold: CHAPTER_TWO_START_THRESHOLD,
+            description: 'Reveal the continuous neighborhood road and reserved home lots.',
+            icon: 'road',
+            choices: [],
+          }
+        : projectId === 'ch2-complete'
+          ? {
+              id: 'ch2-complete',
+              name: 'Chapter 2 · Complete',
+              threshold: CHAPTER_TWO_COMPLETE_THRESHOLD,
+              description: 'Unlock every current Chapter 2 project.',
+              icon: 'tree',
+              choices: [],
+            }
+          : [...ALL_PROJECTS, ...LEGACY_PROJECTS].find((p) => p.id === projectId);
   if (!target) throw new Error('Choose an existing milestone.');
   const threshold = target.threshold;
   const designs: Record<string, string> = {};
-  for (const p of PROJECTS.filter((p) => p.threshold <= threshold))
+  for (const p of ALL_PROJECTS.filter((p) => p.threshold <= threshold))
     designs[p.id] = session.hiddenDesigns[p.id] || p.choices[0].id;
-  const legacyUnlocks =
-    target.legacy || target.id === 'chapter'
-      ? Object.entries(LEGACY_UNLOCK_THRESHOLDS)
-          .filter(([, required]) => (target.legacy ? required <= threshold : false))
-          .map(([id]) => id)
-      : [];
+  const legacyUnlocks = Object.entries(LEGACY_UNLOCK_THRESHOLDS)
+    .filter(([, required]) => required <= threshold)
+    .map(([id]) => id);
   if (target.legacy) {
     for (const project of LEGACY_PROJECTS.filter((p) => p.threshold <= threshold)) {
       designs[project.id] = session.hiddenDesigns[project.id] || project.choices[0].id;
@@ -116,12 +155,23 @@ export function jumpPreview(session: PreviewSession, projectId: string): Preview
         PROJECTS.find((p) => p.id === 'backyard')!.choices[0].id;
     }
   }
+  if (
+    threshold >= CHAPTER_TWO_START_THRESHOLD &&
+    session.hiddenDesigns['ch2-neighborhood'] !== '__hidden__'
+  )
+    designs['ch2-neighborhood'] = 'reveal';
+  if (projectId === 'chapter') designs['chapter'] = 'reveal';
+  const neighborhoodSeen =
+      threshold >= CHAPTER_TWO_START_THRESHOLD || session.state.chapterNotices.neighborhoodSeen,
+    completeSeen =
+      threshold >= CHAPTER_TWO_COMPLETE_THRESHOLD || session.state.chapterNotices.completeSeen;
   return {
     ...session,
     stars: threshold,
     state: {
       ...session.state,
       onboarding: { ...session.state.onboarding, firstHomeUnlocked: true },
+      chapterNotices: { neighborhoodSeen, completeSeen },
       designs,
       legacyUnlocks,
       preferences: {
@@ -145,6 +195,8 @@ export function scenarioPreview(kind: PreviewScenario, date: string): PreviewSes
   state = selectDesign(state, 'home', 'sage');
   const session = copyPreview(state);
   if (kind === 'several') return jumpPreview(session, 'retreat');
-  if (kind === 'all') return jumpPreview(session, 'chapter');
+  if (kind === 'neighborhood') return jumpPreview(session, 'ch2-neighborhood');
+  if (kind === 'chapter-two') return jumpPreview(session, 'ch2-neighbor-3');
+  if (kind === 'complete' || kind === 'all') return jumpPreview(session, 'ch2-complete');
   return session;
 }

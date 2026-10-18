@@ -41,6 +41,30 @@ aside {
   line-height: 1.6;
   margin: 12px 0;
 }
+.chapter-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+  padding: 7px 0;
+  background: var(--cream);
+  border-bottom: 1px solid var(--line);
+}
+.chapter-tabs button {
+  min-width: 0;
+  min-height: 42px;
+  padding: 6px 4px;
+  font-size: 11px;
+  touch-action: manipulation;
+}
+.chapter-tabs button.active {
+  border-color: #6c8b70;
+  background: #e3ebdc;
+  color: #304b3b;
+  font-weight: 700;
+}
 section {
   border-top: 1px solid var(--line);
   padding: 14px 0 5px;
@@ -117,6 +141,11 @@ button:not(.toggle) {
   font-weight: 600;
   color: #4c6854;
   touch-action: manipulation;
+}
+.project-preview summary span {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 10px;
 }
 .project-preview[open] summary {
   margin-bottom: 4px;

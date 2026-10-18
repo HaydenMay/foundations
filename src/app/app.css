@@ -1229,6 +1229,36 @@ app-town {
   font-size: 12px;
   text-decoration: underline;
 }
+.chapter-transition {
+  position: absolute;
+  z-index: 7;
+  left: 50%;
+  bottom: calc(var(--sheet, 0px) + 18px);
+  width: min(500px, calc(100vw - 32px));
+  transform: translateX(-50%);
+  padding: 20px 22px;
+  border: 1px solid #fff;
+  border-radius: 20px;
+  background: #fbfaf4f2;
+  box-shadow: 0 14px 40px #263c2d24;
+  color: #334538;
+}
+.chapter-transition h2 {
+  margin: 7px 0 8px;
+  font: 26px/1.1 Georgia, serif;
+}
+.chapter-transition p {
+  margin: 0;
+}
+.chapter-transition-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  margin-top: 14px;
+}
+.chapter-transition-actions button {
+  padding: 0 16px;
+}
 .developer-entry {
   font-size: 12px;
   opacity: 0.85;
@@ -1256,6 +1286,12 @@ app-town {
     justify-content: space-between;
     max-width: calc(100vw - 24px);
     font-size: 11px;
+  }
+  .chapter-transition {
+    padding: 16px 18px;
+  }
+  .chapter-transition h2 {
+    font-size: 22px;
   }
   .preview-banner {
     right: 12px;
@@ -1297,5 +1333,10 @@ app-town {
     left: auto;
     right: 12px;
     top: 48px;
+  }
+  .chapter-transition {
+    top: 50%;
+    bottom: auto;
+    transform: translate(-50%, -50%);
   }
 }

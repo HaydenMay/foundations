@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FoundationsStore } from './state.service';
-import { exportState, importState, STORAGE_KEY } from './domain/state';
+import { exportState, importState, initialState, STORAGE_KEY } from './domain/state';
 import { completeHabit } from './domain/habits';
+import { nextDate } from './domain/dates';
 describe('local storage resilience', () => {
   const stores: FoundationsStore[] = [];
   function makeStore() {
@@ -73,5 +74,22 @@ describe('local storage resilience', () => {
     );
     await expect(store.preferences({ panelOpen: false })).rejects.toThrow('Import');
     expect(localStorage.getItem(STORAGE_KEY)).toBe('{invalid external data');
+  });
+  it('recovers a pending neighborhood notice after reload and persists dismissal', async () => {
+    let state = initialState('2026-08-01');
+    let date = '2026-08-01';
+    for (let i = 0; i < 50; i++) {
+      state = completeHabit(state, state.habits[0].id, date);
+      date = nextDate(date);
+    }
+    localStorage.setItem(STORAGE_KEY, exportState(state));
+    const store = makeStore();
+
+    expect(store.chapterNotice()).toBe('neighborhood');
+    await store.acknowledgeChapterNotice('neighborhood');
+
+    const reopened = makeStore();
+    expect(reopened.chapterNotice()).toBeUndefined();
+    expect(reopened.realState().chapterNotices.neighborhoodSeen).toBe(true);
   });
 });

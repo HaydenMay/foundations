@@ -101,7 +101,7 @@ it('durably confirms a milestone design before requesting its assembly reveal', 
   expect(app.construction()).toBeGreaterThan(0);
 });
 
-it('reveals the next empty lot when lifetime stars cross 100 and does not replay after reload', async () => {
+it('reveals the connected neighborhood when lifetime stars cross 100 and does not replay after reload', async () => {
   let state = initialState('2026-01-01');
   for (let day = 0; day < 48; day++) {
     const date = new Date(Date.UTC(2026, 0, 1 + day)).toISOString().slice(0, 10);
@@ -120,13 +120,14 @@ it('reveals the next empty lot when lifetime stars cross 100 and does not replay
   const app = fixture.componentInstance,
     store = TestBed.inject(FoundationsStore);
   expect(store.stars()).toBe(97);
-  expect(app.renderDesigns()['chapter']).toBeUndefined();
+  expect(app.renderDesigns()['ch2-neighborhood']).toBeUndefined();
   await store.complete(state.habits[2].id);
   fixture.detectChanges();
   expect(store.stars()).toBe(100);
-  expect(app.renderDesigns()['chapter']).toBe('reveal');
-  expect(app.constructionProject()).toBe('chapter');
+  expect(app.renderDesigns()['ch2-neighborhood']).toBe('reveal');
+  expect(app.constructionProject()).toBe('ch2-neighborhood');
   expect(app.construction()).toBeGreaterThan(0);
+  await store.acknowledgeChapterNotice('neighborhood');
 
   fixture.destroy();
   TestBed.resetTestingModule();
@@ -135,7 +136,7 @@ it('reveals the next empty lot when lifetime stars cross 100 and does not replay
   });
   const reopened = TestBed.createComponent(App);
   reopened.detectChanges();
-  expect(reopened.componentInstance.renderDesigns()['chapter']).toBe('reveal');
+  expect(reopened.componentInstance.renderDesigns()['ch2-neighborhood']).toBe('reveal');
   expect(reopened.componentInstance.construction()).toBe(0);
 });
 
@@ -161,12 +162,12 @@ it('queues a genuine chapter reveal delivered by another tab while preview is ac
   localStorage.setItem(STORAGE_KEY, raw);
   window.dispatchEvent(new StorageEvent('storage', { key: STORAGE_KEY, newValue: raw }));
   fixture.detectChanges();
-  expect(store.stars()).toBe(100);
+  expect(store.stars()).toBe(200);
   expect(app.construction()).toBe(0);
 
   store.exitPreview();
   fixture.detectChanges();
   expect(store.stars()).toBe(100);
-  expect(app.constructionProject()).toBe('chapter');
+  expect(app.constructionProject()).toBe('ch2-neighborhood');
   expect(app.construction()).toBeGreaterThan(0);
 });

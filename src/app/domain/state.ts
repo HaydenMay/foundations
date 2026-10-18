@@ -1,14 +1,22 @@
-import { AppState } from './models';
-import { createHabit, STAR_VALUES, validateInput } from './habits';
+import {
+  AppState,
+  CAMERA_MAX_ZOOM,
+  CAMERA_MIN_ZOOM,
+  CAMERA_X_LIMIT,
+  CAMERA_Z_LIMIT,
+} from './models';
+import { createHabit, lifetimeStars, STAR_VALUES, validateInput } from './habits';
 import { isDate, weekStart } from './dates';
 import { LEGACY_UNLOCK_THRESHOLDS, legacyUnlocksFor, selectDesign } from './progression';
 export const STORAGE_KEY = 'foundations.v1';
 export const MIGRATION_BACKUP_KEY = 'foundations.pre-v2';
 export const MIGRATION_BACKUP_V3_KEY = 'foundations.pre-v3';
+export const MIGRATION_BACKUP_V4_KEY = 'foundations.pre-v4';
 export function initialState(date: string): AppState {
   return {
-    version: 3,
+    version: 4,
     onboarding: { firstHomeUnlocked: false },
+    chapterNotices: { neighborhoodSeen: false, completeSeen: false },
     habits: [
       createHabit(
         {
@@ -66,7 +74,7 @@ export function importState(json: string): AppState {
   const version = (s as { version: number })?.version;
   requireValid(
     s &&
-      (version === 1 || version === 2 || version === 3) &&
+      (version === 1 || version === 2 || version === 3 || version === 4) &&
       Array.isArray(s.habits) &&
       s.habits.length <= 10000 &&
       Array.isArray(s.completions) &&
@@ -136,17 +144,16 @@ export function importState(json: string): AppState {
   requireValid(
     camera &&
       [camera.x, camera.z, camera.zoom, camera.angle].every(Number.isFinite) &&
-      Math.abs(camera.x) <= 18 &&
-      Math.abs(camera.z) <= 18 &&
-      camera.zoom >= 0.5 &&
-      camera.zoom <= 2.5 &&
+      Math.abs(camera.x) <= CAMERA_X_LIMIT &&
+      Math.abs(camera.z) <= CAMERA_Z_LIMIT &&
+      camera.zoom >= CAMERA_MIN_ZOOM &&
+      camera.zoom <= CAMERA_MAX_ZOOM &&
       Math.abs(camera.angle) <= Math.PI * 100,
   );
   requireValid(s.designs && typeof s.designs === 'object' && !Array.isArray(s.designs));
   if (version === 1) {
     requireValid(Object.hasOwn(s.designs, 'home'));
     // Every v1 profile already owned a home, even with no earned stars.
-    s.version = 3;
     s.onboarding = { ...s.onboarding, firstHomeUnlocked: true };
     s.legacyUnlocks = legacyUnlocksFor(s);
   } else {
@@ -157,7 +164,7 @@ export function importState(json: string): AppState {
         typeof s.onboarding.firstHomeUnlocked === 'boolean',
     );
     if (s.completions.length || s.designs['home']) s.onboarding.firstHomeUnlocked = true;
-    if (version === 3) {
+    if (version === 3 || version === 4) {
       const allowedLegacyIds = Object.keys(LEGACY_UNLOCK_THRESHOLDS);
       requireValid(
         Array.isArray(s.legacyUnlocks) &&
@@ -172,8 +179,22 @@ export function importState(json: string): AppState {
     } else {
       // Freeze prior access before the new threshold schedule is applied.
       s.legacyUnlocks = legacyUnlocksFor(s);
-      s.version = 3;
     }
+  }
+  if (version < 4) {
+    const stars = lifetimeStars(s);
+    s.chapterNotices = {
+      neighborhoodSeen: stars >= 100,
+      completeSeen: stars >= 200,
+    };
+    s.version = 4;
+  } else {
+    requireValid(
+      s.chapterNotices &&
+        typeof s.chapterNotices === 'object' &&
+        typeof s.chapterNotices.neighborhoodSeen === 'boolean' &&
+        typeof s.chapterNotices.completeSeen === 'boolean',
+    );
   }
   for (const [id, choice] of Object.entries(s.designs)) selectDesign(s, id, choice);
   // Parse into a fresh object so the caller cannot mutate a previously validated backup.

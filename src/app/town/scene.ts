@@ -5,7 +5,7 @@ import { lightAt, torchFlickerIntensity } from './lighting';
 import { buildWorld, TownWorld } from './world';
 import { AssemblyAnimator } from './assembly';
 import type { AssemblyConfigOverride } from './assembly';
-import { homeTransition, projectTransition } from './construction';
+import { homeTransition, projectTransition, settleConstructionCamera } from './construction';
 
 export class TownScene {
   readonly renderer: T.WebGLRenderer;
@@ -29,6 +29,7 @@ export class TownScene {
     last: number;
     from: CameraState;
     focus?: { x: number; z: number; zoom: number };
+    settleAtFocus: boolean;
     animator: AssemblyAnimator;
     visibility: boolean[];
     done: () => void;
@@ -110,6 +111,13 @@ export class TownScene {
       this.world.assets.dispose();
     }
     this.world = buildWorld(designs);
+    const expanded = this.world.projectAssets.has('ch2-neighborhood');
+    this.sun.shadow.camera.left = expanded ? -40 : -30;
+    this.sun.shadow.camera.right = expanded ? 70 : 30;
+    this.sun.shadow.camera.top = expanded ? 40 : 30;
+    this.sun.shadow.camera.bottom = expanded ? -40 : -30;
+    this.sun.shadow.camera.far = expanded ? 130 : 80;
+    this.sun.shadow.camera.updateProjectionMatrix();
     this.renderer.shadowMap.needsUpdate = true;
     this.scene.add(this.world.group);
     this.updateLight();
@@ -132,7 +140,15 @@ export class TownScene {
       done();
       return;
     }
-    this.celebrateAsset(asset.root, asset.pieces, asset.recipe, asset.focus, done, override);
+    this.celebrateAsset(
+      asset.root,
+      asset.pieces,
+      asset.recipe,
+      asset.focus,
+      done,
+      override,
+      projectId === 'ch2-neighborhood',
+    );
   }
   focusProjectPreview(projectId: string) {
     const focus = this.world?.projectAssets.get(projectId)?.focus;
@@ -164,6 +180,7 @@ export class TownScene {
     focus: { x: number; z: number; zoom: number } | undefined,
     done: () => void,
     override: AssemblyConfigOverride,
+    settleAtFocus = false,
   ) {
     this.cancelConstruction();
     if (!root || !pieces || !recipe) {
@@ -199,6 +216,7 @@ export class TownScene {
       last: -100,
       from: this.camera.state(),
       focus,
+      settleAtFocus,
       animator,
       visibility: animator.pieces.map((piece) => piece.object.visible),
       done,
@@ -266,7 +284,9 @@ export class TownScene {
     this.camera.controls.enabled = true;
     this.renderer.shadowMap.needsUpdate = true;
     this.previewCamera = undefined;
-    this.camera.home();
+    if (animation.settleAtFocus && animation.focus) {
+      this.camera.set(settleConstructionCamera(animation.from, animation.focus, true));
+    } else this.camera.home();
     this.suppressCameraPersistence = false;
     this.render();
     animation.done();
@@ -316,7 +336,10 @@ export class TownScene {
     this.label(palette.label);
     this.updateTorchFlicker(
       palette.label === 'night' &&
-        !(typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches),
+        !(
+          typeof matchMedia !== 'undefined' &&
+          matchMedia('(prefers-reduced-motion: reduce)').matches
+        ),
     );
     this.render();
   }

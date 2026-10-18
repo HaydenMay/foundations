@@ -14,14 +14,13 @@ import { HabitEditor } from './components/habit-editor';
 import { Icon } from './components/icon';
 import { TownComponent } from './town/town.component';
 import { AppState, Habit, HabitInput, Lighting, Project, CameraState } from './domain/models';
+import { isCompleted, isScheduled, scheduleLabel, STAR_VALUES } from './domain/habits';
 import {
-  isCompleted,
-  isScheduled,
-  lifetimeStars,
-  scheduleLabel,
-  STAR_VALUES,
-} from './domain/habits';
-import { PROJECTS, chapterLotVisible, isProjectUnlocked } from './domain/progression';
+  ALL_PROJECTS,
+  CHAPTER_TWO_PROJECTS,
+  PROJECTS,
+  isProjectUnlocked,
+} from './domain/progression';
 import { importState } from './domain/state';
 import { HomeSelection } from './components/home-selection';
 import { ConstructionPreviewRequest, DeveloperPanel } from './components/developer-panel';
@@ -49,18 +48,17 @@ export class App {
   readonly renderDesigns = computed(() => {
     const designs = { ...this.store.state().designs, ...this.draftProjects() };
     if (this.choosingHome()) designs['home'] = this.draftHome();
-    const teaserHidden = this.store.preview()?.hiddenDesigns['chapter'] === '__hidden__';
-    if (chapterLotVisible(this.store.stars(), designs) && !teaserHidden)
-      designs['chapter'] = 'reveal';
-    else delete designs['chapter'];
+    const neighborhoodHidden =
+      this.store.preview()?.hiddenDesigns['ch2-neighborhood'] === '__hidden__';
+    if (this.store.stars() >= 100 && !neighborhoodHidden) designs['ch2-neighborhood'] = 'reveal';
+    else delete designs['ch2-neighborhood'];
     return designs;
   });
   private constructionId = 0;
   private offeredSession = -1;
   private constructionSession = 0;
   private draftSession = -1;
-  private lastObservedStars = lifetimeStars(this.store.realState());
-  private pendingRealChapterReveal = false;
+  private startedNoticeKey = '';
   readonly sceneLight = signal('day');
   readonly dialog = viewChild.required<ElementRef<HTMLDialogElement>>('dialog');
   readonly overlay = signal('');
@@ -70,7 +68,7 @@ export class App {
   readonly selectedProject = signal<Project>(PROJECTS[0]);
   readonly backup = signal<AppState | null>(null);
   readonly busy = signal(false);
-  readonly projects = PROJECTS;
+  readonly projects = ALL_PROJECTS;
   readonly values = STAR_VALUES;
   readonly scheduleLabel = scheduleLabel;
   readonly due = computed(() =>
@@ -99,9 +97,7 @@ export class App {
   constructor() {
     effect(() => {
       const state = this.store.state(),
-        realState = this.store.realState(),
         session = this.store.sessionKey(),
-        realStars = lifetimeStars(realState),
         previewActive = !!this.store.preview();
       untracked(() => {
         if (this.constructionSession !== session) {
@@ -112,15 +108,16 @@ export class App {
           this.draftSession = session;
           this.draftProjects.set({});
         }
-        const crossedChapterThreshold = this.lastObservedStars < 100 && realStars >= 100;
-        this.lastObservedStars = realStars;
-        if (crossedChapterThreshold && previewActive) this.pendingRealChapterReveal = true;
-        if (!previewActive && (crossedChapterThreshold || this.pendingRealChapterReveal)) {
-          this.pendingRealChapterReveal = false;
-          if (chapterLotVisible(realStars, realState.designs)) {
-            this.constructionProject.set('chapter');
+        const notice = this.store.chapterNotice();
+        if (notice === 'neighborhood') {
+          const noticeKey = `${session}:${previewActive ? 'preview' : 'real'}:${notice}`;
+          if (this.startedNoticeKey !== noticeKey) {
+            this.startedNoticeKey = noticeKey;
+            this.constructionProject.set('ch2-neighborhood');
             this.construction.set(++this.constructionId);
           }
+        } else if (!notice) {
+          this.startedNoticeKey = '';
         }
         // A constructed home has already been offered in this session, including preview hides.
         if (state.designs['home']) this.offeredSession = session;
@@ -277,6 +274,8 @@ export class App {
     if (event.id !== this.construction() || event.sessionKey !== this.store.sessionKey()) return;
     this.construction.set(0);
     const project = this.constructionProject();
+    if (project === 'ch2-neighborhood' && this.store.chapterNotice() === 'neighborhood')
+      this.act(() => this.store.acknowledgeChapterNotice('neighborhood'));
     this.notify(
       this.store.preview()
         ? 'Construction preview complete.'
@@ -294,6 +293,19 @@ export class App {
   skipConstruction() {
     this.town()?.skipConstruction();
     this.construction.set(0);
+  }
+  dismissChapterNotice() {
+    const notice = this.store.chapterNotice();
+    if (notice) this.act(() => this.store.acknowledgeChapterNotice(notice));
+  }
+  skipChapterNotice() {
+    const notice = this.store.chapterNotice();
+    if (!notice) return;
+    if (notice === 'neighborhood') {
+      this.town()?.skipConstruction();
+      this.construction.set(0);
+    }
+    this.act(() => this.store.acknowledgeChapterNotice(notice));
   }
   enterPreview() {
     this.close();
@@ -320,6 +332,16 @@ export class App {
     if (request.projectId === 'chapter') {
       this.store.previewStars(Math.max(100, this.store.stars()));
       this.store.previewVisible('chapter', true);
+    } else if (request.projectId === 'ch2-neighborhood') {
+      this.store.previewStars(Math.max(100, this.store.stars()));
+      void this.store.acknowledgeChapterNotice('neighborhood');
+      this.store.previewVisible('ch2-neighborhood', true);
+    } else if (CHAPTER_TWO_PROJECTS.some((project) => project.id === request.projectId)) {
+      const project = CHAPTER_TWO_PROJECTS.find((candidate) => candidate.id === request.projectId)!;
+      this.store.previewStars(Math.max(100, project.threshold, this.store.stars()));
+      void this.store.acknowledgeChapterNotice('neighborhood');
+      this.store.previewVisible('ch2-neighborhood', true);
+      this.store.previewVisible(request.projectId, true);
     } else {
       this.store.previewVisible(request.projectId, true);
     }
@@ -330,7 +352,7 @@ export class App {
     this.cancelHome();
     this.previewPanelOpen.set(true);
   }
-  exportUpgradeBackup(version: 1 | 2 = 1) {
+  exportUpgradeBackup(version: 1 | 2 | 3 = 1) {
     this.act(async () => this.store.exportMigrationBackup(version));
   }
   complete(h: Habit) {

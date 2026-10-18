@@ -1,4 +1,10 @@
-import { CameraState } from '../domain/models';
+import {
+  CAMERA_MAX_ZOOM,
+  CAMERA_MIN_ZOOM,
+  CAMERA_X_LIMIT,
+  CAMERA_Z_LIMIT,
+  CameraState,
+} from '../domain/models';
 import { MOUSE, OrthographicCamera, TOUCH, Vector3 } from 'three';
 import { MapControls } from 'three/addons/controls/MapControls.js';
 const HOME = new Vector3(-5, 1.8, -4.6);
@@ -8,9 +14,9 @@ export function homeViewHeight(width: number, height: number): number {
 export function clampCamera(state: CameraState): CameraState {
   const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
   return {
-    x: clamp(state.x, -18, 18),
-    z: clamp(state.z, -18, 18),
-    zoom: clamp(state.zoom, 0.5, 2.5),
+    x: clamp(state.x, -CAMERA_X_LIMIT, CAMERA_X_LIMIT),
+    z: clamp(state.z, -CAMERA_Z_LIMIT, CAMERA_Z_LIMIT),
+    zoom: clamp(state.zoom, CAMERA_MIN_ZOOM, CAMERA_MAX_ZOOM),
     angle: ((state.angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2),
   };
 }
@@ -46,8 +52,8 @@ export class TownCamera {
     this.controls.enableRotate = false;
     this.controls.enableDamping = false;
     this.controls.screenSpacePanning = false;
-    this.controls.minZoom = 0.5;
-    this.controls.maxZoom = 2.5;
+    this.controls.minZoom = CAMERA_MIN_ZOOM;
+    this.controls.maxZoom = CAMERA_MAX_ZOOM;
     this.controls.mouseButtons = { LEFT: MOUSE.PAN, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.PAN };
     this.controls.touches = { ONE: TOUCH.PAN, TWO: TOUCH.DOLLY_PAN };
     this.controls.addEventListener('change', () => {

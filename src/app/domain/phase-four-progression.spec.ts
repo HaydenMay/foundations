@@ -84,7 +84,7 @@ describe('Phase 4 milestone catalog', () => {
       ownerExtension: { keep: true },
     } as unknown as AppState;
     const migrated = importState(JSON.stringify(v2));
-    expect(migrated.version).toBe(3);
+    expect(migrated.version).toBe(4);
     expect(migrated.designs).toEqual(v2.designs);
     expect(migrated.legacyUnlocks).toEqual(
       expect.arrayContaining(['backyard', 'exterior', 'neighbor']),

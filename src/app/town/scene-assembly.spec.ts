@@ -68,7 +68,10 @@ function sceneFixture(recipePieces: readonly string[] = ['walls', 'roof']) {
         pieces: recipePieces.map((id, order) => ({ id, order })),
         config: { durationMs: 1000, dropHeight: 10, staggerMs: 0, concurrency: 1 },
       },
-      projectAssets: new Map([['frontGarden', projectAsset]]),
+      projectAssets: new Map([
+        ['frontGarden', projectAsset],
+        ['ch2-neighborhood', { ...projectAsset, focus: { x: 31, z: 10, zoom: 0.62 } }],
+      ]),
     },
     renderer: { shadowMap },
     camera: {
@@ -180,6 +183,27 @@ it('reveals a selected milestone composition, focuses its lot zone and returns h
   expect(f.done).toHaveBeenCalledOnce();
   expect(f.projectPieces.get('beds')?.position.y).toBe(2);
   expect(f.cameraHome).toHaveBeenCalledOnce();
+});
+
+it('settles the Chapter 2 neighborhood reveal at its new streets instead of returning home', () => {
+  const f = sceneFixture();
+  f.scene.celebrateProject('ch2-neighborhood', f.done, {
+    durationMs: 1000,
+    dropHeight: 10,
+    staggerMs: 0,
+    concurrency: 1,
+  });
+  f.frame(0);
+  f.frame(1000);
+
+  expect(f.done).toHaveBeenCalledOnce();
+  expect(f.cameraHome).not.toHaveBeenCalled();
+  expect(f.cameraSet.mock.calls.at(-1)?.[0]).toMatchObject({
+    x: 31,
+    z: 10,
+    zoom: 0.62,
+  });
+  expect(f.cameraSet.mock.calls.at(-1)?.[0].angle).toBeCloseTo(Math.PI / 4);
 });
 
 it('focuses in-world previews temporarily and restores the original camera without saving it', () => {

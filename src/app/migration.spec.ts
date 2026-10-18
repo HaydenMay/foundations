@@ -5,9 +5,11 @@ import {
   STORAGE_KEY,
   MIGRATION_BACKUP_KEY,
   MIGRATION_BACKUP_V3_KEY,
+  MIGRATION_BACKUP_V4_KEY,
 } from './domain/state';
 import { importState, exportState } from './domain/state';
 import { completeHabit } from './domain/habits';
+import { nextDate } from './domain/dates';
 
 describe('safe schema migration and durable first house', () => {
   const stores: FoundationsStore[] = [];
@@ -35,7 +37,7 @@ describe('safe schema migration and durable first house', () => {
     expect(localStorage.getItem(MIGRATION_BACKUP_KEY)).toBe(raw);
     expect(s.state().designs['home']).toBe('blue');
     expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toMatchObject({
-      version: 3,
+      version: 4,
       onboarding: { firstHomeUnlocked: true },
       futureExtension: { keep: true },
     });
@@ -96,6 +98,46 @@ describe('safe schema migration and durable first house', () => {
     const s = make();
     expect(localStorage.getItem(STORAGE_KEY)).toBe(raw);
     expect(s.state().designs['home']).toBe('sage');
+    expect(s.warning()).toContain('open tab');
+  });
+  it('backs up exact v3 bytes before upgrading a player who already reached Chapter 2', () => {
+    let earned = initialState('2026-09-01');
+    let date = '2026-09-01';
+    for (let i = 0; i < 50; i++) {
+      earned = completeHabit(earned, earned.habits[0].id, date);
+      date = nextDate(date);
+    }
+    earned.onboarding.firstHomeUnlocked = true;
+    earned.designs['home'] = 'blue';
+    const legacy = JSON.parse(exportState(earned));
+    legacy.version = 3;
+    delete legacy.chapterNotices;
+    const raw = JSON.stringify(legacy);
+    localStorage.setItem(STORAGE_KEY, raw);
+
+    const s = make();
+
+    expect(localStorage.getItem(MIGRATION_BACKUP_V4_KEY)).toBe(raw);
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).version).toBe(4);
+    expect(s.state().chapterNotices).toEqual({ neighborhoodSeen: true, completeSeen: false });
+    expect(s.state().designs['home']).toBe('blue');
+  });
+  it('leaves exact v3 bytes in place if the pre-v4 safety copy cannot be written', () => {
+    const legacy = JSON.parse(exportState(initialState('2026-09-01')));
+    legacy.version = 3;
+    delete legacy.chapterNotices;
+    const raw = JSON.stringify(legacy);
+    localStorage.setItem(STORAGE_KEY, raw);
+    const write = Storage.prototype.setItem;
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(function (this: Storage, key, value) {
+      if (key === MIGRATION_BACKUP_V4_KEY) throw new Error('quota');
+      write.call(this, key, value);
+    });
+
+    const s = make();
+
+    expect(localStorage.getItem(STORAGE_KEY)).toBe(raw);
+    expect(s.state().chapterNotices).toEqual({ neighborhoodSeen: false, completeSeen: false });
     expect(s.warning()).toContain('open tab');
   });
   it('saves unlock and completion together before selection and reload', async () => {
