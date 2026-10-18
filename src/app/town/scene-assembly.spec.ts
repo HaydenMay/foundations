@@ -1,6 +1,10 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import { Group } from 'three';
+import * as T from 'three';
 import { TownScene } from './scene';
+import { AssemblyAnimator } from './assembly';
+import { buildWorld } from './world';
+import { PROJECTS } from '../domain/progression';
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -191,4 +195,75 @@ it('focuses in-world previews temporarily and restores the original camera witho
   expect(f.cameraSet).toHaveBeenLastCalledWith(original);
   expect(suppression).toEqual([true, true]);
   expect(f.scene.render).toHaveBeenCalledTimes(2);
+});
+
+it('replays every production Phase 4 recipe ten times without drift or duplicate geometry', () => {
+  const designs = Object.fromEntries([
+      ['home', 'sage'],
+      ...PROJECTS.filter((project) => project.id !== 'home').map((project) => [
+        project.id,
+        project.choices[0].id,
+      ]),
+      ['chapter', 'reveal'],
+    ]),
+    world = buildWorld(designs);
+  const assets = [
+    {
+      id: 'home',
+      root: world.home!,
+      pieces: world.homeAssemblies!,
+      recipe: world.homeRecipe!,
+    },
+    ...[...world.projectAssets].map(([id, asset]) => ({ id, ...asset })),
+  ];
+  const meshCount = (root: T.Object3D) => {
+    let count = 0;
+    root.traverse((object) => {
+      if (object instanceof T.Mesh) count++;
+    });
+    return count;
+  };
+
+  try {
+    expect(assets.map((asset) => asset.id).sort()).toEqual(
+      [...PROJECTS.map((project) => project.id), 'chapter'].sort(),
+    );
+    for (const asset of assets) {
+      expect([...asset.pieces.keys()], asset.id).toEqual(asset.recipe.pieces.map((piece) => piece.id));
+      const count = meshCount(asset.root),
+        baseline = asset.recipe.pieces.map(({ id }) => {
+          const piece = asset.pieces.get(id)!;
+          return {
+            id,
+            position: piece.position.toArray(),
+            rotation: piece.quaternion.toArray(),
+            scale: piece.scale.toArray(),
+            visible: piece.visible,
+          };
+        }),
+        animator = new AssemblyAnimator(asset.root, asset.pieces, asset.recipe, { speed: 2 });
+      for (let replay = 0; replay < 10; replay++) {
+        expect(replay === 0 ? animator.play() : animator.replay(), asset.id).toBe(true);
+        animator.update(0.4);
+        animator.update(1);
+        expect(
+          asset.recipe.pieces.map(({ id }) => {
+            const piece = asset.pieces.get(id)!;
+            return {
+              id,
+              position: piece.position.toArray(),
+              rotation: piece.quaternion.toArray(),
+              scale: piece.scale.toArray(),
+              visible: piece.visible,
+            };
+          }),
+          `${asset.id} replay ${replay + 1}`,
+        ).toEqual(baseline);
+        expect(meshCount(asset.root), asset.id).toBe(count);
+      }
+      animator.dispose();
+    }
+  } finally {
+    world.assets.dispose();
+  }
 });

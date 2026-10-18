@@ -22,12 +22,15 @@ it('emits selected assembly speed and the optional reduced-motion override', () 
   reduced.checked = true;
   reduced.dispatchEvent(new Event('change', { bubbles: true }));
   fixture.detectChanges();
-  const action = [...fixture.nativeElement.querySelectorAll('button')].find((button) =>
-    button.textContent?.includes('Preview construction'),
+  const action = fixture.nativeElement.querySelector(
+    '[data-build-preview="home"]',
   ) as HTMLButtonElement;
   action.click();
 
-  expect(emitted).toHaveBeenCalledWith({ speed: 2, reducedMotion: true });
+  expect(emitted).toHaveBeenCalledWith({
+    projectId: 'home',
+    override: { speed: 2, reducedMotion: true },
+  });
 });
 
 it('leaves operating-system reduced-motion preference in control unless forced', () => {
@@ -36,11 +39,68 @@ it('leaves operating-system reduced-motion preference in control unless forced',
     emitted = vi.fn();
   fixture.componentInstance.construct.subscribe(emitted);
   fixture.detectChanges();
-  const action = [...fixture.nativeElement.querySelectorAll('button')].find((button) =>
-    button.textContent?.includes('Preview construction'),
+  const action = fixture.nativeElement.querySelector(
+    '[data-build-preview="home"]',
   ) as HTMLButtonElement;
   action.click();
-  expect(emitted).toHaveBeenCalledWith({ speed: 1 });
+  expect(emitted).toHaveBeenCalledWith({ projectId: 'home', override: { speed: 1 } });
+});
+
+it('supports extra-slow preview replays for inspecting construction frames', () => {
+  TestBed.configureTestingModule({ imports: [DeveloperPanel] });
+  const fixture = TestBed.createComponent(DeveloperPanel),
+    emitted = vi.fn();
+  fixture.componentInstance.construct.subscribe(emitted);
+  fixture.detectChanges();
+  fixture.componentInstance.setAssemblySpeed({ target: { value: '0.25' } } as unknown as Event);
+  fixture.nativeElement.querySelector('[data-build-preview="porch"]').click();
+
+  expect(emitted).toHaveBeenCalledWith({ projectId: 'porch', override: { speed: 0.25 } });
+});
+
+it('offers production Build Preview controls for every existing milestone, including locked ones', () => {
+  TestBed.configureTestingModule({ imports: [DeveloperPanel] });
+  const fixture = TestBed.createComponent(DeveloperPanel);
+  fixture.detectChanges();
+  const store = fixture.componentInstance.store;
+  store.enterPreview();
+  store.previewScenario('new');
+  fixture.detectChanges();
+
+  const ids = [...fixture.nativeElement.querySelectorAll('[data-build-preview]')].map(
+    (button: HTMLButtonElement) => button.dataset['buildPreview'],
+  );
+  expect(ids).toEqual([
+    'chapter',
+    'home',
+    'backyard',
+    ...PROJECTS.filter((project) => project.id !== 'home' && project.id !== 'backyard').map(
+      (project) => project.id,
+    ),
+  ]);
+});
+
+it('emits the chosen locked milestone replay target without changing the genuine save', () => {
+  TestBed.configureTestingModule({ imports: [DeveloperPanel] });
+  const fixture = TestBed.createComponent(DeveloperPanel),
+    emitted = vi.fn();
+  fixture.componentInstance.construct.subscribe(emitted);
+  fixture.detectChanges();
+  const store = fixture.componentInstance.store,
+    genuine = structuredClone(store.realState());
+  store.enterPreview();
+  store.previewScenario('new');
+  fixture.detectChanges();
+  const speed = fixture.nativeElement.querySelector('#assembly-speed') as HTMLSelectElement;
+  speed.value = '2';
+  speed.dispatchEvent(new Event('change', { bubbles: true }));
+  const control = fixture.nativeElement.querySelector(
+    '[data-build-preview="frontGarden"]',
+  ) as HTMLButtonElement;
+  control.click();
+
+  expect(emitted).toHaveBeenCalledWith({ projectId: 'frontGarden', override: { speed: 2 } });
+  expect(store.realState()).toEqual(genuine);
 });
 
 it('offers every current milestone appearance and visibility toggle inside preview only', () => {

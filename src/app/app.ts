@@ -24,7 +24,7 @@ import {
 import { PROJECTS, chapterLotVisible, isProjectUnlocked } from './domain/progression';
 import { importState } from './domain/state';
 import { HomeSelection } from './components/home-selection';
-import { DeveloperPanel } from './components/developer-panel';
+import { ConstructionPreviewRequest, DeveloperPanel } from './components/developer-panel';
 import type { AssemblyConfigOverride } from './town/assembly';
 
 @Component({
@@ -312,12 +312,18 @@ export class App {
     this.previewAssemblyOptions.set({});
     this.store.exitPreview();
   }
-  previewConstruction(options: AssemblyConfigOverride = {}) {
+  previewConstruction(request: ConstructionPreviewRequest) {
     if (!this.store.preview()) return;
-    this.previewAssemblyOptions.set(options);
+    this.previewAssemblyOptions.set(request.override);
     this.cancelHome();
     this.store.previewVisible('home', true);
-    this.constructionProject.set('home');
+    if (request.projectId === 'chapter') {
+      this.store.previewStars(Math.max(100, this.store.stars()));
+      this.store.previewVisible('chapter', true);
+    } else {
+      this.store.previewVisible(request.projectId, true);
+    }
+    this.constructionProject.set(request.projectId);
     this.construction.set(++this.constructionId);
   }
   showPreviewControls() {

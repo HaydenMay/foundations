@@ -5,6 +5,12 @@ import { PROJECTS } from '../domain/progression';
 import { Lighting } from '../domain/models';
 import { PreviewScenario } from '../domain/preview';
 import type { AssemblyConfigOverride } from '../town/assembly';
+
+export interface ConstructionPreviewRequest {
+  projectId: string;
+  override: AssemblyConfigOverride;
+}
+
 @Component({
   selector: 'app-developer-panel',
   imports: [DecimalPipe],
@@ -74,6 +80,13 @@ import type { AssemblyConfigOverride } from '../town/assembly';
               (change)="visible('chapter', $event)"
             />Show the 100-star empty next lot</label
           >
+          <button
+            class="wide build-preview"
+            data-build-preview="chapter"
+            (click)="buildPreview('chapter')"
+          >
+            ▶ Build Preview
+          </button>
           <div class="two">
             <button (click)="setScenarioValue('new')">Return to empty lot</button
             ><button (click)="setScenarioValue('ready')">Preview first-home unlock</button>
@@ -105,6 +118,7 @@ import type { AssemblyConfigOverride } from '../town/assembly';
             [value]="assemblySpeed()"
             (change)="setAssemblySpeed($event)"
           >
+            <option value="0.25">Very slow · ¼×</option>
             <option value="0.5">Slow · ½×</option>
             <option value="1">Natural · 1×</option>
             <option value="2">Quick · 2×</option>
@@ -116,7 +130,9 @@ import type { AssemblyConfigOverride } from '../town/assembly';
               [checked]="forceReducedMotion()"
               (change)="setForceReducedMotion($event)"
             />Force reduced motion</label
-          ><button class="wide" (click)="previewConstruction()">Preview construction</button>
+          ><button class="wide build-preview" data-build-preview="home" (click)="buildPreview('home')">
+            ▶ Build Preview
+          </button>
         </section>
         <section>
           <h3>Backyard</h3>
@@ -141,6 +157,13 @@ import type { AssemblyConfigOverride } from '../town/assembly';
               (change)="visible('backyard', $event)"
             />Show backyard project</label
           >
+          <button
+            class="wide build-preview"
+            data-build-preview="backyard"
+            (click)="buildPreview('backyard')"
+          >
+            ▶ Build Preview
+          </button>
         </section>
         <section>
           <h3>Other home milestones</h3>
@@ -171,6 +194,14 @@ import type { AssemblyConfigOverride } from '../town/assembly';
                   (change)="visible(p.id, $event)"
                 />Show {{ p.name }}</label
               >
+              <button
+                class="wide build-preview"
+                [attr.data-build-preview]="p.id"
+                [attr.aria-label]="'Build preview: ' + p.name"
+                (click)="buildPreview(p.id)"
+              >
+                ▶ Build Preview
+              </button>
             </details>
           }
         </section>
@@ -217,7 +248,7 @@ export class DeveloperPanel {
   readonly open = input(true);
   readonly position = input<{ x: number; y: number; z: number } | null>(null);
   readonly toggle = output<void>();
-  readonly construct = output<AssemblyConfigOverride>();
+  readonly construct = output<ConstructionPreviewRequest>();
   readonly home = output<void>();
   readonly error = signal('');
   readonly scenario = signal('');
@@ -272,14 +303,14 @@ export class DeveloperPanel {
   }
   setAssemblySpeed(e: Event) {
     const speed = Number(this.value(e));
-    if ([0.5, 1, 2].includes(speed)) this.assemblySpeed.set(speed);
+    if ([0.25, 0.5, 1, 2].includes(speed)) this.assemblySpeed.set(speed);
   }
   setForceReducedMotion(e: Event) {
     this.forceReducedMotion.set((e.target as HTMLInputElement).checked);
   }
-  previewConstruction() {
+  buildPreview(projectId: string) {
     const override: AssemblyConfigOverride = { speed: this.assemblySpeed() };
     if (this.forceReducedMotion()) override.reducedMotion = true;
-    this.construct.emit(override);
+    this.construct.emit({ projectId, override });
   }
 }

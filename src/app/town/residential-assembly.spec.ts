@@ -11,16 +11,16 @@ const EXPECTED_CHOREOGRAPHY: Record<string, string[]> = {
 };
 const BASELINE_BOUNDS: Record<string, { min: number[]; max: number[] }> = {
   sage: {
-    min: [-8.25, 0.155, -7.915],
-    max: [0.451954, 5.86, -0.665],
+    min: [-8.25, 0.13, -7.915],
+    max: [0.451954, 5.86, -0.05],
   },
   cream: {
-    min: [-8.225, 0.155, -7.915],
-    max: [0.451954, 6.71, -0.665],
+    min: [-8.225, 0.13, -7.915],
+    max: [0.451954, 6.71, -0.05],
   },
   blue: {
-    min: [-8.25, 0.155, -7.915],
-    max: [0.451954, 5.86, -0.665],
+    min: [-8.25, 0.13, -7.915],
+    max: [0.451954, 5.86, -0.05],
   },
 };
 
@@ -85,6 +85,36 @@ it('keeps batched house draw calls and triangles within a mobile-friendly budget
     });
     expect(meshes).toBeLessThan(145);
     expect(triangles).toBeLessThan(220000);
+    world.assets.dispose();
+  }
+});
+
+it('keeps front-rail sections clear of porch seat footprints for every house style', () => {
+  for (const style of ['sage', 'cream', 'blue']) {
+    const world = buildWorld({ home: style, porch: 'rockingChairs' });
+    world.group.updateMatrixWorld(true);
+    const frontRails: T.Group[] = [];
+    world.homeAssemblies!.get('entry')!.traverse((object) => {
+      if (object instanceof T.Group && object.userData['porchFrontRail']) frontRails.push(object);
+    });
+    const porchSeats: T.Group[] = [];
+    world.projectAssets.get('porch')!.pieces.get('seating')!.traverse((object) => {
+      if (object instanceof T.Group && object.name.startsWith('porch-seat-')) porchSeats.push(object);
+    });
+
+    expect(frontRails.length, `${style} has split front-rail segments`).toBeGreaterThan(0);
+    expect(porchSeats).toHaveLength(2);
+    for (const seat of porchSeats) {
+      const bounds = new T.Box3().setFromObject(seat);
+      for (const rail of frontRails) {
+        const center = rail.getWorldPosition(new T.Vector3());
+        const width = rail.userData['porchFrontRail'].width as number;
+        expect(
+          bounds.min.x < center.x + width / 2 && bounds.max.x > center.x - width / 2,
+          `${style} ${seat.name} is screened by ${rail.name}`,
+        ).toBe(false);
+      }
+    }
     world.assets.dispose();
   }
 });

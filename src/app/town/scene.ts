@@ -1,7 +1,7 @@
 import * as T from 'three';
 import { CameraState, Lighting } from '../domain/models';
 import { TownCamera } from './camera';
-import { lightAt } from './lighting';
+import { lightAt, torchFlickerIntensity } from './lighting';
 import { buildWorld, TownWorld } from './world';
 import { AssemblyAnimator } from './assembly';
 import type { AssemblyConfigOverride } from './assembly';
@@ -19,6 +19,7 @@ export class TownScene {
   private lighting: Lighting = 'auto';
   private lightKey = '';
   private readonly timer: ReturnType<typeof setInterval>;
+  private torchTimer?: ReturnType<typeof setInterval>;
   private active = true;
   private suppressCameraPersistence = false;
   private previewCamera?: CameraState;
@@ -37,7 +38,7 @@ export class TownScene {
     if (this.active) {
       this.updateLight();
       this.render();
-    }
+    } else this.stopTorchFlicker();
   };
   constructor(
     private readonly container: HTMLElement,
@@ -103,6 +104,7 @@ export class TownScene {
   }
   setDesigns(designs: Record<string, string>) {
     this.cancelConstruction();
+    this.stopTorchFlicker();
     if (this.world) {
       this.scene.remove(this.world.group);
       this.world.assets.dispose();
@@ -312,7 +314,37 @@ export class TownScene {
       l.intensity = palette.windows * 14;
     });
     this.label(palette.label);
+    this.updateTorchFlicker(
+      palette.label === 'night' &&
+        !(typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches),
+    );
     this.render();
+  }
+  private updateTorchFlicker(night: boolean) {
+    const flames = this.world?.assets.torchFlames;
+    if (!this.active || !night || !flames?.length) {
+      this.stopTorchFlicker();
+      flames?.forEach((material, index) => {
+        material.emissiveIntensity = torchFlickerIntensity(0, false) * (index ? 0.9 : 1);
+      });
+      return;
+    }
+    if (this.torchTimer) return;
+    const tick = () => {
+      if (!this.active) return;
+      const intensity = torchFlickerIntensity(performance.now() / 1000, true);
+      flames.forEach((material, index) => {
+        material.emissiveIntensity = intensity * (index ? 0.9 : 1);
+      });
+      // Emission changes need a render, but no shadow-map refresh or additional light objects.
+      this.render();
+    };
+    tick();
+    this.torchTimer = setInterval(tick, 520);
+  }
+  private stopTorchFlicker() {
+    if (this.torchTimer) clearInterval(this.torchTimer);
+    this.torchTimer = undefined;
   }
   private resize() {
     const { width, height } = this.container.getBoundingClientRect();
@@ -328,6 +360,7 @@ export class TownScene {
   }
   dispose() {
     this.stopConstruction(false, false);
+    this.stopTorchFlicker();
     clearInterval(this.timer);
     document.removeEventListener('visibilitychange', this.visibility);
     this.observer.disconnect();

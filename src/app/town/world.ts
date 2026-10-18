@@ -211,7 +211,11 @@ export function buildWorld(designs: Record<string, string>): TownWorld {
   }
   if (home) startingLandscape(a, group);
   for (const [id, choice] of Object.entries(designs)) {
-    if (FEATURE_ZONES[id]) projectAssets.set(id, buildMilestoneProject(a, group, id, choice));
+    if (FEATURE_ZONES[id])
+      projectAssets.set(
+        id,
+        buildMilestoneProject(a, group, id, choice, designs['home'] || 'sage'),
+      );
     else if (PROJECT_ASSETS[id]) {
       const legacy = a.group(group);
       legacy.name = `legacy-project:${id}`;

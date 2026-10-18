@@ -181,26 +181,35 @@ function porch(set: PieceSet, choice: string) {
   const structure = part(set, 'seating');
   const details = part(set, 'warm-entry-details');
   const centerX = -5.35,
-    frontZ = -2.02,
+    frontZ = -1.94,
     wood = surface(a, 'wood', '#9b724d');
-  tile(a, ground, centerX, frontZ, 1.8, 0.9, '#b9ad97');
-  a.box(details, '#7f765f', centerX, 0.19, -1.48, 0.78, 0.05, 0.3);
+  const mat = a.group(ground);
+  a.box(mat, surface(a, 'paving', '#b9ad97'), centerX, 0.13, frontZ, 1.55, 0.06, 0.78);
+  const planters = a.group(ground);
+  a.box(details, '#8b8069', centerX, 0.64, -2.39, 0.86, 0.05, 0.16);
+  const seat = (name: string) => {
+    const group = a.group(structure);
+    group.name = `porch-seat-${name}`;
+    group.userData['staticBatchBoundary'] = true;
+    return group;
+  };
   if (choice === 'rockingChairs') {
-    for (const x of [-6.04, -4.66]) {
-      a.box(structure, wood, x, 0.47, frontZ, 0.58, 0.12, 0.55);
-      const back = a.box(structure, wood, x, 0.82, frontZ - 0.24, 0.55, 0.65, 0.1);
+    for (const x of [-6.72, -3.98]) {
+      const chair = seat(`rocker-${x < centerX ? 'left' : 'right'}`);
+      a.box(chair, wood, x, 0.47, frontZ, 0.58, 0.12, 0.55);
+      const back = a.box(chair, wood, x, 0.82, frontZ - 0.24, 0.55, 0.65, 0.1);
       back.rotation.x = -0.12;
       for (const side of [-1, 1]) {
-        a.box(structure, wood, x + side * 0.3, 0.6, frontZ, 0.07, 0.38, 0.5);
+        a.box(chair, wood, x + side * 0.3, 0.6, frontZ, 0.07, 0.38, 0.5);
         const rocker = a.mesh(
-          structure,
+          chair,
           a.cachedGeometry(
             'porch-rocker-arc',
-            () => new T.TorusGeometry(0.35, 0.035, 5, 16, Math.PI),
+            () => new T.TorusGeometry(0.2, 0.035, 5, 16, Math.PI),
           ),
           wood,
           x + side * 0.22,
-          0.18,
+          0.235,
           frontZ,
           0.8,
           1,
@@ -209,25 +218,23 @@ function porch(set: PieceSet, choice: string) {
         rocker.rotation.z = Math.PI;
       }
     }
+    planter(a, planters, -3.25, frontZ, '#c6a18b');
   } else if (choice === 'porchSwing') {
-    for (const x of [-6.06, -4.64]) {
-      a.box(structure, wood, x, 1.07, frontZ - 0.09, 0.055, 1.95, 0.055);
-      a.cylinder(structure, '#4d544a', x, 2.02, frontZ - 0.09, 0.025, 0.2);
+    const swing = seat('swing-left'),
+      swingX = -6.65;
+    for (const x of [swingX - 0.48, swingX + 0.48]) {
+      a.box(swing, wood, x, 1.35, frontZ - 0.09, 0.055, 2.2, 0.055);
+      a.cylinder(swing, '#4d544a', x, 2.45, frontZ - 0.09, 0.025, 0.18);
     }
-    a.box(structure, wood, centerX, 0.52, frontZ, 1.5, 0.15, 0.46);
-    const back = a.box(structure, wood, centerX, 0.85, frontZ - 0.2, 1.5, 0.5, 0.12);
+    a.box(swing, wood, swingX, 0.47, frontZ, 1.32, 0.15, 0.46);
+    const back = a.box(swing, wood, swingX, 0.8, frontZ - 0.2, 1.32, 0.5, 0.12);
     back.rotation.x = -0.08;
-    for (const x of [-6.05, -4.65]) planter(a, ground, x, frontZ + 0.33, '#d2a18e');
+    planter(a, planters, -3.25, frontZ, '#a7ad91');
   } else {
-    a.bench(structure, centerX, frontZ, Math.PI);
-    for (const x of [-6.18, -4.52]) a.lantern(details, x, 1.25, frontZ, true);
-  }
-  if (choice !== 'porchSwing') {
-    planter(a, ground, -6.32, frontZ + 0.16, '#c6a18b');
-    planter(a, ground, -4.38, frontZ + 0.16, '#a7ad91');
-  }
-  if (choice === 'benchLanterns') {
-    a.box(details, '#e2c88e', centerX, 1.02, frontZ - 0.3, 0.08, 0.46, 0.08);
+    const bench = seat('entry-bench');
+    a.bench(bench, -6.8, frontZ, Math.PI);
+    for (const x of [-6.18, -4.52]) a.lantern(details, x, 1.92, -2.37, false, false);
+    planter(a, planters, -3.25, frontZ, '#a7ad91');
   }
 }
 
@@ -266,24 +273,68 @@ function retreat(set: PieceSet, choice: string) {
       for (const side of [-1, 1])
         a.box(details, wood, x + dx + side * 0.21, 0.28, z - 0.08, 0.04, 0.42, 0.04);
     }
-  } else {
-    a.bench(structure, x, z, Math.PI / 2);
-    const shade = a.mesh(
-      structure,
-      a.cachedGeometry('garden-lounge-canopy', () => new T.ConeGeometry(1, 0.35, 12)),
-      '#a6aa91',
-      x,
-      2.15,
-      z,
-      1.25,
-      1,
-      0.95,
+    const umbrella = a.group(details, x, 0, z);
+    umbrella.name = 'retreat-umbrella';
+    umbrella.userData['staticBatchBoundary'] = true;
+    umbrella.userData['polePassesThroughTable'] = true;
+    const base = a.cylinder(umbrella, '#6c685e', 0, 0.31, 0, 0.32, 0.22);
+    base.name = 'umbrella-base';
+    const pole = a.cylinder(umbrella, '#776448', 0, 1.53, 0, 0.045, 2.48);
+    pole.name = 'umbrella-pole';
+    const canopy = a.mesh(
+      umbrella,
+      a.cachedGeometry('retreat-umbrella-canopy', () => new T.ConeGeometry(1.08, 0.5, 12)),
+      '#d0c2a3',
+      0,
+      2.62,
+      0,
     );
-    shade.rotation.y = Math.PI / 6;
-    planter(a, details, x - 1.3, z + 0.75, '#d3a49a');
-    planter(a, details, x + 1.3, z + 0.75, '#a9b493');
+    canopy.name = 'umbrella-canopy';
+    canopy.castShadow = false;
+  } else {
+    const lounge = a.group(structure, 0, 0, 0);
+    lounge.name = 'garden-lounge-shelter';
+    for (const dx of [-1.15, 1.15]) {
+      a.box(lounge, wood, x + dx, 1.27, z, 0.12, 2.35, 0.12);
+      a.box(lounge, '#b69c78', x + dx, 2.46, z, 0.2, 0.1, 0.18);
+    }
+    a.box(lounge, '#a89573', x, 2.45, z, 2.48, 0.12, 1.65);
+    for (let dx = -1.1; dx <= 1.1; dx += 0.35)
+      a.box(lounge, wood, x + dx, 2.36, z, 0.055, 0.16, 1.55);
+    a.bench(details, x - 0.25, z + 0.24, Math.PI / 2);
+    a.box(details, '#c1b29c', x - 0.22, 0.78, z + 0.18, 1.1, 0.24, 0.56);
+    a.box(details, '#d9c9ae', x - 1.28, 0.83, z + 0.2, 0.2, 0.28, 0.62);
+    a.box(details, '#d9c9ae', x + 0.84, 0.83, z + 0.2, 0.2, 0.28, 0.62);
+    planter(a, details, x - 1.45, z + 0.78, '#d3a49a');
+    planter(a, details, x + 1.45, z + 0.78, '#a9b493');
   }
   for (const dx of [-1.92, 1.92]) shrub(a, planting, x + dx, z + 0.85, 0.35, true, dx + 159);
+}
+
+function flowerStem(
+  a: AssetLibrary,
+  p: T.Object3D,
+  x: number,
+  z: number,
+  height: number,
+  color: string,
+  lean = 0,
+  size = 0.09,
+) {
+  const base = 0.16,
+    stem = a.mesh(
+      p,
+      a.cachedGeometry('phase4-flower-stem', () => new T.CylinderGeometry(0.013, 0.022, 1, 5)),
+      '#657b52',
+      x,
+      base + height / 2,
+      z,
+      1,
+      height,
+      1,
+    );
+  stem.rotation.z = lean;
+  flower(a, p, x + Math.sin(lean) * height * 0.34, base + height, z, color, size);
 }
 
 function gardenExpansion(set: PieceSet, choice: string) {
@@ -297,35 +348,112 @@ function gardenExpansion(set: PieceSet, choice: string) {
   for (const dx of [-1.12, 1.12]) a.box(edging, '#b2a890', x + dx, 0.18, z, 0.06, 0.13, 1.88);
   for (const dz of [-0.92, 0.92]) a.box(edging, '#b2a890', x, 0.18, z + dz, 2.28, 0.13, 0.08);
   if (choice === 'evergreenShrubs') {
-    for (const dx of [-0.56, 0, 0.56])
-      for (const dz of [-0.42, 0, 0.42])
-        shrub(
-          a,
-          plants,
-          x + dx,
-          z + dz,
-          0.24 + (Math.round((dx + dz + 2) * 3) % 2) * 0.025,
-          false,
-          211 + Math.round((dx + 2) * 13 + dz),
-        );
+    for (const [index, [dx, dz]] of [
+      [-0.62, -0.45],
+      [0, -0.45],
+      [0.62, -0.45],
+      [-0.34, 0.05],
+      [0.34, 0.05],
+      [-0.62, 0.53],
+      [0, 0.53],
+      [0.62, 0.53],
+    ].entries())
+      shrub(a, plants, x + dx, z + dz, index % 3 === 0 ? 0.28 : 0.24, false, 211 + index);
+  } else if (choice === 'flowerBeds') {
+    // Deliberate low rows create a dense, colorful border that reads as tended planting.
+    for (const [index, [dx, dz]] of [
+      [-0.74, -0.55],
+      [-0.25, -0.55],
+      [0.25, -0.55],
+      [0.74, -0.55],
+      [-0.74, 0],
+      [-0.25, 0],
+      [0.25, 0],
+      [0.74, 0],
+      [-0.74, 0.55],
+      [-0.25, 0.55],
+      [0.25, 0.55],
+      [0.74, 0.55],
+    ].entries()) {
+      shrub(a, plants, x + dx, z + dz, 0.2, false, 231 + index);
+      const heights = [0.37, 0.43, 0.4, 0.46];
+      const colors = ['#c57979', '#ead9b2', '#897fa4', '#d89c83', '#e1c36f'];
+      flowerStem(
+        a,
+        plants,
+        x + dx + (index % 2 ? 0.1 : -0.1),
+        z + dz + (index % 3 === 0 ? 0.09 : -0.08),
+        heights[index % heights.length],
+        colors[index % colors.length],
+        0,
+        0.09,
+      );
+    }
   } else {
-    const color = choice === 'flowerBeds' ? '#c88c88' : '#d2b96f';
-    for (const dx of [-0.56, 0, 0.56]) {
-      for (const dz of [-0.42, 0, 0.42]) {
-        shrub(a, plants, x + dx, z + dz, 0.21, true, 231 + Math.round((dx + 1) * 17 + dz));
-        flower(a, plants, x + dx - 0.12, 0.48, z + dz + 0.1, color, 0.075);
-        flower(
-          a,
-          plants,
-          x + dx + 0.12,
-          0.47,
-          z + dz - 0.12,
-          choice === 'flowerBeds' ? '#e7d9b5' : color,
-          0.07,
-        );
-      }
+    // Irregular clusters, taller stems and scattered grasses distinguish the meadow-like option.
+    const blooms: [number, number, number, string, number][] = [
+      [-0.78, -0.52, 0.82, '#9286aa', -0.12],
+      [-0.48, -0.45, 0.54, '#e5d2a4', 0.08],
+      [0.03, -0.6, 0.98, '#b98b9d', -0.16],
+      [0.55, -0.48, 0.69, '#d3b66e', 0.11],
+      [0.82, -0.18, 0.9, '#9582ab', -0.09],
+      [-0.72, 0.02, 0.62, '#e4d3ae', 0.13],
+      [-0.22, 0.08, 1.02, '#a98aa8', -0.1],
+      [0.34, 0.13, 0.74, '#d6b46d', 0.15],
+      [-0.56, 0.57, 0.93, '#9685b0', -0.14],
+      [0.04, 0.52, 0.61, '#e6d3a8', 0.08],
+      [0.57, 0.62, 1.08, '#b4819a', -0.11],
+    ];
+    for (const [index, [dx, dz, height, color, lean]] of blooms.entries())
+      flowerStem(a, plants, x + dx, z + dz, height, color, lean, index % 3 === 0 ? 0.095 : 0.08);
+    const grass = a.cachedGeometry(
+      'phase4-wildflower-grass',
+      () => new T.CylinderGeometry(0.005, 0.018, 1, 4),
+    );
+    for (const [index, [dx, dz, height, lean]] of [
+      [-0.92, -0.28, 0.54, -0.18],
+      [-0.61, -0.12, 0.72, 0.2],
+      [-0.22, -0.67, 0.61, -0.13],
+      [0.25, -0.48, 0.66, 0.17],
+      [0.91, 0.02, 0.64, 0.15],
+      [-0.94, 0.31, 0.7, 0.1],
+      [-0.42, 0.39, 0.57, -0.16],
+      [0.22, 0.64, 0.68, 0.15],
+      [0.88, 0.49, 0.53, -0.12],
+      [0.72, -0.65, 0.62, 0.13],
+      [-0.04, -0.05, 0.48, -0.17],
+      [0.42, 0.4, 0.58, -0.12],
+    ].entries()) {
+      const blade = a.mesh(
+        plants,
+        grass,
+        index % 2 ? '#73845a' : '#899468',
+        x + dx,
+        0.16 + height / 2,
+        z + dz,
+        1,
+        height,
+        1,
+      );
+      blade.rotation.z = lean;
+      blade.castShadow = false;
     }
   }
+}
+
+function clippedHedge(a: AssetLibrary, parent: T.Object3D, x: number, z: number, scale = 1) {
+  const colors = ['#4c6247', '#566c4d', '#607550'];
+  for (let i = 0; i < colors.length; i++)
+    a.sphere(
+      parent,
+      colors[i],
+      x,
+      0.72 + i * 0.12,
+      z,
+      0.42 * scale,
+      (0.78 - i * 0.08) * scale,
+      0.38 * scale,
+    );
 }
 
 function boundary(set: PieceSet, choice: string) {
@@ -338,7 +466,7 @@ function boundary(set: PieceSet, choice: string) {
   const material = choice === 'picketFence' ? '#e6e1d1' : lowStone ? '#999589' : '#667b58';
   const post = (x: number, z: number, vertical = false) => {
     if (hedge) {
-      shrub(a, perimeter, x, z, 0.25, false, Math.round((x + z + 20) * 17));
+      clippedHedge(a, perimeter, x, z, 0.82);
     } else if (lowStone) {
       a.box(perimeter, material, x, 0.34, z, vertical ? 0.34 : 0.5, 0.58, vertical ? 0.5 : 0.34);
       a.box(perimeter, '#beb8a7', x, 0.66, z, vertical ? 0.42 : 0.56, 0.1, vertical ? 0.56 : 0.42);
@@ -354,7 +482,10 @@ function boundary(set: PieceSet, choice: string) {
     fixed: number,
     gap?: [number, number],
   ) => {
-    for (let value = start; value <= end + 0.001; value += hedge ? 0.58 : 0.64) {
+    const hedgeInset = hedge && axis === 'x' ? 0.36 : 0,
+      from = start + hedgeInset,
+      to = end - hedgeInset;
+    for (let value = from; value <= to + 0.001; value += hedge ? 0.32 : 0.64) {
       if (gap && value > gap[0] && value < gap[1]) continue;
       const x = axis === 'x' ? value : fixed;
       const z = axis === 'z' ? value : fixed;
@@ -374,32 +505,33 @@ function boundary(set: PieceSet, choice: string) {
   };
   // Three enclosed edges plus front segments with generous gaps for the existing walk and drive.
   line('x', -12.55, 0.7, -11.86);
-  line('z', -11.86, 1.0, -12.58);
-  line('z', -11.86, 1.0, 0.9);
-  line('x', -12.55, -8.85, 1.0);
-  line('x', -5.6, -2.45, 1.0);
+  line('z', -11.86, 0.98, hedge ? -12.5 : -12.58);
+  line('z', -11.86, 0.98, hedge ? 0.5 : 0.9);
+  line('x', -12.55, -8.85, hedge ? 0.98 : 1.0);
+  line('x', -5.6, -2.45, hedge ? 0.98 : 1.0);
   // Gate piers make the open path and driveway intentional in all three boundary styles.
   for (const [x, z] of [
     [-8.85, 1.0],
     [-5.6, 1.0],
     [-2.45, 1.0],
-    [-12.58, 1.0],
-    [0.7, 1.0],
+    [hedge ? -12.5 : -12.58, hedge ? 0.98 : 1.0],
+    [hedge ? 0.5 : 0.7, hedge ? 0.98 : 1.0],
   ]) {
-    if (hedge) shrub(a, details, x, z, 0.33, false, x + z + 277);
+    if (hedge) clippedHedge(a, details, x, z, 0.82);
     else {
       a.box(details, lowStone ? '#89877d' : '#ddd8c8', x, 0.46, z, 0.4, 0.9, 0.4);
       if (!lowStone) a.box(details, '#f2eddf', x, 0.95, z, 0.46, 0.12, 0.46);
     }
   }
   if (hedge) {
-    for (const x of [-11.9, -11.25, -10.6, -9.95]) shrub(a, planting, x, -2.2, 0.3, true, x + 291);
+    for (const x of [-11.9, -11.25, -10.6, -9.95])
+      shrub(a, planting, x, -2.2, 0.26, false, x + 291);
   } else {
     for (const x of [-11.9, -11.25, -10.6, -9.95]) shrub(a, planting, x, -2.2, 0.26, true, x + 301);
   }
 }
 
-function stringLight(a: AssetLibrary, p: T.Object3D, x: number, z: number) {
+function stringLight(a: AssetLibrary, p: T.Object3D, from: T.Vector3, to: T.Vector3) {
   const bulb = a.namedMaterial(
     'phase4-string-light-bulb',
     () =>
@@ -410,13 +542,12 @@ function stringLight(a: AssetLibrary, p: T.Object3D, x: number, z: number) {
         roughness: 0.42,
       }),
   );
-  const curve = new T.CatmullRomCurve3([
-    new T.Vector3(x - 1.9, 2.95, z - 0.8),
-    new T.Vector3(x - 1.0, 2.52, z - 0.35),
-    new T.Vector3(x, 2.43, z),
-    new T.Vector3(x + 1.0, 2.52, z + 0.35),
-    new T.Vector3(x + 1.9, 2.95, z + 0.8),
-  ]);
+  const quarter = from.clone().lerp(to, 0.25),
+    middle = from.clone().lerp(to, 0.5),
+    threeQuarter = from.clone().lerp(to, 0.75);
+  quarter.y = threeQuarter.y = 2.59;
+  middle.y = 2.45;
+  const curve = new T.CatmullRomCurve3([from, quarter, middle, threeQuarter, to]);
   a.mesh(p, a.geometry(new T.TubeGeometry(curve, 14, 0.025, 5, false)), '#685b46', 0, 0, 0);
   for (let i = 0; i < 7; i++) {
     const point = curve.getPoint(i / 6);
@@ -432,7 +563,26 @@ function stringLight(a: AssetLibrary, p: T.Object3D, x: number, z: number) {
   }
 }
 
-function outdoorLighting(set: PieceSet, choice: string) {
+function wallSconce(
+  set: PieceSet,
+  x: number,
+  y: number,
+  z: number,
+  side: 'front' | 'rear' | 'left' | 'right',
+  style: string,
+) {
+  const { a } = set,
+    rotation = side === 'rear' ? Math.PI : side === 'left' ? -Math.PI / 2 : side === 'right' ? Math.PI / 2 : 0,
+    mount = a.group(set.pieces.get('lighting-hardware')!, x, y, z, rotation);
+  mount.name = `wall-sconce-mount-${side}-${x.toFixed(2)}`;
+  mount.userData['wallSconce'] = { side, style };
+  a.box(mount, '#4f554d', 0, 0, 0, 0.2, 0.28, 0.08);
+  a.box(mount, '#4f554d', 0, -0.02, 0.09, 0.07, 0.08, 0.18);
+  const lamp = a.group(set.pieces.get('warm-light-accents')!, x, y, z, rotation);
+  a.lantern(lamp, 0, 0, 0.18, false, false);
+}
+
+function outdoorLighting(set: PieceSet, choice: string, houseStyle: string) {
   const { a } = set;
   const hardware = part(set, 'lighting-hardware');
   const accents = part(set, 'warm-light-accents');
@@ -440,7 +590,12 @@ function outdoorLighting(set: PieceSet, choice: string) {
   if (choice === 'stringLights') {
     for (const x of [-6.5, -3.8])
       for (const z of [-11.0, -9.45]) a.box(hardware, '#705c43', x, 1.5, z, 0.12, 3, 0.12);
-    stringLight(a, accents, -5.15, -10.22);
+    const runs = [
+      [new T.Vector3(-6.5, 2.82, -11), new T.Vector3(-3.8, 2.82, -11)],
+      [new T.Vector3(-6.5, 2.82, -9.45), new T.Vector3(-3.8, 2.82, -9.45)],
+    ];
+    accents.userData['stringLightAnchors'] = runs.map(([from, to]) => [from.toArray(), to.toArray()]);
+    for (const [from, to] of runs) stringLight(a, accents, from, to);
     for (const x of [-6.8, -3.45]) planter(a, plants, x, -9.55, '#d2b18b');
   } else if (choice === 'gardenTorches') {
     for (const [x, z] of [
@@ -451,37 +606,57 @@ function outdoorLighting(set: PieceSet, choice: string) {
     ]) {
       a.cylinder(hardware, '#76583b', x, 0.72, z, 0.055, 1.35);
       a.cylinder(hardware, '#a8794c', x, 1.4, z, 0.12, 0.12);
+      const flameMaterial = a.namedMaterial(
+        'phase4-torch-glow',
+        () =>
+          new T.MeshStandardMaterial({
+            color: '#ffc978',
+            emissive: '#ed8f44',
+            emissiveIntensity: 0.46,
+          }),
+      );
+      const innerMaterial = a.namedMaterial(
+        'phase4-torch-core',
+        () =>
+          new T.MeshStandardMaterial({
+            color: '#fff0bb',
+            emissive: '#ffd17b',
+            emissiveIntensity: 0.55,
+          }),
+      );
+      if (!a.torchFlames.includes(flameMaterial)) a.torchFlames.push(flameMaterial);
+      if (!a.torchFlames.includes(innerMaterial)) a.torchFlames.push(innerMaterial);
       const flame = a.mesh(
         accents,
         a.cachedGeometry('phase4-torch-flame', () => new T.ConeGeometry(0.09, 0.22, 7)),
-        a.namedMaterial(
-          'phase4-torch-glow',
-          () =>
-            new T.MeshStandardMaterial({
-              color: '#ffc978',
-              emissive: '#ed8f44',
-              emissiveIntensity: 0.6,
-            }),
-        ),
+        flameMaterial,
         x,
-        1.57,
+        1.58,
         z,
       );
       flame.castShadow = false;
-      a.lantern(accents, x, 1.58, z, false);
+      flame.name = 'visible-torch-flame';
+      const core = a.mesh(
+        accents,
+        a.cachedGeometry('phase4-torch-core', () => new T.ConeGeometry(0.046, 0.14, 6)),
+        innerMaterial,
+        x,
+        1.59,
+        z,
+      );
+      core.castShadow = false;
     }
     planter(a, plants, -7.15, -7.8, '#ad9580');
     planter(a, plants, -3.1, -8.5, '#c0a18a');
   } else {
-    for (const [x, z] of [
-      [-7.55, -2.25],
-      [-3.12, -2.25],
-      [-7.55, -6.25],
-    ]) {
-      a.box(hardware, '#4f554d', x, 1.83, z, 0.13, 0.2, 0.1);
-      a.box(hardware, '#4f554d', x, 1.7, z - 0.09, 0.07, 0.12, 0.23);
-      a.lantern(accents, x, 1.93, z - 0.17, false);
-    }
+    const frontLocal = houseStyle === 'cream' ? [-2.15, 1.65] : [-1.02, 0.55],
+      rearLocal = [-1.0, 0.56];
+    for (const localX of frontLocal)
+      wallSconce(set, -5 + localX, 1.95, -2.4, 'front', houseStyle);
+    for (const localX of rearLocal)
+      wallSconce(set, -5 + localX, 1.9, -6.8, 'rear', houseStyle);
+    wallSconce(set, -7.9, 1.85, -4.6, 'left', houseStyle);
+    wallSconce(set, -2.1, 1.85, -4.6, 'right', houseStyle);
     planter(a, plants, -7.85, -1.0, '#c0a18d');
     planter(a, plants, -2.82, -1.0, '#a7ad91');
   }
@@ -546,7 +721,7 @@ function signature(set: PieceSet, choice: string) {
   for (const dx of [-0.68, 0.68]) shrub(a, plants, x + dx, z - 0.5, 0.28, true, dx + 373);
 }
 
-function compose(set: PieceSet, choice: string) {
+function compose(set: PieceSet, choice: string, houseStyle: string) {
   switch (set.root.name.split(':')[1]) {
     case 'frontGarden':
       frontGarden(set, choice);
@@ -576,7 +751,7 @@ function compose(set: PieceSet, choice: string) {
       boundary(set, choice);
       break;
     case 'outdoorLighting':
-      outdoorLighting(set, choice);
+      outdoorLighting(set, choice, houseStyle);
       break;
     case 'signature':
       signature(set, choice);
@@ -603,6 +778,7 @@ export function buildMilestoneProject(
   parent: T.Group,
   projectId: string,
   choiceId: string,
+  houseStyle = 'sage',
 ): MilestoneAsset {
   const definition = PROJECTS.find((project) => project.id === projectId);
   if (!FEATURE_ZONES[projectId] || !definition)
@@ -610,7 +786,7 @@ export function buildMilestoneProject(
   if (!definition.choices.some((choice) => choice.id === choiceId))
     throw new Error(`Unknown ${projectId} design choice: ${choiceId}`);
   const set = createSet(a, parent, projectId);
-  compose(set, choiceId);
+  compose(set, choiceId, houseStyle);
   for (const piece of set.pieces.values()) {
     batchStatic(piece, (geometry) => a.geometry(geometry));
     piece.userData['staticBatchBoundary'] = true;

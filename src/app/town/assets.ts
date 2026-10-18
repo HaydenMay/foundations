@@ -17,6 +17,7 @@ export const HOUSE_STYLES: Record<string, HouseStyle> = {
 export class AssetLibrary {
   readonly windows: T.MeshStandardMaterial[] = [];
   readonly lamps: T.PointLight[] = [];
+  readonly torchFlames: T.MeshStandardMaterial[] = [];
   private readonly materials = new Map<string, T.MeshStandardMaterial>();
   private readonly geometries = new Set<T.BufferGeometry>();
   private readonly geometryCache = new Map<string, T.BufferGeometry>();
@@ -242,7 +243,14 @@ export class AssetLibrary {
     for (const zz of [-0.22, 0, 0.22]) this.box(g, '#b09a78', 0, 0.58, zz, 1.7, 0.09, 0.17);
     for (const y of [0.9, 1.14]) this.box(g, '#b09a78', 0, y, -0.3, 1.7, 0.18, 0.07);
   }
-  lantern(parent: T.Object3D, x: number, y: number, z: number, tall = true) {
+  lantern(
+    parent: T.Object3D,
+    x: number,
+    y: number,
+    z: number,
+    tall = true,
+    includePointLight = true,
+  ) {
     if (tall) {
       this.cylinder(parent, '#5d685a', x, y / 2, z, 0.065, y);
       this.cylinder(parent, '#7b8270', x, 0.1, z, 0.18, 0.2);
@@ -250,10 +258,12 @@ export class AssetLibrary {
     const material = this.glass();
     this.box(parent, material, x, y + 0.15, z, 0.3, 0.45, 0.3);
     this.box(parent, '#57644f', x, y + 0.42, z, 0.42, 0.1, 0.42);
-    const light = new T.PointLight('#ffd39a', 0, 6, 2);
-    light.position.set(x, y + 0.1, z);
-    parent.add(light);
-    this.lamps.push(light);
+    if (includePointLight) {
+      const light = new T.PointLight('#ffd39a', 0, 6, 2);
+      light.position.set(x, y + 0.1, z);
+      parent.add(light);
+      this.lamps.push(light);
+    }
   }
   dispose() {
     this.geometries.forEach((g) => g.dispose());
@@ -262,6 +272,7 @@ export class AssetLibrary {
     this.textures.clear();
     this.windows.length = 0;
     this.lamps.length = 0;
+    this.torchFlames.length = 0;
     this.materials.clear();
     this.geometries.clear();
     this.geometryCache.clear();

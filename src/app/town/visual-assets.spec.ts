@@ -6,12 +6,26 @@ import { batchStatic } from './batching';
 import { buildWorld } from './world';
 import { homeViewHeight } from './camera';
 import { lightAt } from './lighting';
+import * as Lighting from './lighting';
 import { buildBackyard } from './backyards';
 import { surface } from './surfaces';
 import { PROJECTS } from '../domain/progression';
 import { FEATURE_ZONES } from './milestone-assets';
 
 describe('residential asset contracts', () => {
+  it('gives Cottage, Craftsman and Brick a broad shared residential porch footprint', () => {
+    const widths: number[] = [];
+    for (const style of ['sage', 'cream', 'blue']) {
+      const assets = new AssetLibrary(),
+        home = buildStartingHouse(assets, new T.Group(), style),
+        entry = home.assemblies.get('entry')!,
+        bounds = new T.Box3().setFromObject(entry);
+      widths.push(bounds.max.x - bounds.min.x);
+      assets.dispose();
+    }
+    expect(widths.every((width) => width >= 5)).toBe(true);
+    expect(Math.max(...widths) - Math.min(...widths)).toBeLessThan(1);
+  });
   it('offers distinct architecture in the same usable lot with a shared entrance', () => {
     const signatures: string[] = [];
     for (const choice of ['sage', 'cream', 'blue']) {
@@ -244,6 +258,18 @@ describe('residential asset contracts', () => {
   });
 });
 describe('reference lighting and framing', () => {
+  it('keeps torch flames steady by day and gently varies their emission at night', () => {
+    const getIntensity = (Lighting as unknown as {
+      torchFlickerIntensity?: (seconds: number, night: boolean) => number;
+    }).torchFlickerIntensity;
+    expect(getIntensity).toBeTypeOf('function');
+    const day = getIntensity!(3, false),
+      values = [0, 0.2, 0.4, 0.8, 1.3, 2].map((seconds) => getIntensity!(seconds, true));
+    expect(day).toBeCloseTo(0.46);
+    expect(Math.max(...values) - Math.min(...values)).toBeGreaterThan(0.05);
+    expect(Math.min(...values)).toBeGreaterThan(0.5);
+    expect(Math.max(...values)).toBeLessThan(0.75);
+  });
   it('has a lower golden-hour sun and continuous direction at mood boundaries', () => {
     expect(lightAt('day', 12).direction?.[1]).toBeGreaterThan(
       lightAt('sunset', 18).direction?.[1] || 0,

@@ -57,6 +57,13 @@ const PALETTES: Record<string, LightPalette> = {
     label: 'night',
   },
 };
+
+/** Shared low-amplitude emission for the static torch meshes; no moving lights or shadows. */
+export function torchFlickerIntensity(seconds: number, night: boolean): number {
+  if (!night || !Number.isFinite(seconds)) return 0.46;
+  return 0.62 + 0.055 * Math.sin(seconds * 8.3) + 0.022 * Math.sin(seconds * 17.2 + 0.7);
+}
+
 export function lightAt(preference: Lighting, hour: number): LightPalette {
   if (preference !== 'auto') return PALETTES[preference];
   const h = ((hour % 24) + 24) % 24;

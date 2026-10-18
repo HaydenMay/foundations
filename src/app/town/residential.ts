@@ -130,14 +130,20 @@ function railing(
   z: number,
   width: number,
   color: string,
+  frontRail?: 'left' | 'right',
 ) {
+  const rail = a.group(g, x, 0, z);
+  if (frontRail) {
+    rail.name = `porch-front-rail-${frontRail}`;
+    rail.userData['porchFrontRail'] = { width };
+  }
   for (const xx of [-width / 2, width / 2]) {
-    a.box(g, color, x + xx, 0.95, z, 0.12, 1.08, 0.12);
-    a.box(g, color, x + xx, 1.5, z, 0.18, 0.08, 0.18);
+    a.box(rail, color, xx, 0.95, 0, 0.12, 1.08, 0.12);
+    a.box(rail, color, xx, 1.5, 0, 0.18, 0.08, 0.18);
   }
   for (let xx = -0.5 * width + 0.2; xx < width / 2 - 0.1; xx += 0.19)
-    a.box(g, color, x + xx, 0.99, z, 0.055, 0.76, 0.055);
-  for (const y of [0.57, 1.4]) a.box(g, color, x, y, z, width, 0.09, 0.1);
+    a.box(rail, color, xx, 0.99, 0, 0.055, 0.76, 0.055);
+  for (const y of [0.57, 1.4]) a.box(rail, color, 0, y, 0, width, 0.09, 0.1);
 }
 
 function porch(
@@ -148,14 +154,25 @@ function porch(
   craftsman: boolean,
   brick: boolean,
 ) {
-  const width = brick ? 2.2 : 5.6,
+  const width = brick ? 5.1 : 5.4,
     center = brick ? -0.35 : 0;
   const paving = surface(a, 'stone', '#bcb4a0');
-  a.box(g, paving, center, 0.3, 2.85, width, 0.38, 1.5);
-  for (let i = 0; i < 3; i++)
-    a.box(g, '#c4bba7', -0.35, 0.12 + i * 0.1, 3.75 - i * 0.24, 1.55 + i * 0.14, 0.19, 0.37);
+  a.box(g, paving, center, 0.3, 2.85, width, 0.38, 1.8);
+  for (let i = 0; i < 3; i++) {
+    const step = a.box(
+      g,
+      '#c4bba7',
+      -0.35,
+      0.09 + i * 0.14,
+      4.38 - i * 0.33,
+      1.55 + i * 0.14,
+      0.18 + i * 0.02,
+      0.34,
+    );
+    step.name = `porch-step-${i + 1}`;
+  }
   const post = craftsman ? '#785333' : TRIM;
-  for (const x of brick ? [-1.28, 0.58] : [-2.55, -0.9, 0.9, 2.55]) {
+  for (const x of brick ? [center - 2.12, center + 2.12] : [-2.55, -0.9, 0.9, 2.55]) {
     if (craftsman) {
       a.box(g, paving, x, 0.92, 3.35, 0.48, 1.0, 0.48);
       a.box(g, '#c9bda1', x, 1.43, 3.35, 0.55, 0.12, 0.55);
@@ -174,14 +191,20 @@ function porch(
   }
   a.box(g, post, center, 2.83, 3.35, width + 0.2, 0.2, 0.2);
   if (brick) {
-    const portico = a.group(g, -0.35, 0, 2.95, Math.PI / 2);
-    pitchedRoof(a, portico, 1.8, 2.5, 0.57, 2.95, roof, wall);
+    const portico = a.group(g, center, 0, 2.85);
+    pitchedRoof(a, portico, 4.95, 2.15, 0.62, 2.84, roof, wall);
+    railing(a, g, center - 2.32, 3.48, 0.42, post, 'left');
+    railing(a, g, center + 2.32, 3.48, 0.42, post, 'right');
+    for (const side of [-1, 1]) {
+      const end = a.group(g, center + side * (width / 2 - 0.12), 0, 2.85, Math.PI / 2);
+      railing(a, end, 0, 0, 1.2, post);
+    }
   } else {
     const canopy = a.box(g, roof, 0, 3.02, 2.9, 6.1, 0.13, 1.9);
     canopy.rotation.x = 0.2;
     a.box(g, post, 0, 2.85, 3.8, 6.1, 0.12, 0.12);
-    railing(a, g, -1.83, 3.5, 1.45, post);
-    railing(a, g, 1.53, 3.5, 2.05, post);
+    railing(a, g, -2.75, 3.5, 0.5, post, 'left');
+    railing(a, g, 2.75, 3.5, 0.5, post, 'right');
     for (const side of [-1, 1]) {
       const end = a.group(g, side * 2.75, 0, 2.9, Math.PI / 2);
       railing(a, end, 0, 0, 1.22, post);

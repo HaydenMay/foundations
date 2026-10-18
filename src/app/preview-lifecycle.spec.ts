@@ -40,9 +40,59 @@ it('keeps assembly playback overrides outside saved preview and genuine state', 
   const store = TestBed.inject(FoundationsStore);
   const genuine = structuredClone(store.realState());
   store.enterPreview();
-  app.previewConstruction({ speed: 2, reducedMotion: true });
+  app.previewConstruction({
+    projectId: 'frontGarden',
+    override: { speed: 2, reducedMotion: true },
+  });
 
   expect(app.previewAssemblyOptions()).toEqual({ speed: 2, reducedMotion: true });
+  expect(app.constructionProject()).toBe('frontGarden');
+  expect(store.state().designs['home']).toBe('sage');
+  expect(store.state().designs['frontGarden']).toBe('roses');
+  expect(store.realState()).toEqual(genuine);
+  expect(JSON.parse(store.backupJSON())).toEqual(genuine);
+});
+
+it('replays a visible milestone without changing its choice or the real save', () => {
+  localStorage.clear();
+  TestBed.configureTestingModule({ imports: [App] }).overrideComponent(App, {
+    set: { template: '', imports: [] },
+  });
+  const fixture = TestBed.createComponent(App),
+    app = fixture.componentInstance;
+  fixture.detectChanges();
+  const store = TestBed.inject(FoundationsStore),
+    genuine = structuredClone(store.realState());
+  store.enterPreview();
+  store.previewScenario('all');
+  store.previewDesign('frontGarden', 'blue');
+  const chosen = store.state().designs['frontGarden'];
+  app.previewConstruction({ projectId: 'frontGarden', override: { speed: 0.5 } });
+  const firstRequest = app.construction();
+  app.previewConstruction({ projectId: 'frontGarden', override: { speed: 0.5 } });
+
+  expect(app.construction()).toBe(firstRequest + 1);
+  expect(store.state().designs['frontGarden']).toBe(chosen);
+  expect(store.realState()).toEqual(genuine);
+  expect(JSON.parse(store.backupJSON())).toEqual(genuine);
+});
+
+it('makes the existing empty-parcel recipe available for preview without saving simulated stars', () => {
+  localStorage.clear();
+  TestBed.configureTestingModule({ imports: [App] }).overrideComponent(App, {
+    set: { template: '', imports: [] },
+  });
+  const fixture = TestBed.createComponent(App),
+    app = fixture.componentInstance;
+  fixture.detectChanges();
+  const store = TestBed.inject(FoundationsStore),
+    genuine = structuredClone(store.realState());
+  store.enterPreview();
+  app.previewConstruction({ projectId: 'chapter', override: {} });
+
+  expect(app.constructionProject()).toBe('chapter');
+  expect(store.stars()).toBe(100);
+  expect(store.preview()?.hiddenDesigns['chapter']).toBeUndefined();
   expect(store.realState()).toEqual(genuine);
   expect(JSON.parse(store.backupJSON())).toEqual(genuine);
 });
@@ -217,5 +267,54 @@ it('dispatches a confirmed milestone construction to its own scene assembly', ()
     'frontGarden',
     expect.any(Function),
     undefined,
+  );
+});
+
+it('replays an already visible milestone on repeated requests without rebuilding the world', () => {
+  const preferences = initialState('2026-10-17').preferences,
+    designs = { home: 'sage', frontGarden: 'blue' },
+    options = { speed: 2 },
+    scene = {
+      cancelConstruction: vi.fn(),
+      setDesigns: vi.fn(),
+      setLighting: vi.fn(),
+      camera: { set: vi.fn() },
+      celebrate: vi.fn(),
+      celebrateProject: vi.fn(),
+    };
+  const town: TownComponent = Object.create(TownComponent.prototype);
+  Object.assign(town, {
+    scene,
+    lastSession: 1,
+    lastConstruction: 7,
+    lastDesigns: JSON.stringify(designs),
+    lastCamera: JSON.stringify(preferences.camera),
+    incomingCamera: JSON.stringify(preferences.camera),
+    constructionProject: () => 'frontGarden',
+    assemblyOptions: () => options,
+    building: signal(false),
+  });
+  const sync = (
+    town as unknown as {
+      sync: (
+        d: Record<string, string>,
+        p: typeof preferences,
+        session: number,
+        request: number,
+        options?: { speed: number },
+      ) => void;
+    }
+  ).sync;
+
+  sync.call(town, designs, preferences, 1, 8, options);
+  sync.call(town, designs, preferences, 1, 9, options);
+
+  expect(scene.setDesigns).not.toHaveBeenCalled();
+  expect(scene.celebrateProject).toHaveBeenCalledTimes(2);
+  expect(scene.celebrateProject).toHaveBeenNthCalledWith(
+    2,
+    'frontGarden',
+    expect.any(Function),
+    options,
   );
 });

@@ -81,6 +81,11 @@ button:not(.toggle) {
   width: 100%;
   margin-top: 9px;
 }
+.build-preview {
+  min-height: 44px;
+  font-weight: 650;
+  touch-action: manipulation;
+}
 .two {
   display: grid;
   grid-template-columns: 1fr 1fr;
