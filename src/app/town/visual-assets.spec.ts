@@ -8,6 +8,8 @@ import { homeViewHeight } from './camera';
 import { lightAt } from './lighting';
 import { buildBackyard } from './backyards';
 import { surface } from './surfaces';
+import { PROJECTS } from '../domain/progression';
+import { FEATURE_ZONES } from './milestone-assets';
 
 describe('residential asset contracts', () => {
   it('offers distinct architecture in the same usable lot with a shared entrance', () => {
@@ -159,6 +161,86 @@ describe('residential asset contracts', () => {
     expect(released).toBe(geometries.size);
     expect(releasedMaterials).toBe(materials.size);
     expect(releasedTextures).toBe(textures.size);
+  });
+  it('keeps selected milestone roots separately addressable on each compatible house lot', () => {
+    const projects = PROJECTS.filter((project) => project.id !== 'home');
+    for (const house of ['sage', 'cream', 'blue']) {
+      const designs = Object.fromEntries([
+        ['home', house],
+        ...projects.map((project) => [project.id, project.choices[0].id]),
+      ]);
+      const world = buildWorld(designs);
+      expect(world.projectAssets?.size).toBe(projects.length);
+      const home = world.group.getObjectByName('starting-home')!;
+      expect(home.position.toArray()).toEqual([-5, 0.13, -4.6]);
+      for (const project of projects) {
+        const asset = world.projectAssets!.get(project.id)!;
+        expect(asset.root.parent).toBe(world.group);
+        expect(asset.root.name).toBe(`project-asset:${project.id}`);
+        const bounds = new T.Box3().setFromObject(asset.root);
+        const zone = FEATURE_ZONES[project.id];
+        expect(bounds.min.x, `${house}/${project.id} west`).toBeGreaterThanOrEqual(
+          zone.minX - 0.05,
+        );
+        expect(bounds.max.x, `${house}/${project.id} east`).toBeLessThanOrEqual(zone.maxX + 0.05);
+        expect(bounds.min.z, `${house}/${project.id} rear`).toBeGreaterThanOrEqual(
+          zone.minZ - 0.05,
+        );
+        expect(bounds.max.z, `${house}/${project.id} front`).toBeLessThanOrEqual(zone.maxZ + 0.05);
+      }
+      world.assets.dispose();
+    }
+  });
+  it('retains selected legacy constructions outside the new Phase 4 reservations', () => {
+    const world = buildWorld({
+      home: 'cream',
+      exterior: 'moss',
+      garden: 'orchard',
+      street: 'avenue',
+      neighbor: 'rose',
+      house2: 'sage',
+      circle: 'oak',
+    });
+    const reserved = Object.values(FEATURE_ZONES).filter(
+      (zone) => zone.id !== 'boundary' && zone.id !== 'outdoorLighting',
+    );
+    for (const id of ['exterior', 'garden', 'street', 'neighbor', 'house2', 'circle']) {
+      const root = world.group.getObjectByName(`legacy-project:${id}`);
+      expect(root, `${id} remains available`).toBeDefined();
+      const bounds = new T.Box3().setFromObject(root!);
+      for (const zone of reserved) {
+        const overlaps =
+          bounds.min.x < zone.maxX &&
+          bounds.max.x > zone.minX &&
+          bounds.min.z < zone.maxZ &&
+          bounds.max.z > zone.minZ;
+        expect(overlaps, `${id} avoids ${zone.id}`).toBe(false);
+      }
+    }
+    world.assets.dispose();
+  });
+  it('keeps a fully built original home inside the mobile scene-geometry budget', () => {
+    const projects = PROJECTS.filter((project) => project.id !== 'home');
+    for (const house of ['sage', 'cream', 'blue']) {
+      const world = buildWorld(
+        Object.fromEntries([
+          ['home', house],
+          ...projects.map((project) => [project.id, project.choices[0].id]),
+        ]),
+      );
+      let meshes = 0,
+        triangles = 0;
+      world.group.traverse((object) => {
+        if (object instanceof T.Mesh) {
+          meshes++;
+          triangles +=
+            (object.geometry.index?.count || object.geometry.getAttribute('position').count) / 3;
+        }
+      });
+      expect(meshes, `${house} mesh budget`).toBeLessThan(240);
+      expect(triangles, `${house} triangle budget`).toBeLessThan(350000);
+      world.assets.dispose();
+    }
   });
 });
 describe('reference lighting and framing', () => {

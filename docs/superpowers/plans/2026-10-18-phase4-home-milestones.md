@@ -44,11 +44,13 @@
 
 **Files:** `src/app/town/{milestone-assets,world,landscaping,backyards,residential}.ts`, focused world/compatibility tests, `docs/visual-assets.md`.
 
-- [ ] Define metre-based zones for front planting, front centerpiece, porch, attraction, retreat, garden expansion, boundary, lighting and signature feature around the existing house/driveway anchors.
-- [ ] Build each target A/B/C option as a deterministic composition using shared asset/material conventions; map the supplied three reference boards directly to the A/B/C choices in the brief.
-- [ ] Return one owned root and stable assembly-piece map per selected project. Keep pre-Phase-4 project factories intact for legacy saves.
-- [ ] Add geometry-bound/anchor tests for all options, no overlap with road/driveway/door/paths or adjacent milestone zones, and all three house styles. Make a controlled layout proposal before changing lot bounds if the fixed layout fails these checks.
-- [ ] Verify mesh/triangle/draw-call growth remains within the existing mobile budget.
+- [x] Define metre-based zones for front planting, front centerpiece, porch, attraction, retreat, garden expansion, boundary, lighting and signature feature around the existing house/driveway anchors.
+- [x] Build each target A/B/C option as a deterministic composition using shared asset/material conventions; map the supplied three reference boards directly to the A/B/C choices in the brief.
+- [x] Return one owned root and stable assembly-piece map per selected project. Keep pre-Phase-4 project factories intact for legacy saves.
+- [x] Add geometry-bound/anchor tests for all options, no overlap with road/driveway/door/paths or adjacent milestone zones, and all three house styles. Make a controlled layout proposal before changing lot bounds if the fixed layout fails these checks.
+- [x] Verify mesh/triangle/draw-call growth remains within the existing mobile budget.
+
+Task 2 validation: `npm exec --yes --package=node@24.15.0 -- npm test -- --include=src/app/town/visual-assets.spec.ts --include=src/app/town/milestone-assets.spec.ts` → 15/15 passed; `git diff --check` passed. The full-lot budgets are enforced at <240 meshes and <350,000 triangles for each starting-house style.
 
 ### Task 3: Project preview, persistence and assembly playback
 

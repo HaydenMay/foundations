@@ -2,12 +2,12 @@ import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { AssetLibrary, HOUSE_STYLES } from './assets';
 import { buildStartingHouse } from './residential';
-import { buildBackyard } from './backyards';
 import { startingLandscape } from './landscaping';
 import { surface } from './surfaces';
 import { batchStatic } from './batching';
 import type { AssemblyRecipe } from './assembly';
 import { STARTING_HOME_ASSEMBLY_RECIPES } from './residential-assembly';
+import { buildMilestoneProject, FEATURE_ZONES, MilestoneAsset } from './milestone-assets';
 
 export interface TownWorld {
   group: T.Group;
@@ -15,12 +15,10 @@ export interface TownWorld {
   home?: T.Group;
   homeAssemblies?: ReadonlyMap<string, T.Group>;
   homeRecipe?: AssemblyRecipe;
+  projectAssets: Map<string, MilestoneAsset>;
+  legacyAssets: Map<string, T.Group>;
 }
 type ProjectFactory = (a: AssetLibrary, g: T.Group, choice: string) => void;
-
-function backyard(a: AssetLibrary, g: T.Group, choice: string) {
-  buildBackyard(a, g, choice);
-}
 
 function garden(a: AssetLibrary, g: T.Group, choice: string) {
   const area = a.group(g, 9, 0, -11);
@@ -82,15 +80,15 @@ function circle(a: AssetLibrary, g: T.Group, choice: string) {
 }
 
 const PROJECT_ASSETS: Record<string, ProjectFactory> = {
-  backyard,
   garden,
   street,
   circle,
   exterior(a, g, choice) {
-    a.bench(g, -10.2, -2);
-    a.flowerBox(g, -7, 0.34, 0.55);
-    a.flowerBox(g, -4.15, 0.34, 0.55);
-    if (choice === 'slate') for (const x of [-8.8, -2]) a.shrub(g, x, -1.8, 0.8, '#9991a0');
+    // Retain the legacy bench and planting on the west verge, clear of all reward zones.
+    a.bench(g, -14.05, -6.35);
+    a.flowerBox(g, -15.0, 0.34, -5.7);
+    a.flowerBox(g, -13.1, 0.34, -5.7);
+    if (choice === 'slate') for (const x of [-15.25, -12.85]) a.shrub(g, x, -6.95, 0.42, '#9991a0');
   },
   neighbor(a, g, choice) {
     a.box(g, '#a3ad7f', 5.8, 0.06, -3.3, 11.4, 0.1, 10);
@@ -129,6 +127,8 @@ export function buildWorld(designs: Record<string, string>): TownWorld {
   let home: T.Group | undefined,
     homeAssemblies: ReadonlyMap<string, T.Group> | undefined,
     homeRecipe: AssemblyRecipe | undefined;
+  const projectAssets = new Map<string, MilestoneAsset>(),
+    legacyAssets = new Map<string, T.Group>();
   if (designs['home']) {
     a.box(group, '#c8c7b5', -0.8, 0.19, -1.6, 2.6, 0.14, 7.8);
     for (let z = -4; z < 2; z += 1.55) a.box(group, '#b9bda7', -0.8, 0.27, z, 2.58, 0.008, 0.025);
@@ -143,25 +143,19 @@ export function buildWorld(designs: Record<string, string>): TownWorld {
       batchStatic(piece, (geometry) => a.geometry(geometry));
       piece.userData['staticBatchBoundary'] = true;
     }
-    a.fence(group, -6.1, -12.2, 13.3);
-    a.fence(group, -12.8, -5.6, 13.2, Math.PI / 2);
-    for (const x of [-10.8, -9.6, -8.4]) a.shrub(group, x, -0.1, 0.65);
-    for (const z of [-9.8, -8.6, -7.4]) a.shrub(group, -1.6, z, 0.6);
-    // Mailbox, front-garden stepping stones, shrubs and a small birdbath.
-    a.box(group, '#857b61', -2.6, 0.65, 1.25, 0.11, 1.1, 0.11);
-    a.box(group, '#63735e', -2.6, 1.22, 1.25, 0.45, 0.28, 0.6);
-    a.box(group, '#b5ab84', -2.35, 1.3, 1.28, 0.02, 0.16, 0.1);
+    // A clear pedestrian route reaches the sidewalk without overlapping porch furniture.
     for (let i = 0; i < 5; i++)
-      a.box(group, '#c2c1a8', -8.7 + i * 0.65, 0.16, -1.1 + i * 0.22, 0.43, 0.09, 0.48);
-    a.cylinder(group, '#babaa3', -10.5, 0.62, -3, 0.14, 0.9);
-    a.cylinder(group, '#cac8b0', -10.5, 1.08, -3, 0.53, 0.12);
+      a.box(group, '#c2c1a8', -5.35, 0.16, -0.12 + i * 0.52, 0.43, 0.09, 0.44);
+    a.box(group, '#857b61', -2.82, 0.65, 1.34, 0.11, 1.1, 0.11);
+    a.box(group, '#63735e', -2.82, 1.22, 1.34, 0.45, 0.28, 0.6);
+    a.box(group, '#b5ab84', -2.57, 1.3, 1.37, 0.02, 0.16, 0.1);
   } else {
     // A quiet plot marker and modest verge planting mark the same future residential lot.
-    a.box(group, '#857b61', -2.6, 0.65, 1.25, 0.11, 1.1, 0.11);
-    a.box(group, '#63735e', -2.6, 1.22, 1.25, 0.45, 0.28, 0.6);
+    a.box(group, '#857b61', -2.82, 0.65, 1.34, 0.11, 1.1, 0.11);
+    a.box(group, '#63735e', -2.82, 1.22, 1.34, 0.45, 0.28, 0.6);
     for (const x of [-12.4, 0.3])
       for (const z of [-11.8, 0.5]) a.box(group, '#b6b29c', x, 0.2, z, 0.18, 0.3, 0.18);
-    for (const z of [-3.5, -4.8]) a.shrub(group, -12, z, 0.5);
+    for (const z of [-3.5, -4.8]) a.shrub(group, -13.45, z, 0.38);
   }
   const trees: [number, number, number, string][] = [
     [-15.2, -13, 1.1, '#88956d'],
@@ -179,7 +173,17 @@ export function buildWorld(designs: Record<string, string>): TownWorld {
     a.shrub(group, x, z, 0.3 + (i % 3) * 0.12, i % 2 ? '#9ba47a' : '#8b9c71');
   }
   if (home) startingLandscape(a, group);
-  for (const [id, choice] of Object.entries(designs)) PROJECT_ASSETS[id]?.(a, group, choice);
+  for (const [id, choice] of Object.entries(designs)) {
+    if (FEATURE_ZONES[id]) projectAssets.set(id, buildMilestoneProject(a, group, id, choice));
+    else if (PROJECT_ASSETS[id]) {
+      const legacy = a.group(group);
+      legacy.name = `legacy-project:${id}`;
+      PROJECT_ASSETS[id](a, legacy, choice);
+      batchStatic(legacy, (geometry) => a.geometry(geometry));
+      legacy.userData['staticBatchBoundary'] = true;
+      legacyAssets.set(id, legacy);
+    }
+  }
   batchStatic(group, (geometry) => a.geometry(geometry));
-  return { group, assets: a, home, homeAssemblies, homeRecipe };
+  return { group, assets: a, home, homeAssemblies, homeRecipe, projectAssets, legacyAssets };
 }

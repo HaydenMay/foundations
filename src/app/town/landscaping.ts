@@ -200,26 +200,9 @@ export function gardenBed(
   return g;
 }
 export function startingLandscape(a: AssetLibrary, parent: T.Group) {
-  // Keep tall crowns at the plot perimeter, leaving the porch, garage and rear choices readable.
-  plantTree(a, parent, -12.4, -3.1, 0.92, 'birch', 11);
-  plantTree(a, parent, -2.3, -11.8, 0.8, 'flowering', 8);
-  plantTree(a, parent, 1.4, -9.2, 0.95, 'evergreen', 16);
-  gardenBed(a, parent, -8.5, -0.35, 3.9, 1.05, 7);
-  gardenBed(a, parent, -3.0, 0.1, 1.1, 1.4, 28);
-  gardenBed(a, parent, -12.4, -7.7, 0.5, 3.4, 41);
-  for (let i = 3; i < 9; i++)
-    shrub(a, parent, -10.7 + i * 1.2, -11.5, 0.5 + random(i) * 0.14, i % 3 === 0, i + 9);
-  for (let i = 0; i < 5; i++) shrub(a, parent, 0.45, -7.3 + i * 1.05, 0.48, i % 2 === 0, i + 30);
-  // A small front border beside the stepping stones, with restrained mixed perennial colors.
-  for (let i = 0; i < 24; i++)
-    flower(
-      a,
-      parent,
-      -11.1 + random(i + 4) * 2,
-      0.2,
-      0.6 + random(i + 19) * 0.55,
-      i % 3 ? '#e7dec1' : '#c8a19d',
-    );
-  a.bench(parent, -9.4, -4.2, Math.PI / 2);
-  a.lantern(parent, -11.8, 2.65, 1.1);
+  // Keep the fixed project zones visibly open so each earned garden can occupy its own space.
+  // These trees sit beyond the original lot edge and frame it without consuming future rewards.
+  plantTree(a, parent, -14.1, -3.1, 0.78, 'birch', 11);
+  plantTree(a, parent, -14.25, -9.2, 0.82, 'flowering', 8);
+  plantTree(a, parent, 2.65, -13.2, 0.9, 'evergreen', 16);
 }

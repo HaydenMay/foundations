@@ -60,8 +60,21 @@ function lounge(a: AssetLibrary, p: T.Object3D, x: number, z: number) {
   back.rotation.x = -0.7;
   for (const side of [-1, 1]) a.box(p, wood, x + side * 0.23, 0.18, z, 0.06, 0.3, 1.0);
 }
-export function buildBackyard(a: AssetLibrary, parent: T.Group, choice: string) {
-  const g = a.group(parent, -10, 0.13, -8.2);
+export interface BackyardLayout {
+  x: number;
+  z: number;
+  scaleX: number;
+  scaleZ: number;
+}
+
+export function buildBackyard(
+  a: AssetLibrary,
+  parent: T.Group,
+  choice: string,
+  layout: BackyardLayout = { x: -10, z: -8.2, scaleX: 1, scaleZ: 1 },
+) {
+  const g = a.group(parent, layout.x, 0.13, layout.z);
+  g.scale.set(layout.scaleX, 1, layout.scaleZ);
   g.name = 'backyard-project';
   if (choice === 'pool') {
     rounded(a, g, 3.8, 4.7, 0.68, 0.02, surface(a, 'paving', '#c5b79d'));

@@ -27,3 +27,27 @@ No perpetual animation loop is enabled. First-home construction uses a temporary
 ## Replacing provisional assets
 
 An optimized GLTF factory can replace one procedural factory while preserving its anchor and domain IDs. Register all loaded geometry, materials and textures with the same lifetime owner (or an equivalent reference-counted loader). Preserve the shared window emissive convention and the transparent net's material grouping. Do not put model URLs into saved games; use repository-relative URLs so `/foundations/` project-site hosting continues to work. Re-run geometry/compatibility tests, all three house × three backyard captures, portrait/landscape framing and a real mobile performance check after a replacement.
+
+## Phase 4 original-home compositions
+
+Phase 4 keeps the established world and residential-house anchors. The factories in `town/milestone-assets.ts` reserve metre-based zones for front planting, a centerpiece, the rear-west backyard, the porch, a rear retreat, garden expansion, the property boundary, outdoor lighting and a signature feature.
+
+| Project | A / B / C composition |
+| --- | --- |
+| Front garden | Red roses / orange flowers / blue flowers |
+| Centerpiece | Flowering tree / stone fountain / birdbath |
+| Backyard | Pool / trampoline / wooden fort |
+| Porch | Rocking chairs / swing / bench and lanterns |
+| Retreat | Pergola / stone patio / garden lounge |
+| Garden expansion | Flower beds / evergreens / wildflowers |
+| Boundary | Picket fence / clipped hedge / low stone wall |
+| Outdoor lighting | String lights / garden torches / wall sconces |
+| Signature feature | Pond / gazebo / ornamental display bed |
+
+Each selected design owns one named project root, stable assembly-piece groups and a reveal recipe. The shared asset library owns materials, texture maps and reusable geometry; rebuilding the world disposes of one complete library. Static geometry batches by material inside assembly pieces. Existing house, road, driveway and pedestrian-path anchors remain fixed.
+
+The garden-expansion reward uses the open west-side pad between front planting, the centerpiece and porch reservations. The east rear strip was rejected after geometry checks showed it collided with the legacy neighbor footprint in imported saves. Keeping all new rewards on the original lot preserves those existing neighbor builds without changing lot or camera bounds.
+
+The first home remains visually open so later milestones add the fence, planting, outdoor furniture and yard attractions. The old `exterior`, `garden`, `street`, `neighbor`, `house2` and `circle` selections remain in the compatibility factory. The legacy exterior bench and planters sit on the west verge, outside all new reward zones; its roof appearance remains applied to the starting house. Backyard IDs stay `pool`, `trampoline` and `fort`, and reuse the existing backyard model factory inside the reserved rear-west area.
+
+The supplied boards show a denser property with more fine flowers, stonework and decor than the current procedural meshes. Foundations keeps their warm roof, siding, brick, wood, stone, lush planting and soft-light language, but does not yet match their texture richness or photographic lighting. These original geometry factories can be refined or replaced without changing progression, save IDs, or renderer ownership.
