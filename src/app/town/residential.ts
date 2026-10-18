@@ -218,12 +218,17 @@ function garage(a: AssetLibrary, g: T.Object3D, roof: Paint, wall: Paint, crafts
   window(a, wing, 0, 1.5, -1.8, 0.85, 0.9, Math.PI);
 }
 
+export interface StartingHouseAsset {
+  root: T.Group;
+  assemblies: ReadonlyMap<string, T.Group>;
+}
+
 export function buildStartingHouse(
   a: AssetLibrary,
   parent: T.Group,
   choice: string,
   roofChoice?: string,
-): T.Group {
+): StartingHouseAsset {
   const craftsman = choice === 'cream',
     brick = choice === 'blue';
   const wall = surface(
@@ -238,50 +243,65 @@ export function buildStartingHouse(
   );
   const g = a.group(parent, -5, 0.13, -4.6);
   g.name = 'starting-home';
-  a.box(g, surface(a, 'stone', '#a9a18d'), 0, 0.23, 0, 6, 0.4, 4.7);
-  a.box(g, wall, 0, 1.72, 0, 5.8, 2.65, 4.4);
+  const assemblies = new Map<string, T.Group>();
+  const assembly = (id: string) => {
+    const part = a.group(g);
+    part.userData['assemblyId'] = id;
+    assemblies.set(id, part);
+    return part;
+  };
+  const foundation = assembly('foundation'),
+    walls = assembly('walls'),
+    openings = assembly('openings'),
+    entry = assembly('entry'),
+    roofline = assembly('roofline'),
+    garagePiece = assembly('garage'),
+    details = assembly('details');
+
+  a.box(foundation, surface(a, 'stone', '#a9a18d'), 0, 0.23, 0, 6, 0.4, 4.7);
+  a.box(walls, wall, 0, 1.72, 0, 5.8, 2.65, 4.4);
   for (const x of [-2.9, 2.9])
     for (const z of [-2.2, 2.2])
-      a.box(g, craftsman ? '#725234' : TRIM, x, 1.75, z, 0.13, 2.8, 0.13);
+      a.box(walls, craftsman ? '#725234' : TRIM, x, 1.75, z, 0.13, 2.8, 0.13);
   if (craftsman) {
-    a.box(g, wall, -0.6, 3.7, -0.2, 4.6, 1.5, 4);
-    pitchedRoof(a, g, 6.35, 5.05, 1.65, 4.33, roof, wall, '#9b7b50');
-    const front = a.group(g, -1.0, 0, 1.2, Math.PI / 2);
+    a.box(walls, wall, -0.6, 3.7, -0.2, 4.6, 1.5, 4);
+    pitchedRoof(a, roofline, 6.35, 5.05, 1.65, 4.33, roof, wall, '#9b7b50');
+    const front = a.group(roofline, -1.0, 0, 1.2, Math.PI / 2);
     pitchedRoof(a, front, 2.8, 3.25, 1.05, 4.5, roof, wall, '#9b7b50');
-    a.box(g, wall, -1, 3.9, 1.4, 2.9, 1.4, 1.5);
-    window(a, g, -1.55, 4.0, 2.2, 0.82, 1.04, 0, '#ab8a5b');
-    window(a, g, -0.35, 4.0, 2.2, 0.82, 1.04, 0, '#ab8a5b');
-    for (const x of [-1.8, -0.2]) a.box(g, '#765035', x, 4.9, 2.24, 0.08, 0.55, 0.08);
-    window(a, g, 1.4, 3.8, -2.25, 0.85, 1.05, Math.PI, '#ab8a5b');
-    window(a, g, 2.96, 4.98, -0.2, 0.62, 0.78, Math.PI / 2, '#ab8a5b');
+    a.box(walls, wall, -1, 3.9, 1.4, 2.9, 1.4, 1.5);
+    window(a, openings, -1.55, 4.0, 2.2, 0.82, 1.04, 0, '#ab8a5b');
+    window(a, openings, -0.35, 4.0, 2.2, 0.82, 1.04, 0, '#ab8a5b');
+    for (const x of [-1.8, -0.2]) a.box(openings, '#765035', x, 4.9, 2.24, 0.08, 0.55, 0.08);
+    window(a, openings, 1.4, 3.8, -2.25, 0.85, 1.05, Math.PI, '#ab8a5b');
+    window(a, openings, 2.96, 4.98, -0.2, 0.62, 0.78, Math.PI / 2, '#ab8a5b');
   } else {
-    pitchedRoof(a, g, 6.4, 5.2, 2.38, 3.0, roof, wall);
-    dormer(a, g, -1.55, roof, wall);
-    dormer(a, g, 1.35, roof, wall);
-    window(a, g, -2.94, 4.05, 0, 0.7, 0.95, -Math.PI / 2);
-    window(a, g, 2.94, 4.05, 0, 0.7, 0.95, Math.PI / 2);
+    pitchedRoof(a, roofline, 6.4, 5.2, 2.38, 3.0, roof, wall);
+    dormer(a, roofline, -1.55, roof, wall);
+    dormer(a, roofline, 1.35, roof, wall);
+    window(a, openings, -2.94, 4.05, 0, 0.7, 0.95, -Math.PI / 2);
+    window(a, openings, 2.94, 4.05, 0, 0.7, 0.95, Math.PI / 2);
   }
-  porch(a, g, roof, wall, craftsman, brick);
-  door(a, g, -0.35, 2.24, craftsman ? '#9c7c50' : TRIM, craftsman);
+  porch(a, entry, roof, wall, craftsman, brick);
+  door(a, entry, -0.35, 2.24, craftsman ? '#9c7c50' : TRIM, craftsman);
   for (const x of [-1.8, 1.45]) {
-    window(a, g, x, 1.72, 2.24, x > 0 ? 1.15 : 0.95, 1.3, 0, TRIM, brick);
-    if (!brick) a.flowerBox(g, x, 0.92, 2.4, craftsman ? '#785b3e' : '#c3b492');
+    window(a, openings, x, 1.72, 2.24, x > 0 ? 1.15 : 0.95, 1.3, 0, TRIM, brick);
+    if (!brick) a.flowerBox(openings, x, 0.92, 2.4, craftsman ? '#785b3e' : '#c3b492');
   }
   // Deliberate rear elevation: a back door, paired windows and small garden steps.
-  for (const x of [-1.65, 1.5]) window(a, g, x, 1.7, -2.24, 0.9, 1.15, Math.PI);
-  const back = a.group(g, 0, 0, -2.24, Math.PI);
+  for (const x of [-1.65, 1.5]) window(a, openings, x, 1.7, -2.24, 0.9, 1.15, Math.PI);
+  const back = a.group(openings, 0, 0, -2.24, Math.PI);
   a.box(back, '#9b764b', -0.35, 1.35, 0.1, 0.85, 2.0, 0.12);
   a.box(back, a.glass(), -0.35, 1.8, 0.18, 0.57, 0.65, 0.025);
-  a.box(g, '#bfb7a1', 0.35, 0.28, -2.65, 1.4, 0.4, 0.8);
-  a.box(g, '#ccc4ae', 0.35, 0.13, -3.14, 1.6, 0.16, 0.35);
-  for (const z of [-1.1, 1.1]) window(a, g, -2.94, 1.7, z, 0.75, 1.1, -Math.PI / 2);
+  a.box(details, '#bfb7a1', 0.35, 0.28, -2.65, 1.4, 0.4, 0.8);
+  a.box(details, '#ccc4ae', 0.35, 0.13, -3.14, 1.6, 0.16, 0.35);
+  for (const z of [-1.1, 1.1]) window(a, openings, -2.94, 1.7, z, 0.75, 1.1, -Math.PI / 2);
   const chimney = surface(a, 'brick', brick ? '#9b5c43' : '#ac8067');
   const chimneyLift = craftsman ? 0.85 : 0;
-  a.box(g, chimney, 2.03, 4.77 + chimneyLift, -0.85, 0.56, 1.65, 0.65);
-  a.box(g, '#b8ad95', 2.03, 5.62 + chimneyLift, -0.85, 0.73, 0.15, 0.79);
-  a.box(g, '#524b3f', 2.03, 5.71 + chimneyLift, -0.85, 0.37, 0.04, 0.43);
-  garage(a, g, roof, wall, craftsman);
-  a.lantern(g, 0.4, 2.17, 2.55, false);
-  a.lantern(g, -1.0, 2.0, -2.6, false);
-  return g;
+  a.box(roofline, chimney, 2.03, 4.77 + chimneyLift, -0.85, 0.56, 1.65, 0.65);
+  a.box(roofline, '#b8ad95', 2.03, 5.62 + chimneyLift, -0.85, 0.73, 0.15, 0.79);
+  a.box(roofline, '#524b3f', 2.03, 5.71 + chimneyLift, -0.85, 0.37, 0.04, 0.43);
+  garage(a, garagePiece, roof, wall, craftsman);
+  a.lantern(details, 0.4, 2.17, 2.55, false);
+  a.lantern(details, -1.0, 2.0, -2.6, false);
+  return { root: g, assemblies };
 }

@@ -26,6 +26,8 @@ Write failing tests for: no-semantic synthetic groups; stable-ID fallback orderi
 
 ### 2. Add recipe-ready house assemblies
 
+**Status: complete.** All three variants expose seven identity-transform batch boundaries; the completed-house bounds match the pre-change fixtures and the 99-test suite passes.
+
 Create identity-local wrappers for the foundation, main structure, entry/porch, roofline and architectural details while retaining the original mesh builders and child relationships. Define explicit stable IDs and intentional numeric order for each of the three styles. Add tests that all recipes resolve to existing siblings, final local/world bounds remain within baseline tolerances, no piece overlaps another by ancestry, and all three completed worlds stay in a measured draw-call/triangle budget. First assert failure from the current flattened batch; then preserve a local batch boundary for each assembly.
 
 ### 3. Integrate with the one scene animation loop

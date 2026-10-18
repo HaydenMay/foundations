@@ -6,11 +6,15 @@ import { buildBackyard } from './backyards';
 import { startingLandscape } from './landscaping';
 import { surface } from './surfaces';
 import { batchStatic } from './batching';
+import type { AssemblyRecipe } from './assembly';
+import { STARTING_HOME_ASSEMBLY_RECIPES } from './residential-assembly';
 
 export interface TownWorld {
   group: T.Group;
   assets: AssetLibrary;
   home?: T.Group;
+  homeAssemblies?: ReadonlyMap<string, T.Group>;
+  homeRecipe?: AssemblyRecipe;
 }
 type ProjectFactory = (a: AssetLibrary, g: T.Group, choice: string) => void;
 
@@ -122,13 +126,23 @@ export function buildWorld(designs: Record<string, string>): TownWorld {
   }
   for (let x = -16; x < 18; x += 4) a.box(group, '#d1cdb2', x, 0.29, 5, 1.75, 0.012, 0.07);
   for (const z of [2.73, 7.27]) a.box(group, '#bbc0a9', 0, 0.29, z, 35.8, 0.012, 0.045);
-  let home: T.Group | undefined;
+  let home: T.Group | undefined,
+    homeAssemblies: ReadonlyMap<string, T.Group> | undefined,
+    homeRecipe: AssemblyRecipe | undefined;
   if (designs['home']) {
     a.box(group, '#c8c7b5', -0.8, 0.19, -1.6, 2.6, 0.14, 7.8);
     for (let z = -4; z < 2; z += 1.55) a.box(group, '#b9bda7', -0.8, 0.27, z, 2.58, 0.008, 0.025);
     a.box(group, '#d4d0b9', -5.35, 0.2, 0.65, 1.3, 0.15, 2.2);
-    home = buildStartingHouse(a, group, designs['home'], designs['exterior']);
+    const house = buildStartingHouse(a, group, designs['home'], designs['exterior']);
+    home = house.root;
+    homeAssemblies = house.assemblies;
+    homeRecipe =
+      STARTING_HOME_ASSEMBLY_RECIPES[designs['home']] || STARTING_HOME_ASSEMBLY_RECIPES['sage'];
     home.userData['staticBatchBoundary'] = true;
+    for (const piece of homeAssemblies.values()) {
+      batchStatic(piece, (geometry) => a.geometry(geometry));
+      piece.userData['staticBatchBoundary'] = true;
+    }
     a.fence(group, -6.1, -12.2, 13.3);
     a.fence(group, -12.8, -5.6, 13.2, Math.PI / 2);
     for (const x of [-10.8, -9.6, -8.4]) a.shrub(group, x, -0.1, 0.65);
@@ -166,7 +180,6 @@ export function buildWorld(designs: Record<string, string>): TownWorld {
   }
   if (home) startingLandscape(a, group);
   for (const [id, choice] of Object.entries(designs)) PROJECT_ASSETS[id]?.(a, group, choice);
-  if (home) batchStatic(home, (geometry) => a.geometry(geometry));
   batchStatic(group, (geometry) => a.geometry(geometry));
-  return { group, assets: a, home };
+  return { group, assets: a, home, homeAssemblies, homeRecipe };
 }

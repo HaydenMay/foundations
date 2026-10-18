@@ -15,7 +15,7 @@ describe('residential asset contracts', () => {
     for (const choice of ['sage', 'cream', 'blue']) {
       const a = new AssetLibrary(),
         scene = new T.Group();
-      const home = buildStartingHouse(a, scene, choice);
+      const home = buildStartingHouse(a, scene, choice).root;
       const box = new T.Box3().setFromObject(home),
         size = box.getSize(new T.Vector3());
       expect(size.x).toBeGreaterThan(8);

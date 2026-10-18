@@ -29,3 +29,5 @@ The screenshots were captured from the existing production build at source `c4b6
 | Desktop 1440×1000 | [baseline](evidence/phase-3/baseline-desktop-cottage.png) | [baseline](evidence/phase-3/baseline-desktop-craftsman.png) | [baseline](evidence/phase-3/baseline-desktop-brick.png) |
 
 Capture dimensions are device-pixel scaled for mobile. Camera, lighting, visibility and overflow assertions are recorded in [baseline metrics](evidence/phase-3/baseline-metrics.json). The baseline capture script is [capture-phase-3.mjs](../scripts/capture-phase-3.mjs).
+
+Pre-refactor world-space home bounds (metres) are also pinned in the assembly tests: Cottage and Brick `min(-8.25, .155, -7.915)`, `max(.451954, 5.86, -.665)`; Craftsman `min(-8.225, .155, -7.915)`, `max(.451954, 6.71, -.665)`. These bounds detect changes to the original lot envelope after the new identity wrappers are introduced.
