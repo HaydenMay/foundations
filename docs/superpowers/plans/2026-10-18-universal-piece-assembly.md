@@ -20,6 +20,8 @@
 
 ### 1. Build the animator contract test-first
 
+**Status: complete.** The isolated controller contract has 11 focused tests; the full unit suite now passes 96/96.
+
 Write failing tests for: no-semantic synthetic groups; stable-ID fallback ordering; equal normalized progress independent of update history; exact baseline restoration; 20 replays without drift; rotated and non-uniformly scaled parent world-up drops; ancestor/descendant and duplicate-object rejection; required/optional missing bindings; invalid transform rejection; skip/cancel/dispose and at-most-once completion; and independent controllers for separate roots. Then implement the controller with centralized defaults (about 3.6s motion plus at most one 220ms stagger wave, drop height 3.5m, concurrency 4, subtle settle), optional entry overrides and a speed/reduced-motion override. No allocation, geometry creation, clone or callback subscription occurs per animation frame.
 
 ### 2. Add recipe-ready house assemblies
