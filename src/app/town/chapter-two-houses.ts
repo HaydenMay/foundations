@@ -1,6 +1,12 @@
 import * as T from 'three';
-import type { AssetLibrary } from './assets';
 import type { Project } from '../domain/models';
+import type { AssetLibrary } from './assets';
+import {
+  CHAPTER_TWO_HOUSE_BLUEPRINTS,
+  type ChapterTwoHouseBlueprint,
+  type ChapterTwoHouseId,
+} from './chapter-two-blueprints';
+import { addResidentialDoor, addResidentialWindow, pitchedRoof } from './residential';
 import { surface } from './surfaces';
 
 export type NeighborLot = NonNullable<Project['lot']>;
@@ -11,87 +17,292 @@ export interface ChapterTwoHouse {
   pieces: ReadonlyMap<string, T.Group>;
 }
 
-interface LotShape {
-  width: number;
-  depth: number;
-  eaves: number;
-  rise: number;
-  porchWidth: number;
-  porchDepth: number;
-  twoStorey?: boolean;
-  lShape?: boolean;
+interface HousePalette {
+  wallFinish: 'siding' | 'wood' | 'brick';
+  wall: string;
+  roof: string;
+  trim: string;
+  wood: string;
+  stone: string;
 }
 
-const LOTS: Record<NeighborLot, LotShape> = {
-  compact: { width: 5.35, depth: 4.2, eaves: 2.45, rise: 1.48, porchWidth: 2.9, porchDepth: 1.25 },
-  'l-shaped': {
-    width: 7.45,
-    depth: 5.85,
-    eaves: 2.62,
-    rise: 1.55,
-    porchWidth: 3.1,
-    porchDepth: 1.2,
-    lShape: true,
-  },
-  'two-story': {
-    width: 7.25,
-    depth: 6.1,
-    eaves: 4.45,
-    rise: 1.9,
-    porchWidth: 5.4,
-    porchDepth: 1.55,
-    twoStorey: true,
-  },
-  'wide-gable': {
-    width: 8.15,
-    depth: 4.95,
-    eaves: 2.7,
-    rise: 1.72,
-    porchWidth: 3.7,
-    porchDepth: 1.3,
-  },
-};
-
-const STYLE = {
+const STYLE: Readonly<Record<NeighborStyle, HousePalette>> = Object.freeze({
   cottage: {
-    finish: 'siding' as const,
-    wall: '#e5dec9',
-    roof: '#3e494d',
+    wallFinish: 'siding',
+    wall: '#e4ddc9',
+    roof: '#3f494c',
     trim: '#f2eddf',
-    wood: '#77563b',
-    foundation: '#aaa593',
+    wood: '#805d3f',
+    stone: '#aaa391',
   },
   craftsman: {
-    finish: 'wood' as const,
-    wall: '#a17b50',
-    roof: '#434943',
-    trim: '#dccbaa',
-    wood: '#704b2e',
-    foundation: '#978c78',
+    wallFinish: 'wood',
+    wall: '#a27c53',
+    roof: '#464a43',
+    trim: '#dfd0ae',
+    wood: '#745132',
+    stone: '#978d79',
   },
   brick: {
-    finish: 'brick' as const,
-    wall: '#9e5d48',
-    roof: '#404a50',
+    wallFinish: 'brick',
+    wall: '#9d5b45',
+    roof: '#414a4f',
     trim: '#eee8da',
-    wood: '#684a38',
-    foundation: '#a59d8c',
+    wood: '#684934',
+    stone: '#a49b89',
   },
-};
+});
 
-function addOpening(
+function blueprintFor(lot: NeighborLot): ChapterTwoHouseBlueprint {
+  return CHAPTER_TWO_HOUSE_BLUEPRINTS[lot as ChapterTwoHouseId];
+}
+
+function addVolumeTrim(
   a: AssetLibrary,
-  parent: T.Group,
-  x: number,
-  y: number,
-  z: number,
-  width: number,
-  height: number,
-  rotation = 0,
+  parent: T.Object3D,
+  blueprint: ChapterTwoHouseBlueprint,
+  style: NeighborStyle,
+  material: T.Material,
+  palette: HousePalette,
 ) {
-  const opening = a.window(parent, x, y, z, width, height, rotation);
-  opening.name = 'house-window';
-  return opening;
+  for (const volume of blueprint.volumes) {
+    const frontZ = volume.centerZ + volume.depth / 2 + 0.018;
+    const trimColor = style === 'craftsman' ? palette.wood : palette.trim;
+    for (const side of [-1, 1]) {
+      const corner = a.box(
+        parent,
+        trimColor,
+        volume.centerX + side * (volume.width / 2 - 0.08),
+        volume.bottomY + volume.height / 2,
+        frontZ,
+        0.12,
+        volume.height + 0.08,
+        0.095,
+      );
+      corner.name = `${volume.id}-front-corner-trim`;
+    }
+    a.box(
+      parent,
+      material,
+      volume.centerX,
+      volume.bottomY + volume.height + 0.055,
+      frontZ,
+      volume.width - 0.22,
+      0.11,
+      0.1,
+    );
+  }
+}
+
+function addOpenings(
+  a: AssetLibrary,
+  parent: T.Object3D,
+  blueprint: ChapterTwoHouseBlueprint,
+  style: NeighborStyle,
+  palette: HousePalette,
+) {
+  const wallVolumes = blueprint.volumes.filter((volume) => volume.assemblyId !== 'garage');
+  for (const [volumeIndex, volume] of wallVolumes.entries()) {
+    const frontZ = volume.centerZ + volume.depth / 2 + 0.03;
+    const sideCount = volume.width > 8.8 ? 4 : 2;
+    const spacing = volume.width > 8.8 ? volume.width * 0.37 : volume.width * 0.28;
+    const windowXs =
+      sideCount === 4 ? [-spacing, -spacing / 3, spacing / 3, spacing] : [-spacing, spacing];
+    const windowY = volume.bottomY + Math.min(volume.height * 0.54, 1.62);
+    for (const x of windowXs) {
+      const worldX = volume.centerX + x;
+      if (Math.abs(worldX - blueprint.door.x) < 0.96) continue;
+      addResidentialWindow(
+        a,
+        parent,
+        worldX,
+        windowY,
+        frontZ,
+        volume.width > 8 ? 0.9 : 0.82,
+        volumeIndex > 0 ? 1.0 : 1.12,
+        0,
+        palette.trim,
+        style === 'cottage',
+      );
+      if (style === 'brick') {
+        a.box(parent, palette.trim, worldX, windowY + 0.64, frontZ + 0.02, 1.12, 0.11, 0.18);
+        a.box(parent, palette.trim, worldX, windowY - 0.66, frontZ + 0.02, 1.14, 0.1, 0.19);
+      }
+    }
+
+    const rearZ = volume.centerZ - volume.depth / 2 - 0.035;
+    for (const x of [-volume.width * 0.25, volume.width * 0.25])
+      addResidentialWindow(
+        a,
+        parent,
+        volume.centerX + x,
+        windowY,
+        rearZ,
+        0.78,
+        1.02,
+        Math.PI,
+        palette.trim,
+      );
+
+    const sideZs = [volume.centerZ - 0.8, volume.centerZ + 0.8];
+    for (const side of [-1, 1]) {
+      for (const z of sideZs) {
+        if (Math.abs(z - volume.centerZ) > volume.depth / 2 - 0.58) continue;
+        addResidentialWindow(
+          a,
+          parent,
+          volume.centerX + side * (volume.width / 2 + 0.025),
+          windowY,
+          z,
+          0.72,
+          1.02,
+          (side * Math.PI) / 2,
+          palette.trim,
+        );
+      }
+    }
+  }
+
+  if (blueprint.garageDoorX !== undefined) {
+    const garage = blueprint.volumes.find((volume) => volume.assemblyId === 'garage')!;
+    const frontZ = garage.centerZ + garage.depth / 2 + 0.075;
+    const door = a.group(parent, blueprint.garageDoorX, 0, frontZ);
+    door.name = 'attached-garage-door';
+    a.box(door, palette.trim, 0, 1.2, 0, 2.38, 2.22, 0.14);
+    a.box(door, style === 'craftsman' ? palette.wood : '#c6c0af', 0, 1.2, 0.085, 2.18, 2.02, 0.08);
+    for (const y of [0.48, 1.03, 1.58])
+      a.box(door, style === 'craftsman' ? '#6e5134' : '#aea996', 0, y, 0.13, 2.08, 0.035, 0.025);
+    for (const x of [-0.8, -0.27, 0.27, 0.8]) {
+      a.box(door, palette.trim, x, 2.04, 0.15, 0.42, 0.35, 0.03);
+      a.box(door, a.glass(), x, 2.04, 0.175, 0.32, 0.26, 0.025);
+    }
+  }
+}
+
+function addPorch(
+  a: AssetLibrary,
+  blueprint: ChapterTwoHouseBlueprint,
+  style: NeighborStyle,
+  palette: HousePalette,
+  pieces: ReadonlyMap<string, T.Group>,
+  roof: T.MeshStandardMaterial,
+  wall: T.MeshStandardMaterial,
+) {
+  const porch = blueprint.porch;
+  const deckCenterZ = porch.wallFrontZ + porch.depth / 2 - 0.04;
+  const deck = pieces.get('porch-deck')!;
+  a.box(
+    deck,
+    surface(a, 'stone', '#bcb5a2'),
+    porch.centerX,
+    porch.deckY,
+    deckCenterZ,
+    porch.width,
+    0.36,
+    porch.depth,
+  );
+  a.box(
+    deck,
+    palette.stone,
+    porch.centerX,
+    0.48,
+    deckCenterZ - porch.depth / 2 + 0.1,
+    porch.width + 0.12,
+    0.16,
+    0.13,
+  );
+
+  const supports = pieces.get('porch-supports')!;
+  const postMaterial = style === 'craftsman' ? palette.wood : palette.trim;
+  for (const x of [-1, 1].map((side) => porch.centerX + side * (porch.width / 2 - 0.12))) {
+    if (style === 'craftsman') {
+      a.box(supports, surface(a, 'stone', palette.stone), x, 0.82, deckCenterZ, 0.48, 0.82, 0.48);
+      a.box(supports, palette.trim, x, 1.26, deckCenterZ, 0.56, 0.1, 0.56);
+    }
+    a.box(supports, postMaterial, x, 1.58, deckCenterZ, 0.19, 2.05, 0.19);
+    a.box(supports, postMaterial, x, 2.64, deckCenterZ, 0.3, 0.13, 0.3);
+  }
+
+  const rails = pieces.get('porch-rails')!;
+  const railZ = deckCenterZ + porch.depth / 2 - 0.11;
+  for (const side of [-1, 1]) {
+    const railX = porch.centerX + side * (porch.width / 2 - 0.14);
+    a.box(rails, palette.trim, railX, 0.9, deckCenterZ, 0.11, 0.95, porch.depth - 0.18);
+    for (const z of [deckCenterZ - porch.depth / 2 + 0.16, railZ])
+      a.box(rails, palette.trim, railX, 0.87, z, 0.11, 0.1, 0.11);
+  }
+  const railWidth = Math.max(0.8, porch.width - 1.75);
+  a.box(rails, palette.trim, porch.centerX, 0.73, railZ, railWidth, 0.11, 0.09);
+  a.box(rails, palette.trim, porch.centerX, 1.32, railZ, railWidth, 0.11, 0.09);
+  for (let x = -railWidth / 2 + 0.16; x < railWidth / 2; x += 0.32)
+    a.box(rails, palette.trim, porch.centerX + x, 1.02, railZ, 0.055, 0.52, 0.06);
+
+  const stairs = pieces.get('porch-stairs')!;
+  for (let step = 0; step < 3; step++)
+    a.box(
+      stairs,
+      surface(a, 'stone', '#c8c0ad'),
+      porch.centerX,
+      0.14 + step * 0.12,
+      deckCenterZ + porch.depth / 2 + 0.19 + step * 0.29,
+      1.42 + step * 0.17,
+      0.16,
+      0.32,
+    );
+
+  const roofGroup = pieces.get('porch-roof')!;
+  const canopy = a.group(roofGroup, porch.centerX, 0, deckCenterZ);
+  canopy.name = 'covered-entry-roof';
+  pitchedRoof(
+    a,
+    canopy,
+    porch.width + 0.54,
+    porch.depth + 0.5,
+    porch.roofRise,
+    porch.roofEaveY,
+    roof,
+    wall,
+    style === 'craftsman' ? palette.wood : palette.trim,
+  );
+
+  const trim = pieces.get('porch')!;
+  if (style === 'craftsman') {
+    for (const side of [-1, 1]) {
+      const bracket = a.box(
+        trim,
+        palette.wood,
+        porch.centerX + side * (porch.width / 2 - 0.38),
+        2.48,
+        deckCenterZ - porch.depth / 2 + 0.12,
+        0.14,
+        0.58,
+        0.12,
+      );
+      bracket.rotation.z = side * -0.48;
+    }
+  }
+}
+
+function addRoofline(
+  a: AssetLibrary,
+  blueprint: ChapterTwoHouseBlueprint,
+  pieces: ReadonlyMap<string, T.Group>,
+  palette: HousePalette,
+) {
+  const chimney = pieces.get('roofline')!;
+  const c = blueprint.chimney;
+  a.box(
+    chimney,
+    surface(a, 'brick', '#9a6048'),
+    c.x,
+    c.bottomY + c.height / 2,
+    c.z,
+    0.55,
+    c.height,
+    0.58,
+  );
+  a.box(chimney, palette.stone, c.x, c.bottomY + c.height, c.z, 0.7, 0.14, 0.73);
+  a.box(chimney, '#4f5049', c.x, c.bottomY + c.height + 0.09, c.z, 0.39, 0.06, 0.41);
 }
 
 export function buildChapterTwoHouse(
@@ -100,268 +311,204 @@ export function buildChapterTwoHouse(
   lot: NeighborLot,
   styleName: NeighborStyle,
 ): ChapterTwoHouse {
-  const shape = LOTS[lot];
+  const blueprint = blueprintFor(lot);
   const palette = STYLE[styleName];
+  const wall = surface(a, palette.wallFinish, palette.wall);
+  const roof = surface(a, 'shingles', palette.roof);
+  const stone = surface(a, 'stone', palette.stone);
+  const trim = a.material(palette.trim);
   const root = a.group(parent);
   root.name = `chapter-two-house:${lot}:${styleName}`;
   root.userData['lot'] = lot;
   root.userData['style'] = styleName;
+  root.userData['blueprintId'] = blueprint.id;
   root.userData['architecturalDetail'] =
     styleName === 'cottage'
       ? 'cottage-dormer'
       : styleName === 'craftsman'
         ? 'craftsman-beam'
         : 'brick-lintel';
+
   const pieces = new Map<string, T.Group>();
-  const part = (id: string) => {
+  for (const step of blueprint.assembly) {
     const piece = a.group(root);
-    piece.name = id;
-    piece.userData['assemblyId'] = id;
-    pieces.set(id, piece);
-    return piece;
-  };
-  const foundation = part('foundation');
-  const walls = part('walls');
-  const roofline = part('roofline');
-  const openings = part('openings');
-  const porch = part('porch');
-  const details = part('details');
-  const garage = shape.lShape ? part('garage') : undefined;
-
-  const wall = surface(a, palette.finish, palette.wall);
-  const roof = surface(a, 'shingles', palette.roof);
-  const trim = a.material(palette.trim);
-  const stone = surface(a, 'stone', palette.foundation);
-  const mainWidth = shape.lShape ? 4.9 : shape.width;
-  const mainCenterX = shape.lShape ? -0.9 : 0;
-  const mainDepth = shape.lShape ? shape.depth - 0.6 : shape.depth;
-  const wallHeight = shape.twoStorey ? 2.8 : shape.eaves;
-  const firstFloorCenterY = wallHeight / 2 + 0.16;
-
-  a.box(foundation, stone, mainCenterX, 0.22, 0, mainWidth + 0.34, 0.38, mainDepth + 0.34);
-  a.box(walls, wall, mainCenterX, firstFloorCenterY, 0, mainWidth, wallHeight, mainDepth);
-  for (const x of [mainCenterX - mainWidth / 2 + 0.12, mainCenterX + mainWidth / 2 - 0.12]) {
-    for (const z of [-mainDepth / 2 + 0.11, mainDepth / 2 - 0.11])
-      a.box(
-        walls,
-        styleName === 'craftsman' ? palette.wood : trim,
-        x,
-        firstFloorCenterY,
-        z,
-        0.16,
-        wallHeight + 0.08,
-        0.15,
-      );
+    piece.name = step.id;
+    piece.userData['assemblyId'] = step.id;
+    piece.userData['staticBatchBoundary'] = true;
+    pieces.set(step.id, piece);
   }
 
-  if (shape.twoStorey) {
-    a.box(walls, wall, 0, 3.7, -0.1, mainWidth - 0.9, 1.75, mainDepth - 0.8);
-    a.box(foundation, stone, 0, 2.84, 0, mainWidth - 0.72, 0.14, mainDepth - 0.55);
-  }
-  if (shape.lShape) {
-    const wingX = 2.25,
-      wingZ = -0.7,
-      wingWidth = 2.45,
-      wingDepth = 3.8;
-    a.box(foundation, stone, wingX, 0.22, wingZ, wingWidth + 0.25, 0.38, wingDepth + 0.28);
-    a.box(walls, wall, wingX, 1.34, wingZ, wingWidth, 2.45, wingDepth);
-    const garageDoor = a.group(garage!, wingX, 0, wingZ + wingDepth / 2 + 0.045);
-    garageDoor.name = 'attached-garage-door';
-    a.box(garageDoor, trim, 0, 1.2, 0, 2.22, 2.2, 0.12);
-    a.box(garageDoor, palette.wood, 0, 1.2, 0.075, 2.04, 2.0, 0.07);
-    for (const y of [0.52, 1.08, 1.64])
+  const foundation = pieces.get('foundation')!;
+  for (const volume of blueprint.volumes)
+    a.box(
+      foundation,
+      stone,
+      volume.centerX,
+      volume.bottomY - 0.16,
+      volume.centerZ,
+      volume.width + 0.26,
+      0.34,
+      volume.depth + 0.26,
+    );
+
+  for (const volume of blueprint.volumes) {
+    const mass = pieces.get(volume.assemblyId)!;
+    a.box(
+      mass,
+      wall,
+      volume.centerX,
+      volume.bottomY + volume.height / 2,
+      volume.centerZ,
+      volume.width,
+      volume.height,
+      volume.depth,
+    );
+    if (volume.assemblyId !== 'upper-walls') {
+      const front = volume.centerZ + volume.depth / 2;
+      const trimColor = styleName === 'craftsman' ? palette.wood : palette.trim;
+      for (const x of [
+        volume.centerX - volume.width / 2 + 0.08,
+        volume.centerX + volume.width / 2 - 0.08,
+      ])
+        a.box(
+          mass,
+          trimColor,
+          x,
+          volume.bottomY + volume.height / 2,
+          front + 0.018,
+          0.12,
+          volume.height + 0.04,
+          0.1,
+        );
       a.box(
-        garageDoor,
-        styleName === 'craftsman' ? '#b49b78' : '#c5bca9',
-        0,
-        y,
+        mass,
+        palette.trim,
+        volume.centerX,
+        volume.bottomY + volume.height - 0.04,
+        front + 0.02,
+        volume.width - 0.18,
         0.12,
-        1.98,
-        0.035,
-        0.02,
+        0.11,
       );
-    for (const x of [-0.65, -0.22, 0.22, 0.65]) {
-      a.box(garageDoor, trim, x, 2.02, 0.12, 0.34, 0.34, 0.025);
-      a.box(garageDoor, a.glass(), x, 2.02, 0.145, 0.27, 0.27, 0.02);
     }
-    const wingRoof = a.group(roofline, wingX, 0, wingZ);
-    wingRoof.name = 'garage-roofline';
-    a.roof(wingRoof, wingWidth + 0.6, wingDepth + 0.55, 1.1, 2.55, palette.roof);
   }
+  addVolumeTrim(a, pieces.get('details')!, blueprint, styleName, trim, palette);
 
-  const roofY = shape.twoStorey ? 4.55 : shape.eaves + 0.02;
-  a.roof(roofline, mainWidth + 0.72, mainDepth + 0.72, shape.rise, roofY, palette.roof);
-  if (lot === 'wide-gable' || lot === 'two-story') {
-    const frontGable = a.group(roofline, shape.lShape ? -0.9 : 0, 0, mainDepth * 0.18, Math.PI / 2);
-    frontGable.name = 'front-gable-roof';
-    a.roof(frontGable, mainDepth * 0.76, 2.5, shape.rise * 0.78, roofY - 0.03, palette.roof);
-  }
-
-  if (shape.twoStorey) {
-    for (const x of [-1.7, 1.7])
-      addOpening(a, openings, x, 3.73, mainDepth / 2 + 0.025, 0.82, 1.05);
-  } else {
-    for (const x of [mainCenterX - mainWidth * 0.29, mainCenterX + mainWidth * 0.29])
-      addOpening(a, openings, x, 1.63, mainDepth / 2 + 0.025, 0.84, 1.12);
-  }
-  for (const side of [-1, 1]) {
-    addOpening(
+  for (const roofDefinition of blueprint.roofs) {
+    const roofRoot = a.group(
+      pieces.get(roofDefinition.assemblyId)!,
+      roofDefinition.centerX,
+      0,
+      roofDefinition.centerZ,
+      roofDefinition.rotationY ?? 0,
+    );
+    roofRoot.name = `${roofDefinition.assemblyId}-construction`;
+    pitchedRoof(
       a,
-      openings,
-      mainCenterX + side * (mainWidth / 2 + 0.02),
-      1.62,
-      -0.9,
-      0.72,
-      1.05,
-      (side * Math.PI) / 2,
-    );
-    addOpening(
-      a,
-      openings,
-      mainCenterX + side * (mainWidth / 2 + 0.02),
-      1.62,
-      0.95,
-      0.72,
-      1.05,
-      (side * Math.PI) / 2,
+      roofRoot,
+      roofDefinition.width,
+      roofDefinition.depth,
+      roofDefinition.rise,
+      roofDefinition.eaveY,
+      roof,
+      wall,
+      styleName === 'craftsman' ? palette.wood : palette.trim,
     );
   }
-  for (const x of [-mainWidth * 0.28, mainWidth * 0.28])
-    addOpening(a, openings, mainCenterX + x, 1.61, -mainDepth / 2 - 0.025, 0.8, 1.05, Math.PI);
 
-  const doorX = shape.lShape ? -1.0 : 0;
-  const door = a.group(openings, doorX, 0, mainDepth / 2 + 0.09);
-  door.name = 'front-door';
-  a.box(door, trim, 0, 1.16, 0, 1.1, 2.32, 0.16);
-  a.box(door, surface(a, 'wood', palette.wood), 0, 1.15, 0.1, 0.88, 2.08, 0.13);
-  a.box(door, a.glass(), 0, 1.68, 0.18, 0.56, 0.66, 0.025);
-  a.box(door, '#bea374', 0.29, 1.14, 0.19, 0.045, 0.045, 0.04);
+  addOpenings(a, pieces.get('openings')!, blueprint, styleName, palette);
+  addResidentialDoor(
+    a,
+    pieces.get('openings')!,
+    blueprint.door.x,
+    blueprint.door.z,
+    palette.trim,
+    styleName === 'craftsman',
+  );
+  addPorch(a, blueprint, styleName, palette, pieces, roof, wall);
+  addRoofline(a, blueprint, pieces, palette);
 
-  const deckZ = mainDepth / 2 + shape.porchDepth / 2 - 0.02;
-  a.box(
-    porch,
-    surface(a, 'stone', '#bcb5a2'),
-    doorX,
-    0.31,
-    deckZ,
-    shape.porchWidth,
-    0.3,
-    shape.porchDepth,
-  );
-  for (const x of [-shape.porchWidth / 2 + 0.15, shape.porchWidth / 2 - 0.15]) {
-    const colX = doorX + x;
-    if (styleName === 'craftsman') a.box(porch, stone, colX, 0.95, deckZ, 0.43, 1.05, 0.43);
-    a.box(
-      porch,
-      styleName === 'craftsman' ? palette.wood : trim,
-      colX,
-      1.68,
-      deckZ,
-      0.17,
-      1.45,
-      0.17,
-    );
-    a.box(
-      porch,
-      styleName === 'craftsman' ? palette.wood : trim,
-      colX,
-      2.43,
-      deckZ,
-      0.25,
-      0.12,
-      0.25,
-    );
+  if (blueprint.frontGables?.length) {
+    const gables = pieces.get('front-gables')!;
+    for (const [index, detail] of blueprint.frontGables.entries()) {
+      const gable = a.group(gables, detail.centerX, 0, detail.centerZ, Math.PI / 2);
+      gable.name = `front-gable-${index + 1}`;
+      pitchedRoof(
+        a,
+        gable,
+        detail.width,
+        detail.depth,
+        detail.rise,
+        detail.eaveY,
+        roof,
+        wall,
+        styleName === 'craftsman' ? palette.wood : palette.trim,
+      );
+      if (styleName === 'craftsman') {
+        const beam = a.box(
+          gables,
+          palette.wood,
+          detail.centerX,
+          detail.eaveY + detail.rise * 0.53,
+          detail.centerZ + detail.depth / 2,
+          0.14,
+          detail.rise * 0.78,
+          0.12,
+        );
+        beam.rotation.z = Math.PI / 2;
+      }
+    }
   }
-  a.box(
-    porch,
-    styleName === 'craftsman' ? palette.wood : trim,
-    doorX,
-    2.42,
-    deckZ,
-    shape.porchWidth + 0.2,
-    0.16,
-    0.18,
-  );
-  const porchRoof = a.box(
-    porch,
-    roof,
-    doorX,
-    2.62,
-    deckZ + 0.08,
-    shape.porchWidth + 0.55,
-    0.16,
-    shape.porchDepth + 0.36,
-  );
-  porchRoof.rotation.x = 0.08;
-  for (const x of [-shape.porchWidth / 2 + 0.36, shape.porchWidth / 2 - 0.36]) {
-    for (const z of [deckZ - shape.porchDepth / 2 + 0.12, deckZ + shape.porchDepth / 2 - 0.12])
-      a.box(porch, trim, doorX + x, 0.91, z, 0.09, 0.8, 0.09);
-  }
-  for (let i = -2; i <= 2; i++) {
-    if (Math.abs(i) === 0) continue;
-    const railX = doorX + i * Math.min(0.38, shape.porchWidth / 10);
-    a.box(porch, trim, railX, 0.62, deckZ + shape.porchDepth / 2 - 0.05, 0.055, 0.52, 0.055);
-  }
-  a.box(
-    porch,
-    trim,
-    doorX,
-    0.86,
-    deckZ + shape.porchDepth / 2 - 0.05,
-    shape.porchWidth - 0.72,
-    0.09,
-    0.09,
-  );
-  for (let step = 0; step < 3; step++)
-    a.box(
-      porch,
-      surface(a, 'stone', '#c6beab'),
-      doorX,
-      0.16 + step * 0.1,
-      deckZ + shape.porchDepth / 2 + 0.22 + step * 0.31,
-      1.42 + step * 0.18,
-      0.14,
-      0.3,
-    );
 
-  if (styleName === 'cottage') {
-    const dormer = a.group(details, 0.55, 0, mainDepth * 0.16);
-    dormer.name = 'cottage-dormer';
-    a.box(dormer, wall, 0, roofY + shape.rise * 0.42, 0, 1.18, 0.98, 1.15);
-    a.roof(dormer, 1.56, 1.45, 0.58, roofY + shape.rise * 0.42 + 0.5, palette.roof);
-    addOpening(a, dormer, 0, roofY + shape.rise * 0.42, 0.6, 0.58, 0.7);
-    a.box(details, '#8a7052', 0.55, roofY + 0.18, mainDepth * 0.16 + 0.62, 1.25, 0.09, 0.2);
+  if (blueprint.dormer) {
+    const dormer = pieces.get('details')!;
+    const d = blueprint.dormer;
+    a.box(dormer, wall, d.x, d.baseY + 0.43, d.z, 1.2, 0.86, 0.96);
+    const cap = a.group(dormer, d.x, 0, d.z, Math.PI / 2);
+    pitchedRoof(a, cap, 1.48, 1.25, 0.58, d.baseY + 0.82, roof, wall, palette.trim);
+    addResidentialWindow(a, dormer, d.x, d.baseY + 0.44, d.z + 0.51, 0.59, 0.68, 0, palette.trim);
+    a.box(dormer, palette.wood, d.x, d.baseY - 0.06, d.z + 0.59, 1.23, 0.1, 0.18);
   }
+
   if (styleName === 'craftsman') {
-    for (const side of [-1, 1]) {
-      const beam = a.box(
-        details,
-        palette.wood,
-        doorX + side * 0.68,
-        shape.twoStorey ? 4.4 : shape.eaves + 0.12,
-        mainDepth / 2 + 0.18,
-        0.16,
-        0.68,
-        0.14,
-      );
-      beam.rotation.z = side * -0.55;
+    const details = pieces.get('details')!;
+    for (const volume of blueprint.volumes.filter((entry) => entry.assemblyId === 'walls')) {
+      const frontZ = volume.centerZ + volume.depth / 2 + 0.1;
+      for (const side of [-1, 1]) {
+        const bracket = a.box(
+          details,
+          palette.wood,
+          volume.centerX + side * (volume.width / 2 - 0.45),
+          volume.bottomY + volume.height - 0.18,
+          frontZ,
+          0.13,
+          0.64,
+          0.12,
+        );
+        bracket.rotation.z = side * 0.4;
+      }
     }
-    for (const x of [-mainWidth * 0.25, mainWidth * 0.25])
-      a.box(details, palette.wood, mainCenterX + x, 0.45, mainDepth / 2 + 0.16, 0.1, 0.48, 0.08);
-  }
-  if (styleName === 'brick') {
-    for (const x of [mainCenterX - mainWidth * 0.29, mainCenterX + mainWidth * 0.29]) {
-      a.box(details, trim, x, 2.26, mainDepth / 2 + 0.12, 1.02, 0.1, 0.2);
-      a.box(details, trim, x, 0.94, mainDepth / 2 + 0.12, 1.03, 0.1, 0.2);
-    }
-    a.box(details, trim, doorX, 2.4, mainDepth / 2 + 0.14, 1.2, 0.12, 0.22);
-  }
-  if (lot === 'wide-gable') {
-    for (const x of [-2.25, 2.25]) {
-      a.box(details, wall, x, 2.62, mainDepth / 2 + 0.035, 1.2, 0.82, 0.14);
-      addOpening(a, details, x, 2.62, mainDepth / 2 + 0.12, 0.6, 0.48);
-    }
+  } else if (styleName === 'brick') {
+    const details = pieces.get('details')!;
+    for (const volume of blueprint.volumes.filter((entry) => entry.assemblyId === 'walls'))
+      for (const side of [-1, 1])
+        a.box(
+          details,
+          palette.trim,
+          volume.centerX + side * (volume.width / 2 - 0.16),
+          volume.bottomY + volume.height / 2,
+          volume.centerZ + volume.depth / 2 + 0.08,
+          0.13,
+          volume.height + 0.04,
+          0.1,
+        );
   }
 
+  // Recentre each curated silhouette on its lot anchor. The offsets live with the blueprint so
+  // doors, garages, walkways and house geometry share one stable local coordinate system.
+  for (const piece of pieces.values()) {
+    piece.position.x -= blueprint.visualCenter.x;
+    piece.position.z -= blueprint.visualCenter.z;
+  }
   return { root, pieces };
 }

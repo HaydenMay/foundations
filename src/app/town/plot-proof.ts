@@ -33,7 +33,12 @@ const PROOF_LOT_SIDE_GAP_METERS = 8.5;
 const PROOF_LOT = Object.freeze({
   ...CHAPTER_TWO_LOTS[0],
   x: CHAPTER_ONE_PROPERTY_BOUNDS.maxX + PROOF_LOT_SIDE_GAP_METERS + PROOF_LOT_WIDTH / 2,
+  // This is an isolated teaching layout, so keep its own frontage aligned to the proof sidewalk
+  // instead of inheriting the production street's new, curved-road parcel position.
+  z: -3.3,
+  rotation: 0,
   width: PROOF_LOT_WIDTH,
+  depth: 9.8,
 });
 const PROOF_FOCUS = {
   x: (CHAPTER_ONE_PROPERTY_BOUNDS.maxX + PROOF_LOT.x) / 2,

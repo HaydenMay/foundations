@@ -39,6 +39,8 @@ export const FEATURE_ZONES: Readonly<Record<string, FeatureZone>> = {
 export interface MilestoneAsset {
   root: T.Group;
   pieces: ReadonlyMap<string, T.Group>;
+  /** Stable geometry groups that are not animated assembly pieces (for plot ownership bindings). */
+  renderObjects?: ReadonlyMap<string, T.Group>;
   recipe: AssemblyRecipe;
   focus: { x: number; z: number; zoom: number };
 }

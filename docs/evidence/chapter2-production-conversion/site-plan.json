@@ -1,0 +1,180 @@
+{
+  "output": "docs/evidence/chapter2-production-conversion/site-plan.svg",
+  "district": {
+    "width": 132,
+    "depth": 90,
+    "height": 28
+  },
+  "roadWidth": 6.3,
+  "sidewalkWidth": 1.48,
+  "minimumPropertyGapMeters": 2.27,
+  "propertyGaps": [
+    {
+      "a": "Chapter 1",
+      "b": "Neighbor 1",
+      "gap": 2.27
+    },
+    {
+      "a": "Neighbor 1",
+      "b": "Neighbor 2",
+      "gap": 10.55
+    },
+    {
+      "a": "Neighbor 3",
+      "b": "Neighbor 4",
+      "gap": 11.08
+    },
+    {
+      "a": "Neighbor 2",
+      "b": "Neighbor 3",
+      "gap": 11.37
+    },
+    {
+      "a": "Neighbor 2",
+      "b": "Neighbor 4",
+      "gap": 15.77
+    },
+    {
+      "a": "Chapter 1",
+      "b": "Neighbor 2",
+      "gap": 20.85
+    },
+    {
+      "a": "Neighbor 1",
+      "b": "Neighbor 3",
+      "gap": 21.91
+    },
+    {
+      "a": "Chapter 1",
+      "b": "Neighbor 3",
+      "gap": 37.36
+    },
+    {
+      "a": "Neighbor 1",
+      "b": "Neighbor 4",
+      "gap": 37.59
+    },
+    {
+      "a": "Chapter 1",
+      "b": "Neighbor 4",
+      "gap": 52.19
+    }
+  ],
+  "houseClearances": [
+    {
+      "a": "Chapter 1 home",
+      "b": "Neighbor 1",
+      "gap": 5.91
+    },
+    {
+      "a": "Neighbor 1",
+      "b": "Neighbor 2",
+      "gap": 19.71
+    },
+    {
+      "a": "Neighbor 3",
+      "b": "Neighbor 4",
+      "gap": 21.15
+    },
+    {
+      "a": "Neighbor 2",
+      "b": "Neighbor 4",
+      "gap": 21.42
+    },
+    {
+      "a": "Neighbor 2",
+      "b": "Neighbor 3",
+      "gap": 21.96
+    },
+    {
+      "a": "Chapter 1 home",
+      "b": "Neighbor 2",
+      "gap": 26.01
+    },
+    {
+      "a": "Neighbor 1",
+      "b": "Neighbor 3",
+      "gap": 28.9
+    },
+    {
+      "a": "Chapter 1 home",
+      "b": "Neighbor 3",
+      "gap": 41.82
+    },
+    {
+      "a": "Neighbor 1",
+      "b": "Neighbor 4",
+      "gap": 45.46
+    },
+    {
+      "a": "Chapter 1 home",
+      "b": "Neighbor 4",
+      "gap": 56.19
+    }
+  ],
+  "publicClearances": [
+    {
+      "site": "ch2-entrance",
+      "width": 8.4,
+      "depth": 3.2,
+      "nearestPrivate": "Neighbor 1",
+      "clearance": 2.65
+    },
+    {
+      "site": "ch2-community-park",
+      "width": 20,
+      "depth": 16,
+      "nearestPrivate": "Neighbor 3",
+      "clearance": 4.71
+    },
+    {
+      "site": "ch2-landmark",
+      "width": 12,
+      "depth": 10,
+      "nearestPrivate": "Neighbor 3",
+      "clearance": 6.28
+    }
+  ],
+  "lotFrontages": [
+    {
+      "id": "ch2-neighbor-1",
+      "side": "north",
+      "rotation": 0.02,
+      "x": 10.036673955476,
+      "z": -6.53,
+      "width": 13,
+      "depth": 12,
+      "roadZ": 5.07
+    },
+    {
+      "id": "ch2-neighbor-2",
+      "side": "south",
+      "rotation": 3.26,
+      "x": 28.533535621707014,
+      "z": 15.49,
+      "width": 14.5,
+      "depth": 14.5,
+      "roadZ": 2.56
+    },
+    {
+      "id": "ch2-neighbor-3",
+      "side": "north",
+      "rotation": -0.19,
+      "x": 47.66409818629271,
+      "z": -9.7,
+      "width": 15.5,
+      "depth": 16,
+      "roadZ": 4.15
+    },
+    {
+      "id": "ch2-neighbor-4",
+      "side": "south",
+      "rotation": 3.13,
+      "x": 59.916992861026216,
+      "z": 18.29,
+      "width": 15,
+      "depth": 15,
+      "roadZ": 5.18
+    }
+  ]
+}
