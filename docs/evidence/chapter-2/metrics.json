@@ -1,0 +1,957 @@
+{
+  "source": "http://127.0.0.1:4200/foundations/",
+  "sourceCommit": "d38a91a03df499d79ab80f4a55f6313dd89c8ceb",
+  "build": "Angular production bundle from npm run build; served with scripts/serve.mjs under /foundations/.",
+  "capturedAt": "2026-10-18T19:00:36.601Z",
+  "profile": "Fresh synthetic browser profiles; all scenario and construction actions stayed in disposable Developer Preview.",
+  "note": "Headless Chromium production-app evidence. Portrait and landscape use emulated viewport and touch; no physical-device or Safari testing was performed.",
+  "errors": [],
+  "warnings": [
+    "1600x1000: [.WebGL-0x5a5c00427200]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "1600x1000: [.WebGL-0x5a5c00427200]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "1600x1000: [.WebGL-0x5a5c00427200]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "1600x1000: [.WebGL-0x5a5c00427200]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+  ],
+  "isolation": {
+    "previewReloadRestoredZeroStarRealProfile": true,
+    "previewExitRestoredZeroStarRealProfile": true
+  },
+  "captures": [
+    {
+      "name": "neighborhood-overview",
+      "note": "Elevated overview: original home, four neighbors, curved street, park, entrance and landmark.",
+      "file": "docs/evidence/chapter-2/neighborhood-overview.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 511,
+      "triangles": 668683,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          45.04163056034261,
+          29.8,
+          17.041630560342618
+        ],
+        "zoom": 0.37
+      }
+    },
+    {
+      "name": "style-set-option-a",
+      "note": "All four distinct neighbor lots in the Classic Cottage style, with the original home retained.",
+      "file": "docs/evidence/chapter-2/style-set-option-a.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 511,
+      "triangles": 668683,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          45.04163056034261,
+          29.8,
+          17.041630560342618
+        ],
+        "zoom": 0.37
+      }
+    },
+    {
+      "name": "style-set-option-b",
+      "note": "All four distinct neighbor lots in the Modern Craftsman style, with the original home retained.",
+      "file": "docs/evidence/chapter-2/style-set-option-b.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 514,
+      "triangles": 668411,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          45.04163056034261,
+          29.8,
+          17.041630560342618
+        ],
+        "zoom": 0.37
+      }
+    },
+    {
+      "name": "style-set-option-c",
+      "note": "All four distinct neighbor lots in the Traditional Brick style, with the original home retained.",
+      "file": "docs/evidence/chapter-2/style-set-option-c.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 507,
+      "triangles": 668363,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          45.04163056034261,
+          29.8,
+          17.041630560342618
+        ],
+        "zoom": 0.37
+      }
+    },
+    {
+      "name": "lot-1-cottage",
+      "note": "Neighbor lot 1, cottage style; close view shows its footprint, roofline, porch and entry.",
+      "file": "docs/evidence/chapter-2/lot-1-cottage.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 198,
+      "triangles": 382058,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          27.720310216782973,
+          27.329411764705885,
+          18.620310216782975
+        ],
+        "zoom": 1.8
+      }
+    },
+    {
+      "name": "lot-2-cottage",
+      "note": "Neighbor lot 2, cottage style; close view shows its footprint, roofline, porch and entry.",
+      "file": "docs/evidence/chapter-2/lot-2-cottage.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 108,
+      "triangles": 362658,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          41.42031021678298,
+          27.329411764705885,
+          -9.420310216782973
+        ],
+        "zoom": 1.58
+      }
+    },
+    {
+      "name": "lot-3-cottage",
+      "note": "Neighbor lot 3, cottage style; close view shows its footprint, roofline, porch and entry.",
+      "file": "docs/evidence/chapter-2/lot-3-cottage.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 117,
+      "triangles": 458979,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          52.42031021678297,
+          27.329411764705885,
+          13.420310216782976
+        ],
+        "zoom": 1.58
+      }
+    },
+    {
+      "name": "lot-4-cottage",
+      "note": "Neighbor lot 4, cottage style; close view shows its footprint, roofline, porch and entry.",
+      "file": "docs/evidence/chapter-2/lot-4-cottage.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 88,
+      "triangles": 231196,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          63.42031021678298,
+          27.329411764705885,
+          -9.420310216782973
+        ],
+        "zoom": 1.58
+      }
+    },
+    {
+      "name": "lot-1-craftsman",
+      "note": "Neighbor lot 1, craftsman style; close view shows its footprint, roofline, porch and entry.",
+      "file": "docs/evidence/chapter-2/lot-1-craftsman.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 199,
+      "triangles": 381990,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          27.720310216782973,
+          27.329411764705885,
+          18.620310216782975
+        ],
+        "zoom": 1.8
+      }
+    },
+    {
+      "name": "lot-2-craftsman",
+      "note": "Neighbor lot 2, craftsman style; close view shows its footprint, roofline, porch and entry.",
+      "file": "docs/evidence/chapter-2/lot-2-craftsman.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 108,
+      "triangles": 362590,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          41.42031021678298,
+          27.329411764705885,
+          -9.420310216782973
+        ],
+        "zoom": 1.58
+      }
+    },
+    {
+      "name": "lot-3-craftsman",
+      "note": "Neighbor lot 3, craftsman style; close view shows its footprint, roofline, porch and entry.",
+      "file": "docs/evidence/chapter-2/lot-3-craftsman.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 118,
+      "triangles": 458911,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          52.42031021678297,
+          27.329411764705885,
+          13.420310216782976
+        ],
+        "zoom": 1.58
+      }
+    },
+    {
+      "name": "lot-4-craftsman",
+      "note": "Neighbor lot 4, craftsman style; close view shows its footprint, roofline, porch and entry.",
+      "file": "docs/evidence/chapter-2/lot-4-craftsman.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 89,
+      "triangles": 231128,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          63.42031021678298,
+          27.329411764705885,
+          -9.420310216782973
+        ],
+        "zoom": 1.58
+      }
+    },
+    {
+      "name": "lot-1-brick",
+      "note": "Neighbor lot 1, brick style; close view shows its footprint, roofline, porch and entry.",
+      "file": "docs/evidence/chapter-2/lot-1-brick.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 197,
+      "triangles": 381978,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          27.720310216782973,
+          27.329411764705885,
+          18.620310216782975
+        ],
+        "zoom": 1.8
+      }
+    },
+    {
+      "name": "lot-2-brick",
+      "note": "Neighbor lot 2, brick style; close view shows its footprint, roofline, porch and entry.",
+      "file": "docs/evidence/chapter-2/lot-2-brick.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 107,
+      "triangles": 362578,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          41.42031021678298,
+          27.329411764705885,
+          -9.420310216782973
+        ],
+        "zoom": 1.58
+      }
+    },
+    {
+      "name": "lot-3-brick",
+      "note": "Neighbor lot 3, brick style; close view shows its footprint, roofline, porch and entry.",
+      "file": "docs/evidence/chapter-2/lot-3-brick.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 116,
+      "triangles": 458899,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          52.42031021678297,
+          27.329411764705885,
+          13.420310216782976
+        ],
+        "zoom": 1.58
+      }
+    },
+    {
+      "name": "lot-4-brick",
+      "note": "Neighbor lot 4, brick style; close view shows its footprint, roofline, porch and entry.",
+      "file": "docs/evidence/chapter-2/lot-4-brick.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 87,
+      "triangles": 231104,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          63.42031021678298,
+          27.329411764705885,
+          -9.420310216782973
+        ],
+        "zoom": 1.58
+      }
+    },
+    {
+      "name": "mixed-independent-choices",
+      "note": "Mixed house styles and independent street, garden, entrance, park and landmark choices.",
+      "file": "docs/evidence/chapter-2/mixed-independent-choices.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 490,
+      "triangles": 626485,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          45.04163056034261,
+          29.8,
+          17.041630560342618
+        ],
+        "zoom": 0.37
+      }
+    },
+    {
+      "name": "shared-entrance-primary",
+      "note": "entrance with primary selectable design: stone-pillars.",
+      "file": "docs/evidence/chapter-2/shared-entrance-primary.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 190,
+      "triangles": 421436,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          39.12031021678297,
+          27.329411764705885,
+          22.170310216782976
+        ],
+        "zoom": 1.28
+      }
+    },
+    {
+      "name": "shared-entrance-alternative",
+      "note": "entrance with alternative selectable design: flowering-entrance.",
+      "file": "docs/evidence/chapter-2/shared-entrance-alternative.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 194,
+      "triangles": 439498,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          39.12031021678297,
+          27.329411764705885,
+          22.170310216782976
+        ],
+        "zoom": 1.28
+      }
+    },
+    {
+      "name": "shared-community-park-primary",
+      "note": "community-park with primary selectable design: flower-garden.",
+      "file": "docs/evidence/chapter-2/shared-community-park-primary.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 106,
+      "triangles": 307702,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          60.42031021678297,
+          27.329411764705885,
+          -0.0796897832170238
+        ],
+        "zoom": 1.28
+      }
+    },
+    {
+      "name": "shared-community-park-alternative",
+      "note": "community-park with alternative selectable design: playground.",
+      "file": "docs/evidence/chapter-2/shared-community-park-alternative.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 89,
+      "triangles": 267572,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          60.42031021678297,
+          27.329411764705885,
+          -0.0796897832170238
+        ],
+        "zoom": 1.28
+      }
+    },
+    {
+      "name": "shared-landmark-primary",
+      "note": "landmark with primary selectable design: fountain-plaza.",
+      "file": "docs/evidence/chapter-2/shared-landmark-primary.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 67,
+      "triangles": 209588,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          73.92031021678298,
+          27.329411764705885,
+          -0.0796897832170238
+        ],
+        "zoom": 1.28
+      }
+    },
+    {
+      "name": "shared-landmark-alternative",
+      "note": "landmark with alternative selectable design: natural-stone.",
+      "file": "docs/evidence/chapter-2/shared-landmark-alternative.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 64,
+      "triangles": 209400,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          73.92031021678298,
+          27.329411764705885,
+          -0.0796897832170238
+        ],
+        "zoom": 1.28
+      }
+    },
+    {
+      "name": "neighborhood-night",
+      "note": "Chapter 2 overview in manually selected night lighting.",
+      "file": "docs/evidence/chapter-2/neighborhood-night.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "night",
+      "construction": "idle",
+      "drawCalls": 494,
+      "triangles": 644547,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          45.04163056034261,
+          29.8,
+          17.041630560342618
+        ],
+        "zoom": 0.37
+      }
+    },
+    {
+      "name": "chapter-2-welcome-transition",
+      "note": "100-star chapter introduction with Continue and Skip reveal controls.",
+      "file": "docs/evidence/chapter-2/chapter-2-welcome-transition.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 255,
+      "triangles": 254085,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          22.041630560342615,
+          29.8,
+          19.441630560342617
+        ],
+        "zoom": 0.6
+      }
+    },
+    {
+      "name": "home-camera-original-home",
+      "note": "Home button returns to the original Chapter 1 lot camera position at zoom 1 and 45°.",
+      "file": "docs/evidence/chapter-2/home-camera-original-home.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 249,
+      "triangles": 253869,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": "Position X 19.0 · Y 29.8 · Z 19.4 Zoom 1.00 · Rotation 45°",
+      "camera": {
+        "position": [
+          19.041630560342615,
+          29.8,
+          19.441630560342617
+        ],
+        "zoom": 1
+      }
+    },
+    {
+      "name": "chapter-2-completion-transition",
+      "note": "200-star chapter completion notice with Continue.",
+      "file": "docs/evidence/chapter-2/chapter-2-completion-transition.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 396,
+      "triangles": 508523,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          22.041630560342615,
+          29.8,
+          19.441630560342617
+        ],
+        "zoom": 0.6
+      }
+    },
+    {
+      "name": "mobile-portrait",
+      "note": "Chapter 2 overview and grouped preview controls at the portrait viewport; emulated browser capture.",
+      "file": "docs/evidence/chapter-2/mobile-portrait.jpg",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 511,
+      "triangles": 668683,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          44.04163056034261,
+          29.8,
+          17.041630560342618
+        ],
+        "zoom": 0.3
+      }
+    },
+    {
+      "name": "mobile-landscape",
+      "note": "Chapter 2 overview and grouped preview controls at the landscape viewport; emulated browser capture.",
+      "file": "docs/evidence/chapter-2/mobile-landscape.jpg",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "documentWidth": 844,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 511,
+      "triangles": 668683,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          44.04163056034261,
+          29.8,
+          17.041630560342618
+        ],
+        "zoom": 0.3
+      }
+    },
+    {
+      "name": "assembly-neighbor-start",
+      "note": "Early assembly frame; lifecycle status and render diagnostics are recorded in metrics.json.",
+      "file": "docs/evidence/chapter-2/assembly-neighbor-start.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "active",
+      "drawCalls": 282,
+      "triangles": 282920,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          29.841630560342615,
+          29.8,
+          20.741630560342617
+        ],
+        "zoom": 1.05
+      }
+    },
+    {
+      "name": "assembly-neighbor-middle",
+      "note": "Later assembly timing sample; see the evidence README for the staged-visibility limitation.",
+      "file": "docs/evidence/chapter-2/assembly-neighbor-middle.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 287,
+      "triangles": 290588,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          19.041630560342615,
+          29.8,
+          19.441630560342617
+        ],
+        "zoom": 1
+      }
+    },
+    {
+      "name": "assembly-neighbor-complete",
+      "note": "Completed construction in the persistent Chapter 2 preview world.",
+      "file": "docs/evidence/chapter-2/assembly-neighbor-complete.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 280,
+      "triangles": 282884,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          27.013203435596424,
+          26.50588235294118,
+          17.913203435596426
+        ],
+        "zoom": 1.12
+      }
+    },
+    {
+      "name": "assembly-community-park-start",
+      "note": "Early assembly frame; lifecycle status and render diagnostics are recorded in metrics.json.",
+      "file": "docs/evidence/chapter-2/assembly-community-park-start.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "active",
+      "drawCalls": 57,
+      "triangles": 155671,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          62.54163056034261,
+          29.8,
+          2.041630560342618
+        ],
+        "zoom": 0.88
+      }
+    },
+    {
+      "name": "assembly-community-park-middle",
+      "note": "Later assembly timing sample; see the evidence README for the staged-visibility limitation.",
+      "file": "docs/evidence/chapter-2/assembly-community-park-middle.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 249,
+      "triangles": 253869,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          19.041630560342615,
+          29.8,
+          19.441630560342617
+        ],
+        "zoom": 1
+      }
+    },
+    {
+      "name": "assembly-community-park-complete",
+      "note": "Completed construction in the persistent Chapter 2 preview world.",
+      "file": "docs/evidence/chapter-2/assembly-community-park-complete.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 51,
+      "triangles": 146923,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          59.71320343559643,
+          26.50588235294118,
+          -0.7867965644035735
+        ],
+        "zoom": 1.12
+      }
+    },
+    {
+      "name": "preview-reload-restores-real-state",
+      "note": "Reload exits disposable preview and retains the genuine new profile at zero stars.",
+      "file": "docs/evidence/chapter-2/preview-reload-restores-real-state.jpg",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 21,
+      "triangles": 80678,
+      "webglError": 0,
+      "contextLost": false,
+      "homeCameraReadout": null,
+      "camera": {
+        "position": [
+          19.041630560342615,
+          29.8,
+          19.441630560342617
+        ],
+        "zoom": 1
+      }
+    }
+  ]
+}
