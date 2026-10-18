@@ -200,6 +200,17 @@ try {
   await page.getByLabel('Preview backyard').selectOption('pool');
   await capture('mixed-front-three-quarter', 'front');
   await capture('mixed-rear-three-quarter', 'rear');
+  await page.getByTestId('preview-badge').click();
+  await page.getByLabel('Test scenario').selectOption('all');
+  await page.locator('#preview-house').selectOption('blue');
+  await page.getByLabel('Preview backyard').selectOption('pool');
+  await setChoice('frontGarden', 'orange');
+  await setChoice('centerpiece', 'fountain');
+  await setChoice('retreat', 'pergolaSeating');
+  await setChoice('boundary', 'stoneWall');
+  await setChoice('outdoorLighting', 'gardenTorches');
+  await capture('mixed-brick-front-three-quarter', 'front');
+  await capture('mixed-brick-rear-three-quarter', 'rear');
   await context.close();
 
   // Manual responsive screenshots, not assertions or an automated test suite.
@@ -285,15 +296,32 @@ try {
         .join('')}</div></section>`;
     })
     .join('');
-  const mixedRows = ['mixed-front-three-quarter', 'mixed-rear-three-quarter']
+  const mixedRows = [
+    {
+      name: 'mixed-front-three-quarter',
+      label: 'Cottage · blue garden · pool · stone patio retreat · string lights',
+    },
+    {
+      name: 'mixed-rear-three-quarter',
+      label: 'Cottage · blue garden · pool · stone patio retreat · string lights',
+    },
+    {
+      name: 'mixed-brick-front-three-quarter',
+      label: 'Brick · orange garden · fountain · pool · pergola · stone wall · garden torches',
+    },
+    {
+      name: 'mixed-brick-rear-three-quarter',
+      label: 'Brick · orange garden · fountain · pool · pergola · stone wall · garden torches',
+    },
+  ]
     .map(
-      (name) =>
-        `<figure><img src="${name}.jpg" alt="${name}"><figcaption>${name.replaceAll('-', ' ')}</figcaption></figure>`,
+      ({ name, label }) =>
+        `<figure><img src="${name}.jpg" alt="${label}"><figcaption>${label}</figcaption></figure>`,
     )
     .join('');
   await writeFile(
     `${directory}/index.html`,
-    `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Foundations Phase 4 visual review</title><style>body{margin:0;padding:24px;background:#f4f1e8;color:#303c32;font:16px system-ui}main{max-width:1400px;margin:auto}h1,h2{font-family:Georgia,serif;font-weight:500}p{max-width:78ch;line-height:1.5}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}figure{margin:0;background:white;padding:8px;border-radius:12px;box-shadow:0 4px 14px #24341e16}img{width:100%;height:auto;border-radius:8px}figcaption{padding:8px;font-size:14px;text-transform:capitalize}section{margin:28px 0}</style><main><h1>Foundations · Phase 4</h1><p>Three complete in-engine property sets, each using one choice at all nine selectable milestones. No cars. Night views use the app's manual night lighting. These are running-app screenshots from a disposable Developer Preview profile.</p>${setRows}<section><h2>Mixed palette clearance check</h2><p>Classic Cottage, blue flowering garden, pool and stone patio retreat, with warm string lighting.</p><div class="grid">${mixedRows}</div></section><h2>Choice legend</h2><p>A: Cottage · Red Rose Bushes · Flowering Ornamental Tree · Swimming Pool · Rocking Chairs + Planters · Pergola Seating · Colorful Flowering Beds · Picket Fence · String Lights · Decorative Pond.</p><p>B: Craftsman · Orange Flowering Bushes · Stone Fountain · Trampoline · Porch Swing + Planters · Stone Patio Seating · Evergreen Shrubs · Trimmed Hedge · Garden Torches · Garden Gazebo.</p><p>C: Brick · Blue Flowering Bushes · Birdbath · Wooden Play Fort · Bench + Lanterns · Garden Lounge · Wildflower Beds · Stone Wall · Wall Sconces · Ornamental Display Garden.</p></main></html>`,
+    `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Foundations Phase 4 visual review</title><style>body{margin:0;padding:24px;background:#f4f1e8;color:#303c32;font:16px system-ui}main{max-width:1400px;margin:auto}h1,h2{font-family:Georgia,serif;font-weight:500}p{max-width:78ch;line-height:1.5}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}figure{margin:0;background:white;padding:8px;border-radius:12px;box-shadow:0 4px 14px #24341e16}img{width:100%;height:auto;border-radius:8px}figcaption{padding:8px;font-size:14px}section{margin:28px 0}</style><main><h1>Foundations · Phase 4</h1><p>Three complete in-engine property sets, each using one choice at all nine selectable milestones. No cars. Night views use the app's manual night lighting. These are running-app screenshots from a disposable Developer Preview profile.</p>${setRows}<section><h2>Mixed palette clearance checks</h2><p>Two mixed combinations are shown from front and rear viewpoints.</p><div class="grid">${mixedRows}</div></section><h2>Choice legend</h2><p>A: Cottage · Red Rose Bushes · Flowering Ornamental Tree · Swimming Pool · Rocking Chairs + Planters · Pergola Seating · Colorful Flowering Beds · Picket Fence · String Lights · Decorative Pond.</p><p>B: Craftsman · Orange Flowering Bushes · Stone Fountain · Trampoline · Porch Swing + Planters · Stone Patio Seating · Evergreen Shrubs · Trimmed Hedge · Garden Torches · Garden Gazebo.</p><p>C: Brick · Blue Flowering Bushes · Birdbath · Wooden Play Fort · Bench + Lanterns · Garden Lounge · Wildflower Beds · Stone Wall · Wall Sconces · Ornamental Display Garden.</p></main></html>`,
   );
   await context.close();
   console.log(

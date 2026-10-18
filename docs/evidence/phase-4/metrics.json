@@ -1,7 +1,7 @@
 {
   "source": "http://127.0.0.1:4200/foundations/",
   "sourceCommit": "62d5d8f21a269720f4d058c2068ebea4ee792ff8",
-  "capturedAt": "2026-10-18T06:31:44.733Z",
+  "capturedAt": "2026-10-18T06:37:34.772Z",
   "profile": "fresh synthetic browser profile; all changes in disposable Developer Preview",
   "note": "Screenshots are from the running production bundle. The built-in orthographic camera keeps a fixed elevated isometric pitch; overview uses wider zoom. Browser viewport emulation is not physical-device testing.",
   "requestHosts": [
@@ -355,6 +355,56 @@
       "zoom": 1,
       "drawCalls": 214,
       "triangles": 239250,
+      "meshes": 214,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "mixed-brick-front-three-quarter",
+      "view": "front",
+      "light": "day",
+      "file": "docs/evidence/phase-4/mixed-brick-front-three-quarter.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "overflow": false,
+      "lighting": "day",
+      "homeVisible": "true",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "drawCalls": 214,
+      "triangles": 226418,
+      "meshes": 214,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "mixed-brick-rear-three-quarter",
+      "view": "rear",
+      "light": "day",
+      "file": "docs/evidence/phase-4/mixed-brick-rear-three-quarter.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "overflow": false,
+      "lighting": "day",
+      "homeVisible": "true",
+      "construction": "idle",
+      "camera": [
+        -29.04163056034263,
+        29.8,
+        -28.641630560342605
+      ],
+      "zoom": 1,
+      "drawCalls": 214,
+      "triangles": 226418,
       "meshes": 214,
       "webglError": 0,
       "contextLost": false
