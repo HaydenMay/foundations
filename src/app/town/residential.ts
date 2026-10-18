@@ -4,6 +4,15 @@ import { surface } from './surfaces';
 
 const TRIM = '#eee6d3',
   WOOD = '#8b5736';
+const STARTING_HOME_Y = 0.13,
+  PORCH_DECK_CENTER_Y = 0.3,
+  PORCH_DECK_THICKNESS = 0.38;
+export const PORCH_DECK_TOP_Y = STARTING_HOME_Y + PORCH_DECK_CENTER_Y + PORCH_DECK_THICKNESS / 2;
+// Keep a broad, consistent eave on rotated side-gable roofs (about 0.33m per side).
+const GARAGE_ROOF_DEPTH = 2.95,
+  GARAGE_ROOF_RISE = 1.06,
+  CRAFTSMAN_GABLE_ROOF_DEPTH = 3.55,
+  CRAFTSMAN_GABLE_ROOF_RISE = 1.15;
 const ROOF_COLORS: Record<string, string> = { clay: '#886350', slate: '#454f58', moss: '#52634b' };
 type Paint = T.MeshStandardMaterial | string;
 
@@ -148,7 +157,11 @@ function railing(
 
 function porch(
   a: AssetLibrary,
-  g: T.Object3D,
+  deck: T.Object3D,
+  supports: T.Object3D,
+  railsGroup: T.Object3D,
+  stairs: T.Object3D,
+  roofGroup: T.Object3D,
   roof: Paint,
   wall: Paint,
   craftsman: boolean,
@@ -157,10 +170,20 @@ function porch(
   const width = brick ? 5.1 : 5.4,
     center = brick ? -0.35 : 0;
   const paving = surface(a, 'stone', '#bcb4a0');
-  a.box(g, paving, center, 0.3, 2.85, width, 0.38, 1.8);
+  const deckSlab = a.box(
+    deck,
+    paving,
+    center,
+    PORCH_DECK_CENTER_Y,
+    2.85,
+    width,
+    PORCH_DECK_THICKNESS,
+    1.8,
+  );
+  deckSlab.name = 'porch-deck-surface';
   for (let i = 0; i < 3; i++) {
     const step = a.box(
-      g,
+      stairs,
       '#c4bba7',
       -0.35,
       0.09 + i * 0.14,
@@ -174,11 +197,11 @@ function porch(
   const post = craftsman ? '#785333' : TRIM;
   for (const x of brick ? [center - 2.12, center + 2.12] : [-2.55, -0.9, 0.9, 2.55]) {
     if (craftsman) {
-      a.box(g, paving, x, 0.92, 3.35, 0.48, 1.0, 0.48);
-      a.box(g, '#c9bda1', x, 1.43, 3.35, 0.55, 0.12, 0.55);
+      a.box(supports, paving, x, 0.92, 3.35, 0.48, 1.0, 0.48);
+      a.box(supports, '#c9bda1', x, 1.43, 3.35, 0.55, 0.12, 0.55);
     }
     a.box(
-      g,
+      supports,
       post,
       x,
       craftsman ? 2.05 : 1.67,
@@ -187,26 +210,26 @@ function porch(
       craftsman ? 1.35 : 2.4,
       craftsman ? 0.22 : 0.13,
     );
-    if (!craftsman) a.box(g, TRIM, x, 2.73, 3.35, 0.24, 0.15, 0.24);
+    if (!craftsman) a.box(supports, TRIM, x, 2.73, 3.35, 0.24, 0.15, 0.24);
   }
-  a.box(g, post, center, 2.83, 3.35, width + 0.2, 0.2, 0.2);
+  a.box(roofGroup, post, center, 2.83, 3.35, width + 0.2, 0.2, 0.2);
   if (brick) {
-    const portico = a.group(g, center, 0, 2.85);
+    const portico = a.group(roofGroup, center, 0, 2.85);
     pitchedRoof(a, portico, 4.95, 2.15, 0.62, 2.84, roof, wall);
-    railing(a, g, center - 2.32, 3.48, 0.42, post, 'left');
-    railing(a, g, center + 2.32, 3.48, 0.42, post, 'right');
+    railing(a, railsGroup, center - 2.32, 3.48, 0.42, post, 'left');
+    railing(a, railsGroup, center + 2.32, 3.48, 0.42, post, 'right');
     for (const side of [-1, 1]) {
-      const end = a.group(g, center + side * (width / 2 - 0.12), 0, 2.85, Math.PI / 2);
+      const end = a.group(railsGroup, center + side * (width / 2 - 0.12), 0, 2.85, Math.PI / 2);
       railing(a, end, 0, 0, 1.2, post);
     }
   } else {
-    const canopy = a.box(g, roof, 0, 3.02, 2.9, 6.1, 0.13, 1.9);
+    const canopy = a.box(roofGroup, roof, 0, 3.02, 2.9, 6.1, 0.13, 1.9);
     canopy.rotation.x = 0.2;
-    a.box(g, post, 0, 2.85, 3.8, 6.1, 0.12, 0.12);
-    railing(a, g, -2.75, 3.5, 0.5, post, 'left');
-    railing(a, g, 2.75, 3.5, 0.5, post, 'right');
+    a.box(roofGroup, post, 0, 2.85, 3.8, 6.1, 0.12, 0.12);
+    railing(a, railsGroup, -2.75, 3.5, 0.5, post, 'left');
+    railing(a, railsGroup, 2.75, 3.5, 0.5, post, 'right');
     for (const side of [-1, 1]) {
-      const end = a.group(g, side * 2.75, 0, 2.9, Math.PI / 2);
+      const end = a.group(railsGroup, side * 2.75, 0, 2.9, Math.PI / 2);
       railing(a, end, 0, 0, 1.22, post);
     }
   }
@@ -224,10 +247,23 @@ function dormer(a: AssetLibrary, g: T.Object3D, x: number, roof: Paint, wall: Pa
 
 function garage(a: AssetLibrary, g: T.Object3D, roof: Paint, wall: Paint, craftsman: boolean) {
   const wing = a.group(g, 4.02, 0, -0.25);
+  wing.name = 'garage-wing';
   a.box(wing, surface(a, 'stone', '#aba594'), 0, 0.22, 0, 2.4, 0.35, 3.8);
-  a.box(wing, wall, 0, 1.4, 0, 2.3, 2.15, 3.5);
+  const garageWall = a.box(wing, wall, 0, 1.4, 0, 2.3, 2.15, 3.5);
+  garageWall.name = 'garage-wall';
   const cap = a.group(wing, 0, 0, 0, Math.PI / 2);
-  pitchedRoof(a, cap, 4, 2.65, 0.95, 2.53, roof, wall, craftsman ? '#97774c' : TRIM);
+  cap.name = 'garage-roof';
+  pitchedRoof(
+    a,
+    cap,
+    4,
+    GARAGE_ROOF_DEPTH,
+    GARAGE_ROOF_RISE,
+    2.53,
+    roof,
+    wall,
+    craftsman ? '#97774c' : TRIM,
+  );
   const doorMaterial = craftsman ? surface(a, 'wood', '#8b633e') : a.material('#dfd8c6');
   a.box(wing, TRIM, 0, 1.33, 1.79, 2.15, 2.2, 0.1);
   a.box(wing, doorMaterial, 0, 1.32, 1.87, 1.97, 2.07, 0.08);
@@ -264,7 +300,7 @@ export function buildStartingHouse(
     'shingles',
     ROOF_COLORS[roofChoice || ''] || (craftsman ? '#454944' : '#414b50'),
   );
-  const g = a.group(parent, -5, 0.13, -4.6);
+  const g = a.group(parent, -5, STARTING_HOME_Y, -4.6);
   g.name = 'starting-home';
   const assemblies = new Map<string, T.Group>();
   const assembly = (id: string) => {
@@ -276,6 +312,11 @@ export function buildStartingHouse(
   const foundation = assembly('foundation'),
     walls = assembly('walls'),
     openings = assembly('openings'),
+    porchDeck = assembly('porch-deck'),
+    porchSupports = assembly('porch-supports'),
+    porchRails = assembly('porch-rails'),
+    porchStairs = assembly('porch-stairs'),
+    porchRoof = assembly('porch-roof'),
     entry = assembly('entry'),
     roofline = assembly('roofline'),
     garagePiece = assembly('garage'),
@@ -290,8 +331,20 @@ export function buildStartingHouse(
     a.box(walls, wall, -0.6, 3.7, -0.2, 4.6, 1.5, 4);
     pitchedRoof(a, roofline, 6.35, 5.05, 1.65, 4.33, roof, wall, '#9b7b50');
     const front = a.group(roofline, -1.0, 0, 1.2, Math.PI / 2);
-    pitchedRoof(a, front, 2.8, 3.25, 1.05, 4.5, roof, wall, '#9b7b50');
-    a.box(walls, wall, -1, 3.9, 1.4, 2.9, 1.4, 1.5);
+    front.name = 'craftsman-front-gable-roof';
+    pitchedRoof(
+      a,
+      front,
+      2.8,
+      CRAFTSMAN_GABLE_ROOF_DEPTH,
+      CRAFTSMAN_GABLE_ROOF_RISE,
+      4.5,
+      roof,
+      wall,
+      '#9b7b50',
+    );
+    const frontGableWall = a.box(walls, wall, -1, 3.9, 1.4, 2.9, 1.4, 1.5);
+    frontGableWall.name = 'craftsman-front-gable-wall';
     window(a, openings, -1.55, 4.0, 2.2, 0.82, 1.04, 0, '#ab8a5b');
     window(a, openings, -0.35, 4.0, 2.2, 0.82, 1.04, 0, '#ab8a5b');
     for (const x of [-1.8, -0.2]) a.box(openings, '#765035', x, 4.9, 2.24, 0.08, 0.55, 0.08);
@@ -304,7 +357,18 @@ export function buildStartingHouse(
     window(a, openings, -2.94, 4.05, 0, 0.7, 0.95, -Math.PI / 2);
     window(a, openings, 2.94, 4.05, 0, 0.7, 0.95, Math.PI / 2);
   }
-  porch(a, entry, roof, wall, craftsman, brick);
+  porch(
+    a,
+    porchDeck,
+    porchSupports,
+    porchRails,
+    porchStairs,
+    porchRoof,
+    roof,
+    wall,
+    craftsman,
+    brick,
+  );
   door(a, entry, -0.35, 2.24, craftsman ? '#9c7c50' : TRIM, craftsman);
   for (const x of [-1.8, 1.45]) {
     window(a, openings, x, 1.72, 2.24, x > 0 ? 1.15 : 0.95, 1.3, 0, TRIM, brick);

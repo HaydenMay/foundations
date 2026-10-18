@@ -41,6 +41,15 @@ describe('Phase 4 milestone catalog', () => {
     ]);
   });
 
+  it('relabels the existing exterior-lighting choice without invalidating saved wallSconces IDs', () => {
+    const lighting = PROJECTS.find((project) => project.id === 'outdoorLighting')!;
+    expect(lighting.choices.map(({ id, name }) => [id, name])).toEqual([
+      ['stringLights', 'Overhead String Lights'],
+      ['gardenTorches', 'Garden Torches'],
+      ['wallSconces', 'Pathway Lanterns'],
+    ]);
+  });
+
   it.each([10, 20, 30, 40, 50, 60, 70, 80, 90])(
     'unlocks a lifetime-star project at %i and not one star before',
     (threshold) => {

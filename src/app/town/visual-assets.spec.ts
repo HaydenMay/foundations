@@ -18,13 +18,49 @@ describe('residential asset contracts', () => {
     for (const style of ['sage', 'cream', 'blue']) {
       const assets = new AssetLibrary(),
         home = buildStartingHouse(assets, new T.Group(), style),
-        entry = home.assemblies.get('entry')!,
-        bounds = new T.Box3().setFromObject(entry);
+        deck = home.assemblies.get('porch-deck')!,
+        bounds = new T.Box3().setFromObject(deck);
       widths.push(bounds.max.x - bounds.min.x);
       assets.dispose();
     }
     expect(widths.every((width) => width >= 5)).toBe(true);
     expect(Math.max(...widths) - Math.min(...widths)).toBeLessThan(1);
+  });
+  it('gives every garage and the Craftsman front gable a clear side-roof overhang', () => {
+    for (const style of ['sage', 'cream', 'blue']) {
+      const assets = new AssetLibrary(),
+        parent = new T.Group(),
+        home = buildStartingHouse(assets, parent, style);
+      parent.updateMatrixWorld(true);
+      const roofsAndWalls: [string, T.Object3D, T.Object3D][] = [
+        [
+          'garage',
+          home.root.getObjectByName('garage-roof')!,
+          home.root.getObjectByName('garage-wall')!,
+        ],
+      ];
+      if (style === 'cream') {
+        roofsAndWalls.push([
+          'front gable',
+          home.root.getObjectByName('craftsman-front-gable-roof')!,
+          home.root.getObjectByName('craftsman-front-gable-wall')!,
+        ]);
+      }
+
+      for (const [name, roof, wall] of roofsAndWalls) {
+        const roofBounds = new T.Box3().setFromObject(roof),
+          wallBounds = new T.Box3().setFromObject(wall);
+        expect(
+          wallBounds.min.x - roofBounds.min.x,
+          `${style} ${name} west eave`,
+        ).toBeGreaterThanOrEqual(0.4);
+        expect(
+          roofBounds.max.x - wallBounds.max.x,
+          `${style} ${name} east eave`,
+        ).toBeGreaterThanOrEqual(0.4);
+      }
+      assets.dispose();
+    }
   });
   it('offers distinct architecture in the same usable lot with a shared entrance', () => {
     const signatures: string[] = [];
@@ -39,7 +75,7 @@ describe('residential asset contracts', () => {
       expect(size.y).toBeGreaterThan(5);
       expect(size.y).toBeLessThan(6.8);
       expect(box.min.x).toBeGreaterThan(-8.5);
-      expect(box.max.x).toBeLessThan(0.6);
+      expect(box.max.x).toBeLessThan(0.7);
       const door = home.getObjectByName('front-door');
       expect(door).toBeDefined();
       expect(door!.getWorldPosition(new T.Vector3()).x).toBeCloseTo(-5.35);
@@ -259,9 +295,11 @@ describe('residential asset contracts', () => {
 });
 describe('reference lighting and framing', () => {
   it('keeps torch flames steady by day and gently varies their emission at night', () => {
-    const getIntensity = (Lighting as unknown as {
-      torchFlickerIntensity?: (seconds: number, night: boolean) => number;
-    }).torchFlickerIntensity;
+    const getIntensity = (
+      Lighting as unknown as {
+        torchFlickerIntensity?: (seconds: number, night: boolean) => number;
+      }
+    ).torchFlickerIntensity;
     expect(getIntensity).toBeTypeOf('function');
     const day = getIntensity!(3, false),
       values = [0, 0.2, 0.4, 0.8, 1.3, 2].map((seconds) => getIntensity!(seconds, true));

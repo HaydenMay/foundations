@@ -1250,13 +1250,16 @@ app-town {
     bottom: calc(var(--sheet) - 9px);
   }
   .construction-status {
-    left: 18px;
-    top: 12px;
+    left: 12px;
+    right: 12px;
+    top: calc(env(safe-area-inset-top, 0px) + 60px);
+    justify-content: space-between;
+    max-width: calc(100vw - 24px);
     font-size: 11px;
   }
   .preview-banner {
     right: 12px;
-    top: 12px;
+    top: calc(env(safe-area-inset-top, 0px) + 10px);
   }
   .preview-banner button {
     font-size: 9px;

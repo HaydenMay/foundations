@@ -1,0 +1,848 @@
+{
+  "source": "http://127.0.0.1:4200/foundations/",
+  "sourceCommit": "1397c9bb20cacd9904e0ed31e5a219ed21902bf5",
+  "capturedAt": "2026-10-18T16:56:17.634Z",
+  "profile": "Fresh synthetic browser profiles; all test scenarios and changes stayed in disposable Developer Preview.",
+  "note": "Production bundle rendered by headless Chromium. Mobile screenshots use emulated viewport/touch; this is not physical-device or Safari testing. Script is manual evidence only and is not used by unit tests or deployment.",
+  "errors": [],
+  "captures": [
+    {
+      "name": "porch-cottage-rocking-chairs",
+      "note": "cottage with rocking-chairs; selected style is reversible in preview.",
+      "file": "docs/evidence/phase-4-2/porch-cottage-rocking-chairs.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 104,
+      "triangles": 138454,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "porch-cottage-porch-swing",
+      "note": "cottage with porch-swing; selected style is reversible in preview.",
+      "file": "docs/evidence/phase-4-2/porch-cottage-porch-swing.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 103,
+      "triangles": 137862,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "porch-cottage-entry-bench",
+      "note": "cottage with entry-bench; selected style is reversible in preview.",
+      "file": "docs/evidence/phase-4-2/porch-cottage-entry-bench.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 106,
+      "triangles": 137850,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "porch-craftsman-rocking-chairs",
+      "note": "craftsman with rocking-chairs; selected style is reversible in preview.",
+      "file": "docs/evidence/phase-4-2/porch-craftsman-rocking-chairs.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 104,
+      "triangles": 136794,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "porch-craftsman-porch-swing",
+      "note": "craftsman with porch-swing; selected style is reversible in preview.",
+      "file": "docs/evidence/phase-4-2/porch-craftsman-porch-swing.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 103,
+      "triangles": 136202,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "porch-craftsman-entry-bench",
+      "note": "craftsman with entry-bench; selected style is reversible in preview.",
+      "file": "docs/evidence/phase-4-2/porch-craftsman-entry-bench.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 106,
+      "triangles": 136190,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "porch-brick-rocking-chairs",
+      "note": "brick with rocking-chairs; selected style is reversible in preview.",
+      "file": "docs/evidence/phase-4-2/porch-brick-rocking-chairs.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 104,
+      "triangles": 137386,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "porch-brick-porch-swing",
+      "note": "brick with porch-swing; selected style is reversible in preview.",
+      "file": "docs/evidence/phase-4-2/porch-brick-porch-swing.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 103,
+      "triangles": 136794,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "porch-brick-entry-bench",
+      "note": "brick with entry-bench; selected style is reversible in preview.",
+      "file": "docs/evidence/phase-4-2/porch-brick-entry-bench.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 106,
+      "triangles": 136782,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "stone-wall-flower-beds",
+      "note": "Stone wall with the flower-beds expansion.",
+      "file": "docs/evidence/phase-4-2/stone-wall-flower-beds.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 242,
+      "triangles": 200985,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "stone-wall-evergreen-shrubs",
+      "note": "Stone wall with the evergreen-shrubs expansion.",
+      "file": "docs/evidence/phase-4-2/stone-wall-evergreen-shrubs.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 239,
+      "triangles": 205857,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "stone-wall-wildflowers",
+      "note": "Stone wall with the wildflowers expansion.",
+      "file": "docs/evidence/phase-4-2/stone-wall-wildflowers.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 253,
+      "triangles": 200026,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "pathway-lanterns-afternoon",
+      "note": "The legacy wallSconces save ID renders Pathway Lanterns in afternoon light.",
+      "file": "docs/evidence/phase-4-2/pathway-lanterns-afternoon.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 263,
+      "triangles": 192402,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "pathway-lanterns-night",
+      "note": "Pathway Lanterns remain visible at night without added point lights.",
+      "file": "docs/evidence/phase-4-2/pathway-lanterns-night.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "night",
+      "construction": "idle",
+      "drawCalls": 263,
+      "triangles": 192402,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-cottage-pool-pergola",
+      "note": "Supported string lights with cottage, pool, and pergola.",
+      "file": "docs/evidence/phase-4-2/string-lights-cottage-pool-pergola.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 249,
+      "triangles": 199882,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-cottage-pool-stone-patio",
+      "note": "Supported string lights with cottage, pool, and stone-patio.",
+      "file": "docs/evidence/phase-4-2/string-lights-cottage-pool-stone-patio.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 244,
+      "triangles": 199870,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-cottage-pool-garden-lounge",
+      "note": "Supported string lights with cottage, pool, and garden-lounge.",
+      "file": "docs/evidence/phase-4-2/string-lights-cottage-pool-garden-lounge.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 263,
+      "triangles": 204598,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-cottage-fort-pergola",
+      "note": "Supported string lights with cottage, fort, and pergola.",
+      "file": "docs/evidence/phase-4-2/string-lights-cottage-fort-pergola.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 246,
+      "triangles": 199294,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-cottage-fort-stone-patio",
+      "note": "Supported string lights with cottage, fort, and stone-patio.",
+      "file": "docs/evidence/phase-4-2/string-lights-cottage-fort-stone-patio.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 241,
+      "triangles": 199282,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-cottage-fort-garden-lounge",
+      "note": "Supported string lights with cottage, fort, and garden-lounge.",
+      "file": "docs/evidence/phase-4-2/string-lights-cottage-fort-garden-lounge.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 260,
+      "triangles": 204010,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-cottage-trampoline-pergola",
+      "note": "Supported string lights with cottage, trampoline, and pergola.",
+      "file": "docs/evidence/phase-4-2/string-lights-cottage-trampoline-pergola.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 247,
+      "triangles": 200774,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-cottage-trampoline-stone-patio",
+      "note": "Supported string lights with cottage, trampoline, and stone-patio.",
+      "file": "docs/evidence/phase-4-2/string-lights-cottage-trampoline-stone-patio.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 242,
+      "triangles": 200762,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-cottage-trampoline-garden-lounge",
+      "note": "Supported string lights with cottage, trampoline, and garden-lounge.",
+      "file": "docs/evidence/phase-4-2/string-lights-cottage-trampoline-garden-lounge.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 261,
+      "triangles": 205490,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-craftsman-pool-pergola",
+      "note": "Supported string lights with craftsman, pool, and pergola.",
+      "file": "docs/evidence/phase-4-2/string-lights-craftsman-pool-pergola.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 249,
+      "triangles": 198222,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-craftsman-pool-stone-patio",
+      "note": "Supported string lights with craftsman, pool, and stone-patio.",
+      "file": "docs/evidence/phase-4-2/string-lights-craftsman-pool-stone-patio.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 244,
+      "triangles": 198210,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-craftsman-pool-garden-lounge",
+      "note": "Supported string lights with craftsman, pool, and garden-lounge.",
+      "file": "docs/evidence/phase-4-2/string-lights-craftsman-pool-garden-lounge.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 263,
+      "triangles": 202938,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-craftsman-fort-pergola",
+      "note": "Supported string lights with craftsman, fort, and pergola.",
+      "file": "docs/evidence/phase-4-2/string-lights-craftsman-fort-pergola.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 246,
+      "triangles": 197634,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-craftsman-fort-stone-patio",
+      "note": "Supported string lights with craftsman, fort, and stone-patio.",
+      "file": "docs/evidence/phase-4-2/string-lights-craftsman-fort-stone-patio.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 241,
+      "triangles": 197622,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-craftsman-fort-garden-lounge",
+      "note": "Supported string lights with craftsman, fort, and garden-lounge.",
+      "file": "docs/evidence/phase-4-2/string-lights-craftsman-fort-garden-lounge.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 260,
+      "triangles": 202350,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-craftsman-trampoline-pergola",
+      "note": "Supported string lights with craftsman, trampoline, and pergola.",
+      "file": "docs/evidence/phase-4-2/string-lights-craftsman-trampoline-pergola.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 247,
+      "triangles": 199114,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-craftsman-trampoline-stone-patio",
+      "note": "Supported string lights with craftsman, trampoline, and stone-patio.",
+      "file": "docs/evidence/phase-4-2/string-lights-craftsman-trampoline-stone-patio.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 242,
+      "triangles": 199102,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-craftsman-trampoline-garden-lounge",
+      "note": "Supported string lights with craftsman, trampoline, and garden-lounge.",
+      "file": "docs/evidence/phase-4-2/string-lights-craftsman-trampoline-garden-lounge.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 261,
+      "triangles": 203830,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-brick-pool-pergola",
+      "note": "Supported string lights with brick, pool, and pergola.",
+      "file": "docs/evidence/phase-4-2/string-lights-brick-pool-pergola.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 249,
+      "triangles": 198814,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-brick-pool-stone-patio",
+      "note": "Supported string lights with brick, pool, and stone-patio.",
+      "file": "docs/evidence/phase-4-2/string-lights-brick-pool-stone-patio.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 244,
+      "triangles": 198802,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-brick-pool-garden-lounge",
+      "note": "Supported string lights with brick, pool, and garden-lounge.",
+      "file": "docs/evidence/phase-4-2/string-lights-brick-pool-garden-lounge.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 263,
+      "triangles": 203530,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-brick-fort-pergola",
+      "note": "Supported string lights with brick, fort, and pergola.",
+      "file": "docs/evidence/phase-4-2/string-lights-brick-fort-pergola.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 246,
+      "triangles": 198226,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-brick-fort-stone-patio",
+      "note": "Supported string lights with brick, fort, and stone-patio.",
+      "file": "docs/evidence/phase-4-2/string-lights-brick-fort-stone-patio.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 241,
+      "triangles": 198214,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-brick-fort-garden-lounge",
+      "note": "Supported string lights with brick, fort, and garden-lounge.",
+      "file": "docs/evidence/phase-4-2/string-lights-brick-fort-garden-lounge.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 260,
+      "triangles": 202942,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-brick-trampoline-pergola",
+      "note": "Supported string lights with brick, trampoline, and pergola.",
+      "file": "docs/evidence/phase-4-2/string-lights-brick-trampoline-pergola.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 247,
+      "triangles": 199706,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-brick-trampoline-stone-patio",
+      "note": "Supported string lights with brick, trampoline, and stone-patio.",
+      "file": "docs/evidence/phase-4-2/string-lights-brick-trampoline-stone-patio.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 242,
+      "triangles": 199694,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "string-lights-brick-trampoline-garden-lounge",
+      "note": "Supported string lights with brick, trampoline, and garden-lounge.",
+      "file": "docs/evidence/phase-4-2/string-lights-brick-trampoline-garden-lounge.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 261,
+      "triangles": 204422,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "animation-stone-wall-start",
+      "note": "First visible wall spans begin before camera movement finishes.",
+      "file": "docs/evidence/phase-4-2/animation-stone-wall-start.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "animation-stone-wall-middle",
+      "note": "Multiple short stone-wall spans are arriving in sequence.",
+      "file": "docs/evidence/phase-4-2/animation-stone-wall-middle.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "animation-stone-wall-complete",
+      "note": "All stone-wall sections are assembled.",
+      "file": "docs/evidence/phase-4-2/animation-stone-wall-complete.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 267,
+      "triangles": 204662,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "animation-pergola-start",
+      "note": "Pergola retreat starts with individual structural pieces.",
+      "file": "docs/evidence/phase-4-2/animation-pergola-start.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "animation-pergola-middle",
+      "note": "Pergola posts and beams are staged as separate pieces.",
+      "file": "docs/evidence/phase-4-2/animation-pergola-middle.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      }
+    },
+    {
+      "name": "animation-pergola-complete",
+      "note": "Pergola, bench, and side table after construction.",
+      "file": "docs/evidence/phase-4-2/animation-pergola-complete.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 216,
+      "triangles": 187183,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "replay-skip-preview",
+      "note": "A second preview replay can be skipped and leaves the selected design complete.",
+      "file": "docs/evidence/phase-4-2/replay-skip-preview.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "rendered": true,
+      "lighting": "day",
+      "construction": "idle",
+      "drawCalls": 253,
+      "triangles": 199946,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "controls-portrait",
+      "note": "Developer Preview controls at portrait mobile viewport.",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "construction-toast-portrait",
+      "note": "Construction toast and Skip while Developer Preview remains active at portrait.",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "preview": {
+        "x": 223.703125,
+        "y": 84,
+        "width": 154.296875,
+        "height": 42,
+        "top": 84,
+        "right": 378,
+        "bottom": 126,
+        "left": 223.703125
+      },
+      "status": {
+        "x": 12,
+        "y": 134,
+        "width": 366,
+        "height": 42,
+        "top": 134,
+        "right": 378,
+        "bottom": 176,
+        "left": 12
+      },
+      "skip": {
+        "x": 321,
+        "y": 135,
+        "width": 50,
+        "height": 40,
+        "top": 135,
+        "right": 371,
+        "bottom": 175,
+        "left": 321
+      },
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "controls-landscape",
+      "note": "Developer Preview controls at landscape mobile viewport.",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      }
+    },
+    {
+      "name": "construction-toast-landscape",
+      "note": "Construction toast and Skip while Developer Preview remains active at landscape.",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "documentWidth": 844,
+      "preview": {
+        "x": 651.390625,
+        "y": 65,
+        "width": 180.609375,
+        "height": 38,
+        "top": 65,
+        "right": 832,
+        "bottom": 103,
+        "left": 651.390625
+      },
+      "status": {
+        "x": 534.578125,
+        "y": 107,
+        "width": 297.421875,
+        "height": 42,
+        "top": 107,
+        "right": 832,
+        "bottom": 149,
+        "left": 534.578125
+      },
+      "skip": {
+        "x": 775,
+        "y": 108,
+        "width": 50,
+        "height": 40,
+        "top": 108,
+        "right": 825,
+        "bottom": 148,
+        "left": 775
+      },
+      "webglError": 0,
+      "contextLost": false
+    }
+  ]
+}
