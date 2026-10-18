@@ -1,0 +1,32 @@
+
+Running 21 tests using 1 worker
+
+(node:6344) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  1 [portrait] › e2e\app.spec.ts:7:5 › renders the town and keeps progress and panel preference after reload (6.6s)
+  ok  2 [portrait] › e2e\app.spec.ts:88:5 › supports lighting, camera controls, and fitting portrait or landscape UI (2.9s)
+  ok  3 [portrait] › e2e\onboarding.spec.ts:14:5 › new players preview three houses and save before a skippable first construction (4.3s)
+  ok  4 [portrait] › e2e\onboarding.spec.ts:125:5 › a failed durable home save leaves the reward pending across reload (2.8s)
+  ok  5 [portrait] › e2e\onboarding.spec.ts:154:5 › startup migration waits for another tab and preserves its newer completion (2.8s)
+  ok  6 [portrait] › e2e\preview.spec.ts:25:5 › preview changes, real backup export and a late camera event cannot change genuine storage (9.0s)
+  ok  7 [portrait] › e2e\preview.spec.ts:53:5 › reload discards preview and another tab stays genuine while real updates survive exit (7.1s)
+(node:33904) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  8 [landscape] › e2e\app.spec.ts:7:5 › renders the town and keeps progress and panel preference after reload (2.9s)
+  ok  9 [landscape] › e2e\app.spec.ts:88:5 › supports lighting, camera controls, and fitting portrait or landscape UI (2.0s)
+  ok 10 [landscape] › e2e\onboarding.spec.ts:14:5 › new players preview three houses and save before a skippable first construction (3.6s)
+  ok 11 [landscape] › e2e\onboarding.spec.ts:125:5 › a failed durable home save leaves the reward pending across reload (2.3s)
+  ok 12 [landscape] › e2e\onboarding.spec.ts:154:5 › startup migration waits for another tab and preserves its newer completion (2.2s)
+  ok 13 [landscape] › e2e\preview.spec.ts:25:5 › preview changes, real backup export and a late camera event cannot change genuine storage (7.2s)
+  ok 14 [landscape] › e2e\preview.spec.ts:53:5 › reload discards preview and another tab stays genuine while real updates survive exit (5.6s)
+(node:31800) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 15 [desktop] › e2e\app.spec.ts:7:5 › renders the town and keeps progress and panel preference after reload (3.7s)
+  ok 16 [desktop] › e2e\app.spec.ts:88:5 › supports lighting, camera controls, and fitting portrait or landscape UI (3.2s)
+  ok 17 [desktop] › e2e\onboarding.spec.ts:14:5 › new players preview three houses and save before a skippable first construction (5.2s)
+  ok 18 [desktop] › e2e\onboarding.spec.ts:125:5 › a failed durable home save leaves the reward pending across reload (3.1s)
+  ok 19 [desktop] › e2e\onboarding.spec.ts:154:5 › startup migration waits for another tab and preserves its newer completion (3.1s)
+  ok 20 [desktop] › e2e\preview.spec.ts:25:5 › preview changes, real backup export and a late camera event cannot change genuine storage (11.0s)
+  ok 21 [desktop] › e2e\preview.spec.ts:53:5 › reload discards preview and another tab stays genuine while real updates survive exit (8.4s)
+
+  21 passed (1.7m)

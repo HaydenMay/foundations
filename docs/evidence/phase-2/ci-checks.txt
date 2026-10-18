@@ -1,0 +1,7 @@
+build	Run npm test	2026-10-17T22:47:39.1254788Z Application bundle generation complete. [3.352 seconds] - 2026-10-17T22:47:39.121Z
+build	Run npm test	2026-10-17T22:47:42.1017926Z ^[[2m      Tests ^[[22m ^[[1m^[[32m85 passed^[[39m^[[22m^[[90m (85)^[[39m
+build	Run npm run build	2026-10-17T22:47:47.0874868Z Application bundle generation complete. [4.285 seconds] - 2026-10-17T22:47:47.085Z
+build	Run npm run test:e2e	2026-10-17T22:59:53.3169907Z   1 skipped
+build	Run npm run test:e2e	2026-10-17T22:59:53.3170447Z   86 passed (11.7m)
+build	Run actions/upload-pages-artifact@v3	2026-10-17T22:59:54.7197831Z ##[end-action id=__actions_upload-pages-artifact.__run_2;outcome=skipped;conclusion=skipped;duration_ms=0]
+build	Run actions/upload-pages-artifact@v3	2026-10-17T22:59:54.7204797Z ##[end-action id=__actions_upload-pages-artifact.__run_3;outcome=skipped;conclusion=skipped;duration_ms=0]

@@ -1,0 +1,26 @@
+
+Running 15 tests using 1 worker
+
+(node:8492) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  1 [portrait] › e2e\onboarding.spec.ts:13:5 › new players preview three houses and save before a skippable first construction (5.9s)
+  ok  2 [portrait] › e2e\onboarding.spec.ts:124:5 › a failed durable home save leaves the reward pending across reload (3.7s)
+  ok  3 [portrait] › e2e\preview.spec.ts:25:5 › preview changes, real backup export and a late camera event cannot change genuine storage (12.1s)
+  ok  4 [portrait] › e2e\preview.spec.ts:53:5 › reload discards preview and another tab stays genuine while real updates survive exit (10.0s)
+  ok  5 [portrait] › e2e\preview.spec.ts:118:5 › visibility toggles hide and restore preview projects without reopening onboarding (6.1s)
+(node:25936) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  6 [landscape] › e2e\onboarding.spec.ts:13:5 › new players preview three houses and save before a skippable first construction (4.4s)
+  ok  7 [landscape] › e2e\onboarding.spec.ts:124:5 › a failed durable home save leaves the reward pending across reload (2.7s)
+  ok  8 [landscape] › e2e\preview.spec.ts:25:5 › preview changes, real backup export and a late camera event cannot change genuine storage (8.9s)
+  ok  9 [landscape] › e2e\preview.spec.ts:53:5 › reload discards preview and another tab stays genuine while real updates survive exit (6.9s)
+  ok 10 [landscape] › e2e\preview.spec.ts:118:5 › visibility toggles hide and restore preview projects without reopening onboarding (4.4s)
+(node:34412) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 11 [desktop] › e2e\onboarding.spec.ts:13:5 › new players preview three houses and save before a skippable first construction (7.5s)
+  ok 12 [desktop] › e2e\onboarding.spec.ts:124:5 › a failed durable home save leaves the reward pending across reload (4.6s)
+  ok 13 [desktop] › e2e\preview.spec.ts:25:5 › preview changes, real backup export and a late camera event cannot change genuine storage (16.0s)
+  ok 14 [desktop] › e2e\preview.spec.ts:53:5 › reload discards preview and another tab stays genuine while real updates survive exit (12.9s)
+  ok 15 [desktop] › e2e\preview.spec.ts:118:5 › visibility toggles hide and restore preview projects without reopening onboarding (7.4s)
+
+  15 passed (1.9m)

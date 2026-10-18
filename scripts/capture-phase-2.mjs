@@ -62,6 +62,11 @@ try {
         const { renderer: r, scene, camera } = window.__visual;
         if (!r || !scene) throw new Error('Missing Three.js observer');
         const home = scene.getObjectByName('starting-home');
+        const lastUpdate = { ...r.info.render };
+        const activeAnimation =
+          document.querySelector('app-town').dataset.construction === 'active';
+        // Separate the last UI update (which may include shadows) from a cached static draw.
+        if (!activeAnimation) r.render(scene, camera);
         let meshes = 0;
         scene.traverse((o) => {
           if (o.isMesh) meshes++;
@@ -75,6 +80,8 @@ try {
           })(),
           calls: r.info.render.calls,
           triangles: r.info.render.triangles,
+          lastUpdate,
+          measurement: activeAnimation ? 'active animation' : 'cached static render',
           meshes,
           resources: { ...r.info.memory, programs: r.info.programs.length },
           home: home ? { visible: home.visible, scale: home.scale.x, y: home.position.y } : null,

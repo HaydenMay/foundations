@@ -79,7 +79,7 @@ Lighting follows the **device's local time**, blending morning, afternoon, sunse
 
 ## Privacy and backups
 
-Habits, schedules, completion snapshots, stars, designs, camera and interface preferences live in browser **localStorage**, under `foundations.v1`. The versioned state is validated on load and import. Multiple same-origin tabs synchronize; browsers with Web Locks serialize updates to prevent duplicate rewards.
+Habits, schedules, completion snapshots, stars, designs, camera and interface preferences live in browser **localStorage**, under `foundations.v1`. The versioned state is validated on load and import. Multiple same-origin tabs synchronize; browsers with Web Locks serialize startup creation, migration and updates to prevent stale writes or duplicate rewards.
 
 The storage key stays unchanged; the JSON schema is now **version 2**. All valid version 1 profiles migrate conservatively as existing homeowners, including zero-star profiles. Habits, history, designs and unknown fields are retained. Before overwriting a stored v1 record, its exact original bytes are copied once to `foundations.pre-v2`; Settings can export that pre-upgrade backup. If that backup cannot be written, the original record is left intact and an unsaved warning appears. Older JSON imports use the same conservative migration. Unsupported or malformed records remain protected. Close stale tabs after an upgrade; an old app version cannot edit the newer schema.
 
@@ -129,4 +129,4 @@ See [validation notes](docs/validation.md) for executed results and deployment e
 - Fixed-hour solar lighting is atmospheric rather than geographically accurate. Motion is deliberately minimal, and future art assets can replace the procedural factories.
 - The current 36×29 terrain, bounded camera and world-wide material batches fit the current eight projects. Future continuous-city growth should extend terrain/camera bounds and introduce spatial lot/chunk batches and level of detail, preserving the original home anchor. No disconnected scenes are introduced here.
 
-Recommended next work: owner review of the three styles and four moods, followed by real iOS/Android performance and Safari checks. If closer reference fidelity is required, replace individual factories with optimized authored models and foliage atlases, preserving the documented lot contract. Keep further neighborhood work out of this visual pass.
+Recommended next work: owner review of the first-home journey and Developer Preview, followed by real iOS/Android performance and Safari checks. If closer reference fidelity is required, replace individual factories with optimized authored models and foliage atlases, preserving the documented lot contract. Keep further neighborhood work out of this visual pass.

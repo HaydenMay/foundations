@@ -1,0 +1,1028 @@
+{
+  "url": "https://haydenmay.github.io/foundations/",
+  "sourceCommit": "c4b6f27b1dd77d6c6a357e6eed704c81be890823",
+  "capturedAt": "2026-10-17T23:03:50.769Z",
+  "note": "Windows headless Chromium, synthetic profiles. Emulated viewports, not physical device FPS. Render calls are CPU submissions, not GPU timings. Source commit may have documented uncommitted UI changes in local captures.",
+  "results": [
+    {
+      "name": "portrait-empty-lot",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 447.90625
+      },
+      "calls": 21,
+      "triangles": 80678,
+      "lastUpdate": {
+        "frame": 4,
+        "calls": 32,
+        "triangles": 157450,
+        "points": 0,
+        "lines": 0
+      },
+      "measurement": "cached static render",
+      "meshes": 21,
+      "resources": {
+        "geometries": 21,
+        "textures": 9,
+        "programs": 4
+      },
+      "home": null,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "haydenmay.github.io"
+      ]
+    },
+    {
+      "name": "portrait-home-selection-cottage",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 447.90625
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "lastUpdate": {
+        "frame": 6,
+        "calls": 118,
+        "triangles": 332960,
+        "points": 0,
+        "lines": 0
+      },
+      "measurement": "cached static render",
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "haydenmay.github.io"
+      ]
+    },
+    {
+      "name": "portrait-home-selection-craftsman",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 447.90625
+      },
+      "calls": 87,
+      "triangles": 185132,
+      "lastUpdate": {
+        "frame": 8,
+        "calls": 135,
+        "triangles": 330548,
+        "points": 0,
+        "lines": 0
+      },
+      "measurement": "cached static render",
+      "meshes": 87,
+      "resources": {
+        "geometries": 87,
+        "textures": 25,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "haydenmay.github.io"
+      ]
+    },
+    {
+      "name": "portrait-home-selection-brick",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 447.90625
+      },
+      "calls": 78,
+      "triangles": 185136,
+      "lastUpdate": {
+        "frame": 10,
+        "calls": 120,
+        "triangles": 330520,
+        "points": 0,
+        "lines": 0
+      },
+      "measurement": "cached static render",
+      "meshes": 78,
+      "resources": {
+        "geometries": 78,
+        "textures": 23,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "haydenmay.github.io"
+      ]
+    },
+    {
+      "name": "portrait-construction",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 447.90625
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "lastUpdate": {
+        "frame": 21,
+        "calls": 76,
+        "triangles": 186792,
+        "points": 0,
+        "lines": 0
+      },
+      "measurement": "active animation",
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "haydenmay.github.io"
+      ]
+    },
+    {
+      "name": "portrait-animation",
+      "elapsedAfterObservedStartMs": 2594.199999988079,
+      "renderCalls": 7,
+      "durableBeforeAnimation": true
+    },
+    {
+      "name": "portrait-first-home",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 447.90625
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "lastUpdate": {
+        "frame": 22,
+        "calls": 118,
+        "triangles": 332960,
+        "points": 0,
+        "lines": 0
+      },
+      "measurement": "cached static render",
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "haydenmay.github.io"
+      ]
+    },
+    {
+      "name": "portrait-preview-entry",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 447.90625
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "lastUpdate": {
+        "frame": 23,
+        "calls": 76,
+        "triangles": 186792,
+        "points": 0,
+        "lines": 0
+      },
+      "measurement": "cached static render",
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "haydenmay.github.io"
+      ]
+    },
+    {
+      "name": "portrait-preview-controls",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 455.609375
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "lastUpdate": {
+        "frame": 26,
+        "calls": 76,
+        "triangles": 186792,
+        "points": 0,
+        "lines": 0
+      },
+      "measurement": "cached static render",
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "haydenmay.github.io"
+      ]
+    },
+    {
+      "name": "preview-scenario-new",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 455.609375
+      },
+      "calls": 21,
+      "triangles": 80678,
+      "lastUpdate": {
+        "frame": 30,
+        "calls": 32,
+        "triangles": 157450,
+        "points": 0,
+        "lines": 0
+      },
+      "measurement": "cached static render",
+      "meshes": 21,
+      "resources": {
+        "geometries": 21,
+        "textures": 9,
+        "programs": 4
+      },
+      "home": null,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "haydenmay.github.io"
+      ]
+    },
+    {
+      "name": "preview-scenario-ready",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 455.609375
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "lastUpdate": {
+        "frame": 33,
+        "calls": 76,
+        "triangles": 186792,
+        "points": 0,
+        "lines": 0
+      },
+      "measurement": "cached static render",
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "haydenmay.github.io"
+      ]
+    },
+    {
+      "name": "preview-scenario-home",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 455.609375
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "lastUpdate": {
+        "frame": 37,
+        "calls": 76,
+        "triangles": 186792,
+        "points": 0,
+        "lines": 0
+      },
+      "measurement": "cached static render",
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "haydenmay.github.io"
+      ]
+    },
+    {
+      "name": "preview-scenario-several",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 455.609375
+      },
+      "calls": 118,
+      "triangles": 217622,
+      "lastUpdate": {
+        "frame": 40,
+        "calls": 118,
+        "triangles": 217622,
+        "points": 0,
+        "lines": 0
+      },
+      "measurement": "cached static render",
+      "meshes": 118,
+      "resources": {
+        "geometries": 118,
+        "textures": 29,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        22.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 0.8,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "haydenmay.github.io"
+      ]
+    },
+    {
+      "name": "preview-scenario-all",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 455.609375
+      },
+      "calls": 125,
+      "triangles": 237662,
+      "lastUpdate": {
+        "frame": 43,
+        "calls": 125,
+        "triangles": 237662,
+        "points": 0,
+        "lines": 0
+      },
+      "measurement": "cached static render",
+      "meshes": 125,
+      "resources": {
+        "geometries": 125,
+        "textures": 29,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        22.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 0.6,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "haydenmay.github.io"
+      ]
+    },
+    {
+      "name": "portrait-preview-backyard-lighting",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 455.609375
+      },
+      "calls": 121,
+      "triangles": 237074,
+      "lastUpdate": {
+        "frame": 46,
+        "calls": 193,
+        "triangles": 414386,
+        "points": 0,
+        "lines": 0
+      },
+      "measurement": "cached static render",
+      "meshes": 121,
+      "resources": {
+        "geometries": 121,
+        "textures": 27,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        22.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 0.6,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "haydenmay.github.io"
+      ]
+    },
+    {
+      "name": "portrait-preview-camera-controls",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 455.609375
+      },
+      "calls": 121,
+      "triangles": 237074,
+      "lastUpdate": {
+        "frame": 47,
+        "calls": 121,
+        "triangles": 237074,
+        "points": 0,
+        "lines": 0
+      },
+      "measurement": "cached static render",
+      "meshes": 121,
+      "resources": {
+        "geometries": 121,
+        "textures": 27,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        22.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 0.6,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "haydenmay.github.io"
+      ]
+    },
+    {
+      "name": "portrait-preview-collapsed",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 714
+      },
+      "calls": 121,
+      "triangles": 237074,
+      "lastUpdate": {
+        "frame": 49,
+        "calls": 121,
+        "triangles": 237074,
+        "points": 0,
+        "lines": 0
+      },
+      "measurement": "cached static render",
+      "meshes": 121,
+      "resources": {
+        "geometries": 121,
+        "textures": 27,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        22.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 0.6,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "haydenmay.github.io"
+      ]
+    },
+    {
+      "name": "portrait-idle",
+      "rendersOver700ms": 0
+    },
+    {
+      "name": "landscape-empty-lot",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 260,
+        "y": 59,
+        "width": 584,
+        "height": 331
+      },
+      "calls": 21,
+      "triangles": 80678,
+      "lastUpdate": {
+        "frame": 4,
+        "calls": 32,
+        "triangles": 157450,
+        "points": 0,
+        "lines": 0
+      },
+      "measurement": "cached static render",
+      "meshes": 21,
+      "resources": {
+        "geometries": 21,
+        "textures": 9,
+        "programs": 4
+      },
+      "home": null,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "haydenmay.github.io"
+      ]
+    },
+    {
+      "name": "landscape-home-selection-cottage",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 320,
+        "y": 59,
+        "width": 524,
+        "height": 331
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "lastUpdate": {
+        "frame": 7,
+        "calls": 76,
+        "triangles": 186792,
+        "points": 0,
+        "lines": 0
+      },
+      "measurement": "cached static render",
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 4
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "haydenmay.github.io"
+      ]
+    },
+    {
+      "name": "landscape-animation",
+      "elapsedAfterObservedStartMs": 2193.599999964237,
+      "renderCalls": 6,
+      "durableBeforeAnimation": true
+    },
+    {
+      "name": "landscape-first-home",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 260,
+        "y": 59,
+        "width": 584,
+        "height": 331
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "lastUpdate": {
+        "frame": 18,
+        "calls": 118,
+        "triangles": 332960,
+        "points": 0,
+        "lines": 0
+      },
+      "measurement": "cached static render",
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "haydenmay.github.io"
+      ]
+    },
+    {
+      "name": "landscape-preview-entry",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 260,
+        "y": 59,
+        "width": 584,
+        "height": 331
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "lastUpdate": {
+        "frame": 19,
+        "calls": 76,
+        "triangles": 186792,
+        "points": 0,
+        "lines": 0
+      },
+      "measurement": "cached static render",
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "haydenmay.github.io"
+      ]
+    },
+    {
+      "name": "landscape-preview-controls",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 320,
+        "y": 59,
+        "width": 524,
+        "height": 331
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "lastUpdate": {
+        "frame": 22,
+        "calls": 76,
+        "triangles": 186792,
+        "points": 0,
+        "lines": 0
+      },
+      "measurement": "cached static render",
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "haydenmay.github.io"
+      ]
+    },
+    {
+      "name": "landscape-preview-collapsed",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "overflow": false,
+      "canvas": {
+        "x": 0,
+        "y": 59,
+        "width": 844,
+        "height": 331
+      },
+      "calls": 76,
+      "triangles": 186792,
+      "lastUpdate": {
+        "frame": 24,
+        "calls": 76,
+        "triangles": 186792,
+        "points": 0,
+        "lines": 0
+      },
+      "measurement": "cached static render",
+      "meshes": 76,
+      "resources": {
+        "geometries": 76,
+        "textures": 23,
+        "programs": 6
+      },
+      "home": {
+        "visible": true,
+        "scale": 1,
+        "y": 0.13
+      },
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "webglError": 0,
+      "contextLost": false,
+      "requestHosts": [
+        "haydenmay.github.io"
+      ]
+    },
+    {
+      "name": "landscape-idle",
+      "rendersOver700ms": 0
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+
+> foundations@0.1.0 build
+> ng build --base-href=/foundations/
+
+> Building...
+√ Building...
+Initial chunk files | Names         |  Raw size | Estimated transfer size
+main-VRSJLIRB.js    | main          | 298.18 kB |                78.91 kB
+styles-NCJC4W5N.css | styles        |   3.17 kB |                 1.05 kB
+chunk-2NFLSA4Y.js   | -             | 449 bytes |               449 bytes
+
+                    | Initial total | 301.80 kB |                80.41 kB
+
+Lazy chunk files    | Names         |  Raw size | Estimated transfer size
+chunk-2JJDU62P.js   | scene         | 633.01 kB |               136.69 kB
+
+Application bundle generation complete. [3.347 seconds] - 2026-10-17T22:46:30.814Z
+
+Output location: C:\Users\mayha\GameDev\foundations\dist\foundations
+

@@ -1,0 +1,17 @@
+
+> foundations@0.1.0 test
+> ng test --watch=false
+
+> Building...
+√ Building...
+Application bundle generation complete. [2.506 seconds] - 2026-10-17T22:45:41.711Z
+
+
+ RUN  v5.0.5 C:/Users/mayha/GameDev/foundations
+
+
+ Test Files  12 passed (12)
+      Tests  85 passed (85)
+   Start at  15:45:42
+   Duration  3.56s (environment 61%, setup 23%, transform 8%, tests 5%, import 2%, worker 1%)
+
