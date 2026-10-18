@@ -39,7 +39,7 @@ Chromium's completed Cottage scene measured 96 WebGL draw calls and 186,792 tria
 
 No serialized model or save version changed in this phase. Existing user data and imported saves keep the same shape. The house selection is saved by the existing durable first-home flow before animation is requested; reload shows the saved house and never replays an old construction event. Preview options are not persistent data.
 
-Implementation commit: `9f6a57832497df96827bead0e93b656f08f1d95f`. Captured application source commit is recorded in `final-metrics.json`. The work is currently on `agent/codex/universal-assembly`. **Push and GitHub Pages verification are pending**; the public deployment remains the previous main-branch build until that completes. The branch must be committed and pushed before deployment can be reported.
+Implementation commit: `19ee8e99bec0cc763f454215d98ad4c7f2d3a5d7`. `final-metrics.json` records the same captured application source commit. The work is currently on `agent/codex/universal-assembly`. **Push and GitHub Pages verification are pending**; the public deployment remains the previous main-branch build until that completes.
 
 ## Limitations and recommended mitigation
 

@@ -1,6 +1,6 @@
 {
-  "repositoryCommit": "9f6a57832497df96827bead0e93b656f08f1d95f",
-  "applicationSourceCommit": "9f6a57832497df96827bead0e93b656f08f1d95f",
+  "repositoryCommit": "19ee8e99bec0cc763f454215d98ad4c7f2d3a5d7",
+  "applicationSourceCommit": "19ee8e99bec0cc763f454215d98ad4c7f2d3a5d7",
   "url": "http://127.0.0.1:4200/foundations/",
   "lighting": "day",
   "captures": [
@@ -509,32 +509,32 @@
       "assemblies": [
         {
           "id": "foundation",
-          "y": 1.9944306789496742,
+          "y": 1.9937291086383868,
           "visible": true
         },
         {
           "id": "walls",
-          "y": 1.9944306789496742,
+          "y": 1.9937291086383868,
           "visible": true
         },
         {
           "id": "openings",
-          "y": 2.468777934599537,
+          "y": 2.4679691179430714,
           "visible": true
         },
         {
           "id": "entry",
-          "y": 2.468777934599537,
+          "y": 2.4679691179430714,
           "visible": true
         },
         {
           "id": "roofline",
-          "y": 3.0129373353111286,
+          "y": 3.012013647566297,
           "visible": true
         },
         {
           "id": "garage",
-          "y": 3.0129373353111286,
+          "y": 3.012013647566297,
           "visible": true
         },
         {
@@ -552,27 +552,27 @@
       "assemblies": [
         {
           "id": "foundation",
-          "y": 1.9436472712223758,
+          "y": 2.2727885460231683,
           "visible": true
         },
         {
           "id": "walls",
-          "y": 1.9436472712223758,
+          "y": 2.2727885460231683,
           "visible": true
         },
         {
           "id": "openings",
-          "y": 2.4101974224288765,
+          "y": 2.7887195814888344,
           "visible": true
         },
         {
           "id": "entry",
-          "y": 2.4101974224288765,
+          "y": 2.7887195814888344,
           "visible": true
         },
         {
           "id": "roofline",
-          "y": 2.9460031124726953,
+          "y": 3.37735689653256,
           "visible": true
         },
         {
@@ -582,7 +582,7 @@
         },
         {
           "id": "details",
-          "y": 2.9460031124726953,
+          "y": 3.37735689653256,
           "visible": true
         }
       ]
@@ -595,27 +595,27 @@
       "assemblies": [
         {
           "id": "foundation",
-          "y": 1.959949636804688,
+          "y": 2.2723511418619458,
           "visible": true
         },
         {
           "id": "walls",
-          "y": 1.959949636804688,
+          "y": 2.2723511418619458,
           "visible": true
         },
         {
           "id": "openings",
-          "y": 2.4290103775432854,
+          "y": 2.7882182611901136,
           "visible": true
         },
         {
           "id": "entry",
-          "y": 2.4290103775432854,
+          "y": 2.7882182611901136,
           "visible": true
         },
         {
           "id": "roofline",
-          "y": 2.9675063831995785,
+          "y": 3.3767873031005866,
           "visible": true
         },
         {
@@ -625,7 +625,7 @@
         },
         {
           "id": "details",
-          "y": 2.9675063831995785,
+          "y": 3.3767873031005866,
           "visible": true
         }
       ]
