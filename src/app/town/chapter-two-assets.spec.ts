@@ -48,6 +48,27 @@ it('builds every neighborhood house lot in each of the three architectural style
   }
 });
 
+it('keeps stone lot borders clear of driveway and front-walk crossings', () => {
+  for (const lot of CHAPTER_TWO_LOTS) {
+    const assets = new AssetLibrary();
+    try {
+      const neighbor = buildChapterTwoProject(assets, new T.Group(), lot.projectId, 'brick');
+      const border = neighbor.pieces.get('garden-border')!;
+      border.updateWorldMatrix(true, true);
+      const pathHitsBorder = (localX: number) => {
+        const origin = border.localToWorld(new T.Vector3(localX, 0.8, lot.depth / 2));
+        const ray = new T.Raycaster(origin, new T.Vector3(0, -1, 0));
+        return ray.intersectObject(border, true).length > 0;
+      };
+
+      expect(pathHitsBorder(lot.house.drivewayX), `${lot.projectId} driveway`).toBe(false);
+      expect(pathHitsBorder(lot.house.entryX), `${lot.projectId} front walk`).toBe(false);
+    } finally {
+      assets.dispose();
+    }
+  }
+});
+
 it('schedules production house pieces only after their blueprint prerequisites complete', () => {
   const assets = new AssetLibrary();
   const house = buildChapterTwoProject(assets, new T.Group(), 'ch2-neighbor-2', 'craftsman');
