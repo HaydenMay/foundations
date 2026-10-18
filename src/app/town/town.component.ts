@@ -225,6 +225,7 @@ export class TownComponent implements OnDestroy {
   readonly sessionKey = input(0);
   readonly construction = input(0);
   readonly constructionProject = input('home');
+  readonly frameworkProof = input(false);
   readonly assemblyOptions = input<AssemblyConfigOverride>({});
   readonly constructionFinished = output<{ id: number; sessionKey: number }>();
   readonly constructionCancelled = output<{ id: number; sessionKey: number }>();
@@ -244,6 +245,7 @@ export class TownComponent implements OnDestroy {
   private incomingCamera = '';
   private lastSession = 0;
   private lastConstruction = 0;
+  private lastFrameworkProof = false;
   private timer?: ReturnType<typeof setTimeout>;
   constructor(private readonly zone: NgZone) {
     afterNextRender(() =>
@@ -290,6 +292,7 @@ export class TownComponent implements OnDestroy {
             this.sessionKey(),
             this.construction(),
             this.assemblyOptions(),
+            this.frameworkProof(),
           );
         } catch (e) {
           console.warn('Town renderer unavailable:', e);
@@ -300,8 +303,16 @@ export class TownComponent implements OnDestroy {
     effect(() => {
       const designs = this.designs(),
         preferences = this.preferences(),
-        assemblyOptions = this.assemblyOptions();
-      this.sync(designs, preferences, this.sessionKey(), this.construction(), assemblyOptions);
+        assemblyOptions = this.assemblyOptions(),
+        frameworkProof = this.frameworkProof();
+      this.sync(
+        designs,
+        preferences,
+        this.sessionKey(),
+        this.construction(),
+        assemblyOptions,
+        frameworkProof,
+      );
     });
   }
   private sync(
@@ -310,6 +321,7 @@ export class TownComponent implements OnDestroy {
     sessionKey: number,
     construction: number,
     assemblyOptions: AssemblyConfigOverride,
+    frameworkProof: boolean,
   ) {
     if (!this.scene) return;
     if (sessionKey !== this.lastSession) {
@@ -321,6 +333,10 @@ export class TownComponent implements OnDestroy {
       this.lastCamera = '';
       // Consume a request from the previous view instead of replaying it in the new scenario.
       this.lastConstruction = construction;
+    }
+    if (frameworkProof !== this.lastFrameworkProof) {
+      this.lastFrameworkProof = frameworkProof;
+      this.scene.setFrameworkProof(frameworkProof);
     }
     const key = JSON.stringify(designs);
     if (this.lastDesigns !== key) {

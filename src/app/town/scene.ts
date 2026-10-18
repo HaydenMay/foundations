@@ -14,6 +14,8 @@ export class TownScene {
   private readonly sun = new T.DirectionalLight('#fff0d5', 2.8);
   private readonly hemi = new T.HemisphereLight('#cad9d4', '#adad91', 1.9);
   private world?: TownWorld;
+  private designs: Record<string, string> = {};
+  private frameworkProof = false;
   private readonly observer: ResizeObserver;
   private readonly ground: T.Mesh<T.PlaneGeometry, T.MeshBasicMaterial>;
   private lighting: Lighting = 'auto';
@@ -104,13 +106,22 @@ export class TownScene {
     document.addEventListener('visibilitychange', this.visibility);
   }
   setDesigns(designs: Record<string, string>) {
+    this.designs = { ...designs };
+    this.rebuildWorld();
+  }
+  setFrameworkProof(enabled: boolean) {
+    if (this.frameworkProof === enabled) return;
+    this.frameworkProof = enabled;
+    this.rebuildWorld();
+  }
+  private rebuildWorld() {
     this.cancelConstruction();
     this.stopTorchFlicker();
     if (this.world) {
       this.scene.remove(this.world.group);
       this.world.assets.dispose();
     }
-    this.world = buildWorld(designs);
+    this.world = buildWorld(this.designs, { frameworkProof: this.frameworkProof });
     const expanded = this.world.projectAssets.has('ch2-neighborhood');
     this.sun.shadow.camera.left = expanded ? -40 : -30;
     this.sun.shadow.camera.right = expanded ? 70 : 30;
@@ -147,7 +158,7 @@ export class TownScene {
       asset.focus,
       done,
       override,
-      projectId === 'ch2-neighborhood',
+      projectId === 'ch2-neighborhood' || projectId === 'framework-proof-neighbor',
     );
   }
   focusProjectPreview(projectId: string) {
