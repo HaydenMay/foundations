@@ -4,7 +4,7 @@ import { App } from './app';
 import { FoundationsStore } from './state.service';
 import { TownComponent } from './town/town.component';
 import { signal } from '@angular/core';
-import { initialState } from './domain/state';
+import { initialState, STORAGE_KEY } from './domain/state';
 
 afterEach(() => {
   TestBed.resetTestingModule();
@@ -75,6 +75,35 @@ it('replays a visible milestone without changing its choice or the real save', (
   expect(store.state().designs['frontGarden']).toBe(chosen);
   expect(store.realState()).toEqual(genuine);
   expect(JSON.parse(store.backupJSON())).toEqual(genuine);
+});
+
+it('keeps multi-piece boundary construction and its selected wall out of real persistence', async () => {
+  localStorage.clear();
+  TestBed.configureTestingModule({ imports: [App] }).overrideComponent(App, {
+    set: { template: '', imports: [] },
+  });
+  const fixture = TestBed.createComponent(App),
+    app = fixture.componentInstance;
+  fixture.detectChanges();
+  await fixture.whenStable();
+  const store = TestBed.inject(FoundationsStore),
+    genuine = structuredClone(store.realState()),
+    serialized = localStorage.getItem(STORAGE_KEY),
+    backup = store.backupJSON();
+  store.enterPreview();
+  store.previewScenario('all');
+  store.previewDesign('boundary', 'stoneWall');
+
+  app.previewConstruction({ projectId: 'boundary', override: { speed: 0.5 } });
+
+  expect(app.constructionProject()).toBe('boundary');
+  expect(app.previewAssemblyOptions()).toEqual({ speed: 0.5 });
+  expect(store.state().designs['boundary']).toBe('stoneWall');
+  expect(store.realState()).toEqual(genuine);
+  expect(localStorage.getItem(STORAGE_KEY)).toBe(serialized);
+  expect(store.backupJSON()).toBe(backup);
+  store.exitPreview();
+  expect(store.state()).toEqual(genuine);
 });
 
 it('makes the existing empty-parcel recipe available for preview without saving simulated stars', () => {

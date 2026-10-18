@@ -19,4 +19,4 @@ $env:CAPTURE_DIR = 'docs/evidence/phase-4-2'
 npm exec --yes --package=node@24.15.0 -- node scripts/capture-phase-4-2.mjs
 ```
 
-The current unit suite passed: 19 files, 164 tests. The production Angular build passed with `/foundations/` as its base path. GitHub Pages deploys only from `main`; this branch has not been deployed, and the live site remains on the last successful `main` deployment.
+The current unit suite passed: 19 files, 165 tests, including a boundary-replay isolation check. The production Angular build passed with `/foundations/` as its base path. GitHub Pages deploys only from `main`; this branch has not been deployed, and the live site remains on the last successful `main` deployment.
