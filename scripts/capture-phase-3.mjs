@@ -1,5 +1,6 @@
 // Captures comparable completed-house baselines or final assembly playback evidence.
-import { chromium, expect } from '@playwright/test';
+import { chromium } from 'playwright';
+import { waitForAttribute, waitForPageCondition, waitForVisible } from './browser-checks.mjs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import assert from 'node:assert/strict';
@@ -72,7 +73,7 @@ try {
     });
 
     await page.goto(url);
-    await expect(page.locator('canvas[data-rendered="true"]')).toBeVisible();
+    await waitForVisible(page.locator('canvas[data-rendered="true"]'));
     if (mode === 'final')
       await page.addStyleTag({ content: '.toast { display: none !important; }' });
     await page.getByRole('button', { name: 'Settings', exact: true }).click();
@@ -80,8 +81,8 @@ try {
     await page.getByRole('button', { name: 'Enter Developer Preview' }).click();
     await page.getByLabel('Test scenario').selectOption('home');
     await page.getByLabel('Preview lighting').selectOption('day');
-    await expect(page.locator('app-town')).toHaveAttribute('data-home-visible', 'true');
-    await expect(page.locator('app-town')).toHaveAttribute('data-lighting', 'day');
+    await waitForAttribute(page, 'app-town', 'data-home-visible', 'true');
+    await waitForAttribute(page, 'app-town', 'data-lighting', 'day');
     await page.getByRole('button', { name: 'Collapse preview controls' }).click();
     await page.getByRole('button', { name: 'Return to your first home' }).click();
     await page.waitForTimeout(150);
@@ -95,7 +96,7 @@ try {
       if (await page.getByTestId('preview-badge').isVisible())
         await page.getByTestId('preview-badge').click();
       await page.locator('#preview-house').selectOption(choice);
-      await expect(page.locator('app-town')).toHaveAttribute('data-home-visible', 'true');
+      await waitForAttribute(page, 'app-town', 'data-home-visible', 'true');
       await page.getByRole('button', { name: 'Collapse preview controls' }).click();
       await page.waitForTimeout(180);
       const frame = await page.evaluate(() => {
@@ -139,10 +140,8 @@ try {
           window.__assemblyFrameControl.freezeAt = performance.now() + 1000;
         });
         await page.getByRole('button', { name: 'Preview construction', exact: true }).click();
-        await expect(page.locator('app-town')).toHaveAttribute('data-construction', 'active');
-        await expect
-          .poll(() => page.evaluate(() => window.__assemblyFrameControl.frozen))
-          .toBe(true);
+        await waitForAttribute(page, 'app-town', 'data-construction', 'active');
+        await waitForPageCondition(page, () => window.__assemblyFrameControl.frozen);
         const during = await page.evaluate(() => {
           const scene = window.__visual?.scene;
           const state = [];
@@ -174,7 +173,7 @@ try {
           window.__assemblyFrameControl.frozen = false;
           window.__assemblyFrameControl.freezeAt = null;
         });
-        await expect(page.locator('app-town')).toHaveAttribute('data-construction', 'idle');
+        await waitForAttribute(page, 'app-town', 'data-construction', 'idle');
       }
     }
     assert.deepEqual(errors, [], `${layout} had browser errors`);

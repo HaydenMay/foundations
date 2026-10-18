@@ -2,7 +2,7 @@
 
 Goal: deliver the owner's autonomous vertical slice, public repository and verified Pages deployment.
 
-Architecture: immutable pure TypeScript domain functions, versioned local store behind an Angular signal service, standalone responsive components and replaceable procedural Three.js assets. Tech: Angular 22, Three.js, Vitest, Playwright, GitHub Actions.
+Architecture: immutable pure TypeScript domain functions, versioned local store behind an Angular signal service, standalone responsive components and replaceable procedural Three.js assets. Tech: Angular 22, Three.js, Vitest, optional Playwright-based visual capture scripts, GitHub Actions.
 
 Spec: [design.md](design.md). Execute inline; the user's autonomous brief supersedes intermediate approval gates.
 

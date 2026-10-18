@@ -1,5 +1,6 @@
 // Real Chromium UI captures with disposable synthetic profiles; no diagnostics ship in the app.
-import { chromium, expect } from '@playwright/test';
+import { chromium } from 'playwright';
+import { waitForAttribute, waitForVisible } from './browser-checks.mjs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import assert from 'node:assert/strict';
@@ -51,7 +52,7 @@ try {
       });
     });
     await page.goto(url);
-    await expect(page.locator('canvas[data-rendered="true"]')).toBeVisible();
+    await waitForVisible(page.locator('canvas[data-rendered="true"]'));
     await page.getByRole('button', { name: 'Settings', exact: true }).click();
     await page.getByLabel('Town lighting').selectOption('day');
     await page.getByRole('button', { name: 'Close dialog' }).click();
@@ -110,9 +111,9 @@ try {
     await page
       .getByRole('button', { name: 'Complete Make a moment to unwind', exact: true })
       .click();
-    await expect(
+    await waitForVisible(
       page.getByRole('heading', { name: 'Your first home is ready!', exact: true }),
-    ).toBeVisible();
+    );
     await capture(`${layout}-home-selection-cottage`);
     if (layout === 'portrait') {
       for (const [name, id] of [
@@ -125,9 +126,7 @@ try {
       await page.getByRole('button', { name: 'Preview Classic Cottage', exact: true }).click();
     }
     await page.getByRole('button', { name: 'Build my home', exact: true }).click();
-    await expect(
-      page.getByRole('button', { name: 'Skip construction', exact: true }),
-    ).toBeVisible();
+    await waitForVisible(page.getByRole('button', { name: 'Skip construction', exact: true }));
     const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('foundations.v1')));
     assert.equal(stored.designs.home, 'sage', 'Home must be durable before animation');
     const animationStart = await page.evaluate(() => ({
@@ -138,7 +137,7 @@ try {
       await page.waitForTimeout(750);
       await capture('portrait-construction', false);
     }
-    await expect(page.locator('app-town')).toHaveAttribute('data-construction', 'idle');
+    await waitForAttribute(page, 'app-town', 'data-construction', 'idle');
     const animationEnd = await page.evaluate(() => ({
       time: performance.now(),
       renders: window.__visual.renders,
@@ -157,7 +156,7 @@ try {
     await page.getByRole('button', { name: 'Developer Preview', exact: true }).click();
     await capture(`${layout}-preview-entry`);
     await page.getByRole('button', { name: 'Enter Developer Preview', exact: true }).click();
-    await expect(page.getByTestId('preview-badge')).toBeVisible();
+    await waitForVisible(page.getByTestId('preview-badge'));
     await capture(`${layout}-preview-controls`);
     if (layout === 'portrait') {
       for (const scenario of ['new', 'ready', 'home', 'several', 'all']) {

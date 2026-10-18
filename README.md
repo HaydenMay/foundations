@@ -28,11 +28,9 @@ Open the URL printed by Angular (normally http://localhost:4200). The applicatio
 npm test                       # Vitest domain and persistence tests, non-watch
 npm run build                  # Production build, /foundations/ base path
 npm run preview                # http://127.0.0.1:4200/foundations/
-npx playwright install chromium
-npm run test:e2e                # Production build must already exist
 ```
 
-The browser suite starts its own preview server when one is not running. It uses Chromium at a 390×664 portrait viewport (390×844 emulated screen), 844×390 landscape, and 1440×1000 desktop, plus a Pacific/Auckland timezone case. Touch gestures are tested in phone projects; the desktop touch-only case is explicitly skipped. Tests use synthetic data and write ignored screenshots/traces into `test-results/`.
+The automated suite is intentionally limited to fast unit tests and the production build. Optional visual evidence scripts in `scripts/` use Playwright and synthetic browser profiles; they are manual capture tools, not tests or deployment gates.
 
 If the host Node is older, a temporary runtime works without upgrading the machine:
 
@@ -108,7 +106,7 @@ No city simulation, traffic, citizens, physics, multiplayer, downloaded art or e
 
 ## GitHub Pages deployment
 
-`.github/workflows/pages.yml` runs on pushes to `main` and manual dispatch. It installs pinned dependencies with `npm ci`, executes unit tests, builds production assets, runs browser tests, uploads `dist/foundations/browser` with `actions/upload-pages-artifact`, and deploys using `actions/deploy-pages`. Deployment uses the `github-pages` environment with Pages-write and OIDC permissions restricted to the deploy job.
+`.github/workflows/pages.yml` runs on pushes to `main` and manual dispatch. It installs pinned dependencies with `npm ci`, runs the unit tests, builds production assets, uploads `dist/foundations/browser` with `actions/upload-pages-artifact`, and deploys using `actions/deploy-pages`. The deploy job uses the `github-pages` environment with Pages-write and OIDC permissions.
 
 Repository Settings → Pages → Source must be **GitHub Actions**. CLI equivalent after the repository has a default branch:
 

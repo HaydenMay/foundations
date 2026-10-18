@@ -1,5 +1,5 @@
 // Actual browser captures with fresh synthetic progress. No diagnostics ship in the application.
-import { chromium } from '@playwright/test';
+import { chromium } from 'playwright';
 import { mkdir, writeFile } from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';

@@ -1,6 +1,6 @@
 // Read-only application instrumentation. Captures use a fresh, synthetic browser profile.
 // Run `npm run build` and `npm run preview` first. No application state is published.
-import { chromium } from '@playwright/test';
+import { chromium } from 'playwright';
 import { mkdir, writeFile } from 'node:fs/promises';
 
 const url = process.env.BASE_URL || 'http://127.0.0.1:4200/foundations/';

@@ -42,9 +42,8 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
-# Browser test artifacts and local wellness backups
+# Local test-run artifacts and wellness backups
 /test-results/
-/playwright-report/
 /foundations-*.json
 /.superpowers/
 /.worktrees/

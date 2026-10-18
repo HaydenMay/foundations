@@ -27,8 +27,8 @@ See [all layouts and the baseline comparison](evidence/phase-3/README.md). The c
 | Check                                                   | Result                                                                                                                      |
 | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | Unit tests (Angular/Vitest)                             | **PASS** — 109 tests across 16 files                                                                                        |
-| Browser suite (Chromium portrait, landscape, desktop)   | **PASS** — 89 passed; **SKIPPED** — 1 expected desktop touch-only pinch case; 90 total                                      |
-| New assembly-preview browser check                      | **PASS** — 1 portrait test; settings complete through preview and genuine storage stays byte-for-byte unchanged             |
+| Browser suite (Chromium portrait, landscape, desktop)   | **PASS (historical)** — 89 passed; 1 expected desktop touch-only pinch case skipped; suite has since been removed          |
+| New assembly-preview browser check                      | **PASS (historical)** — 1 portrait run; genuine storage stayed byte-for-byte unchanged                                      |
 | Production Angular build with `/foundations/` base href | **PASS** — output in `dist/foundations/browser`                                                                             |
 | Final capture and assertions                            | **PASS** — 9 completed views, 3 intermediate frames, consistent camera/light, no console/page errors or horizontal overflow |
 | Physical iPhone/iPad or Safari                          | **SKIPPED** — no physical device or Safari session was available                                                            |
@@ -39,7 +39,7 @@ Chromium's completed Cottage scene measured 96 WebGL draw calls and 186,792 tria
 
 No serialized model or save version changed in this phase. Existing user data and imported saves keep the same shape. The house selection is saved by the existing durable first-home flow before animation is requested; reload shows the saved house and never replays an old construction event. Preview options are not persistent data.
 
-Implementation commit: `19ee8e99bec0cc763f454215d98ad4c7f2d3a5d7`. `final-metrics.json` records the same captured application source commit. The work is currently on `agent/codex/universal-assembly`. **Push and GitHub Pages verification are pending**; the public deployment remains the previous main-branch build until that completes.
+Implementation commit: `19ee8e99bec0cc763f454215d98ad4c7f2d3a5d7`. `final-metrics.json` records the same captured application source commit. The current deployment workflow gates publication on unit tests and the production build; the previously used end-to-end suite has been removed at the owner's request. Optional Playwright-based visual capture scripts remain available for manual evidence gathering.
 
 ## Limitations and recommended mitigation
 
