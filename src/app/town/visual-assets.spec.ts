@@ -18,8 +18,8 @@ describe('residential asset contracts', () => {
     for (const style of ['sage', 'cream', 'blue']) {
       const assets = new AssetLibrary(),
         home = buildStartingHouse(assets, new T.Group(), style),
-        entry = home.assemblies.get('entry')!,
-        bounds = new T.Box3().setFromObject(entry);
+        deck = home.assemblies.get('porch-deck')!,
+        bounds = new T.Box3().setFromObject(deck);
       widths.push(bounds.max.x - bounds.min.x);
       assets.dispose();
     }
@@ -259,9 +259,11 @@ describe('residential asset contracts', () => {
 });
 describe('reference lighting and framing', () => {
   it('keeps torch flames steady by day and gently varies their emission at night', () => {
-    const getIntensity = (Lighting as unknown as {
-      torchFlickerIntensity?: (seconds: number, night: boolean) => number;
-    }).torchFlickerIntensity;
+    const getIntensity = (
+      Lighting as unknown as {
+        torchFlickerIntensity?: (seconds: number, night: boolean) => number;
+      }
+    ).torchFlickerIntensity;
     expect(getIntensity).toBeTypeOf('function');
     const day = getIntensity!(3, false),
       values = [0, 0.2, 0.4, 0.8, 1.3, 2].map((seconds) => getIntensity!(seconds, true));

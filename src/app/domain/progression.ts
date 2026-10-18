@@ -286,8 +286,8 @@ export const PROJECTS: Project[] = [
       ),
       choice(
         'wallSconces',
-        'Exterior Wall Sconces',
-        'Warm, low-intensity lights attached to the house exterior.',
+        'Pathway Lanterns',
+        'Warm, low-intensity lights along the front walk and garden path.',
         '#ddbd80',
         'C',
       ),

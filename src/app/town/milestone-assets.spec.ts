@@ -49,6 +49,42 @@ describe('Phase 4 curated lot compositions', () => {
     }
   });
 
+  it('decomposes the larger Phase 4 projects into stable, mobile-sized construction steps', () => {
+    for (const project of PROJECTS.filter((candidate) =>
+      ['porch', 'retreat', 'gardenExpansion', 'boundary', 'outdoorLighting'].includes(candidate.id),
+    )) {
+      for (const option of project.choices) {
+        const firstAssets = new AssetLibrary(),
+          secondAssets = new AssetLibrary(),
+          first = buildMilestoneProject(firstAssets, new T.Group(), project.id, option.id),
+          second = buildMilestoneProject(secondAssets, new T.Group(), project.id, option.id),
+          ids = [...first.pieces.keys()];
+        const limits: Record<string, [number, number]> = {
+          porch: [5, 12],
+          retreat: [8, 25],
+          gardenExpansion: [8, 16],
+          boundary: [8, 25],
+          outdoorLighting: [4, 12],
+        };
+        expect(ids, `${project.id}/${option.id} has stable deterministic piece IDs`).toEqual([
+          ...second.pieces.keys(),
+        ]);
+        expect(
+          ids.length,
+          `${project.id}/${option.id} has useful assembly detail`,
+        ).toBeGreaterThanOrEqual(limits[project.id][0]);
+        expect(
+          ids.length,
+          `${project.id}/${option.id} avoids excessive assembly pieces`,
+        ).toBeLessThanOrEqual(limits[project.id][1]);
+        expect(first.recipe.pieces.map(({ id }) => id)).toEqual(ids);
+        expect(first.recipe.pieces.map(({ order }) => order)).toEqual(ids.map((_, order) => order));
+        firstAssets.dispose();
+        secondAssets.dispose();
+      }
+    }
+  });
+
   it('keeps feature zones clear of the home entrance, driveway and each other', () => {
     const zones = Object.values(FEATURE_ZONES).filter(
       (zone) => zone.id !== 'boundary' && zone.id !== 'outdoorLighting',
@@ -72,9 +108,10 @@ describe('Phase 4 curated lot compositions', () => {
     const buildPlants = (choice: string) => {
       const assets = new AssetLibrary(),
         project = buildMilestoneProject(assets, new T.Group(), 'gardenExpansion', choice),
-        planting = project.pieces.get('layered-planting')!;
-      const bounds = new T.Box3().setFromObject(planting),
-        height = bounds.max.y - bounds.min.y;
+        bounds = new T.Box3();
+      for (const [id, piece] of project.pieces)
+        if (id.startsWith('garden-cluster-')) bounds.union(new T.Box3().setFromObject(piece));
+      const height = bounds.max.y - bounds.min.y;
       assets.dispose();
       return height;
     };
@@ -86,80 +123,115 @@ describe('Phase 4 curated lot compositions', () => {
     expect(evergreens).toBeLessThan(wildflowers);
   });
 
-  it('builds trimmed hedges as tall solid-green walls without flowering planting', () => {
-    const assets = new AssetLibrary(),
-      project = buildMilestoneProject(assets, new T.Group(), 'boundary', 'trimmedHedge'),
-      wall = project.pieces.get('property-perimeter')!,
-      planting = project.pieces.get('boundary-planting')!,
-      bounds = new T.Box3().setFromObject(wall),
-      colors: string[] = [];
-    planting.traverse((object) => {
-      if (object instanceof T.Mesh) {
-        const mats = Array.isArray(object.material) ? object.material : [object.material];
-        for (const mat of mats)
-          if (mat instanceof T.MeshStandardMaterial) colors.push(`#${mat.color.getHexString()}`);
-      }
-    });
-
-    expect(bounds.max.y - bounds.min.y).toBeGreaterThan(1.3);
-    expect(colors).not.toContain('#d2b4b1');
-    expect(colors).not.toContain('#e9dfbb');
-    assets.dispose();
+  it('keeps boundary designs structural and removes incidental flowers from the stone wall', () => {
+    for (const choice of ['picketFence', 'trimmedHedge', 'stoneWall']) {
+      const assets = new AssetLibrary(),
+        project = buildMilestoneProject(assets, new T.Group(), 'boundary', choice),
+        ids = [...project.pieces.keys()];
+      expect(ids.length, choice).toBeGreaterThanOrEqual(8);
+      expect(ids.length, choice).toBeLessThanOrEqual(25);
+      expect(ids).not.toContain('boundary-planting');
+      expect(
+        ids.every((id) => id.startsWith('boundary-')),
+        choice,
+      ).toBe(true);
+      const bounds = new T.Box3().setFromObject(project.root);
+      expect(bounds.max.y - bounds.min.y, `${choice} has a visible boundary`).toBeGreaterThan(0.45);
+      assets.dispose();
+    }
+    for (const garden of ['flowerBeds', 'evergreenShrubs', 'wildflowerBeds']) {
+      const world = buildWorld({ home: 'sage', boundary: 'stoneWall', gardenExpansion: garden });
+      const wall = world.projectAssets.get('boundary')!;
+      expect(
+        [...wall.pieces.keys()].some((id) => id.includes('planting')),
+        garden,
+      ).toBe(false);
+      world.assets.dispose();
+    }
   });
 
-  it('keeps porch seating clear of the front-door approach in every selected arrangement', () => {
+  it('keeps porch seats out of the front-door path in all three arrangements', () => {
     const doorApproach = { minX: -5.9, maxX: -4.8, minZ: -2.5, maxZ: -1.25 };
     for (const choice of ['rockingChairs', 'porchSwing', 'benchLanterns']) {
       const assets = new AssetLibrary(),
         project = buildMilestoneProject(assets, new T.Group(), 'porch', choice),
-        seating = project.pieces.get('seating')!,
-        porchGround = project.pieces.get('porch-rug-and-planters')!,
-        seatGroups: T.Group[] = [];
-      seating.traverse((object) => {
-        if (object instanceof T.Group && object.name.startsWith('porch-seat-'))
-          seatGroups.push(object);
-      });
-      expect(seatGroups.length, `${choice} exposes its separate seating zones`).toBeGreaterThan(0);
-      expect(new T.Box3().setFromObject(porchGround).min.y, `${choice} porch props rest on the deck`)
-        .toBeLessThan(0.2);
-      for (const seat of seatGroups) {
+        seatGroups = [...project.pieces.entries()].filter(([id]) => id.startsWith('porch-seat-'));
+      expect(seatGroups.length, `${choice} exposes separate furniture items`).toBeGreaterThan(0);
+      for (const [id, seat] of seatGroups) {
         const bounds = new T.Box3().setFromObject(seat);
         const intersects =
           bounds.min.x < doorApproach.maxX &&
           bounds.max.x > doorApproach.minX &&
           bounds.min.z < doorApproach.maxZ &&
           bounds.max.z > doorApproach.minZ;
-        expect(intersects, `${choice} keeps ${seat.name} clear of the door path`).toBe(false);
+        expect(intersects, `${choice} keeps ${id} clear of the door path`).toBe(false);
       }
       assets.dispose();
     }
   });
 
-  it('anchors exterior sconces to style-aware front, rear and side wall locations', () => {
+  it('preserves the legacy lighting choice ID while rendering ground-based pathway lanterns', () => {
     for (const style of ['sage', 'cream', 'blue']) {
       const world = buildWorld({ home: style, outdoorLighting: 'wallSconces' }),
         project = world.projectAssets.get('outdoorLighting')!,
-        hardware = project.pieces.get('lighting-hardware')!,
-        mounts: T.Group[] = [];
-      hardware.traverse((object) => {
-        if (object instanceof T.Group && object.userData['wallSconce']) mounts.push(object);
+        fixtures = [...project.pieces.entries()].filter(([id]) =>
+          id.startsWith('pathway-lantern-'),
+        );
+      expect(fixtures).toHaveLength(6);
+      expect(fixtures.every(([, fixture]) => new T.Box3().setFromObject(fixture).min.y >= 0)).toBe(
+        true,
+      );
+      expect(project.root.getObjectByName('wall-sconce-mount-front-1.02')).toBeUndefined();
+      let pointLights = 0;
+      project.root.traverse((object) => {
+        if (object instanceof T.PointLight) pointLights++;
       });
-      expect(mounts).toHaveLength(6);
-      expect(mounts.map((mount) => mount.userData['wallSconce'].side).sort()).toEqual([
-        'front',
-        'front',
-        'left',
-        'rear',
-        'rear',
-        'right',
-      ]);
-      expect(mounts.every((mount) => mount.userData['wallSconce'].style === style)).toBe(true);
+      expect(pointLights).toBe(0);
+      expect([...project.pieces.keys()].some((id) => id === 'lighting-garden')).toBe(false);
       expect(world.assets.lamps).toHaveLength(2);
+      const driveway = new T.Box3(new T.Vector3(-2.2, 0, -5.6), new T.Vector3(0.55, 2.4, 2.4)),
+        entryPath = new T.Box3(new T.Vector3(-5.565, 0, -0.12), new T.Vector3(-5.135, 1, 1.96));
+      for (const [, fixture] of fixtures) {
+        const bounds = new T.Box3().setFromObject(fixture);
+        expect(bounds.intersectsBox(new T.Box3().setFromObject(world.home!))).toBe(false);
+        expect(bounds.intersectsBox(driveway)).toBe(false);
+        expect(bounds.intersectsBox(entryPath)).toBe(false);
+      }
       world.assets.dispose();
     }
   });
 
-  it('connects string-light runs to their support posts and retains a complete umbrella assembly', () => {
+  it('routes one supported string-light run clear of all house, attraction, and retreat choices', () => {
+    for (const style of ['sage', 'cream', 'blue'])
+      for (const backyard of ['pool', 'trampoline', 'fort'])
+        for (const retreat of ['pergolaSeating', 'stonePatio', 'gardenLounge']) {
+          const world = buildWorld({
+            home: style,
+            backyard,
+            retreat,
+            outdoorLighting: 'stringLights',
+          });
+          const lighting = world.projectAssets.get('outdoorLighting')!;
+          const anchors = lighting.pieces.get('string-light-cable')!.userData[
+            'stringLightAnchors'
+          ] as number[][][];
+          expect(anchors).toHaveLength(1);
+          expect(anchors[0][0][1]).toBe(anchors[0][1][1]);
+          expect(lighting.pieces.has('string-light-post-west')).toBe(true);
+          expect(lighting.pieces.has('string-light-post-east')).toBe(true);
+          for (const projectId of ['home', 'backyard', 'retreat']) {
+            const other =
+              projectId === 'home' ? world.home! : world.projectAssets.get(projectId)!.root;
+            expect(
+              new T.Box3()
+                .setFromObject(lighting.root)
+                .intersectsBox(new T.Box3().setFromObject(other)),
+              `${style}/${backyard}/${retreat} lights clear ${projectId}`,
+            ).toBe(false);
+          }
+          world.assets.dispose();
+        }
+
     const stringAssets = new AssetLibrary(),
       stringProject = buildMilestoneProject(
         stringAssets,
@@ -167,31 +239,27 @@ describe('Phase 4 curated lot compositions', () => {
         'outdoorLighting',
         'stringLights',
       ),
-      anchors = stringProject.pieces.get('warm-light-accents')!.userData[
+      anchors = stringProject.pieces.get('string-light-cable')!.userData[
         'stringLightAnchors'
       ] as number[][][];
-    expect(anchors).toHaveLength(2);
-    expect(anchors).toEqual([
-      [[-6.5, 2.82, -11], [-3.8, 2.82, -11]],
-      [[-6.5, 2.82, -9.45], [-3.8, 2.82, -9.45]],
-    ]);
+    expect(anchors).toHaveLength(1);
+    expect(stringProject.pieces.has('string-light-bulbs')).toBe(true);
     stringAssets.dispose();
 
     const patioAssets = new AssetLibrary(),
       patio = buildMilestoneProject(patioAssets, new T.Group(), 'retreat', 'stonePatio'),
-      umbrella = patio.pieces.get('furnishings')!.getObjectByName('retreat-umbrella')!;
-    expect(umbrella).toBeDefined();
-    expect(umbrella.userData['polePassesThroughTable']).toBe(true);
-    expect(umbrella.getObjectByName('umbrella-base')).toBeDefined();
-    expect(umbrella.getObjectByName('umbrella-pole')).toBeDefined();
-    expect(umbrella.getObjectByName('umbrella-canopy')).toBeDefined();
+      umbrellaBase = patio.pieces.get('retreat-umbrella-base')!,
+      umbrellaPole = patio.pieces.get('retreat-umbrella-pole')!,
+      umbrellaCanopy = patio.pieces.get('retreat-umbrella-canopy')!;
+    expect(umbrellaBase.userData['polePassesThroughTable']).toBe(true);
+    expect(umbrellaPole.userData['polePassesThroughTable']).toBe(true);
+    expect(umbrellaCanopy).toBeDefined();
     patioAssets.dispose();
   });
 
   it('tracks the real outdoor torch flame materials for low-rate night animation', () => {
     const world = buildWorld({ home: 'sage', outdoorLighting: 'gardenTorches' }),
-      flames = (world.assets as unknown as { torchFlames?: T.MeshStandardMaterial[] })
-        .torchFlames;
+      flames = (world.assets as unknown as { torchFlames?: T.MeshStandardMaterial[] }).torchFlames;
     expect(flames?.length).toBeGreaterThan(0);
     expect(world.assets.lamps).toHaveLength(2);
     world.assets.dispose();

@@ -1,10 +1,12 @@
 import * as T from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { AssemblyPieceRecipe, AssemblyRecipe } from './assembly';
 import type { AssetLibrary } from './assets';
 import { batchStatic } from './batching';
 import { buildBackyard } from './backyards';
 import { PROJECTS } from '../domain/progression';
 import { flower, plantTree, shrub } from './landscaping';
+import { PORCH_DECK_TOP_Y } from './residential';
 import { surface } from './surfaces';
 
 export interface FeatureZone {
@@ -175,32 +177,36 @@ function centerpiece(set: PieceSet, choice: string) {
   flowerRow(a, planting, x, z - 0.55, 3, 0.42, choice === 'fountain' ? '#d6c99a' : '#c78d91', 117);
 }
 
-function porch(set: PieceSet, choice: string) {
+function porch(set: PieceSet, choice: string, houseStyle: string) {
   const { a } = set;
-  const ground = part(set, 'porch-rug-and-planters');
-  const structure = part(set, 'seating');
-  const details = part(set, 'warm-entry-details');
-  const centerX = -5.35,
-    frontZ = -1.94,
-    wood = surface(a, 'wood', '#9b724d');
-  const mat = a.group(ground);
-  a.box(mat, surface(a, 'paving', '#b9ad97'), centerX, 0.13, frontZ, 1.55, 0.06, 0.78);
-  const planters = a.group(ground);
-  a.box(details, '#8b8069', centerX, 0.64, -2.39, 0.86, 0.05, 0.16);
-  const seat = (name: string) => {
-    const group = a.group(structure);
-    group.name = `porch-seat-${name}`;
-    group.userData['staticBatchBoundary'] = true;
+  const wood = surface(a, 'wood', '#9b724d'),
+    centerX = -5.35,
+    frontZ = -1.66;
+  const mat = part(set, 'porch-entry-mat');
+  mat.position.y = PORCH_DECK_TOP_Y - 0.1;
+  a.box(mat, surface(a, 'paving', '#b9ad97'), centerX, 0.13, -2.33, 1.55, 0.06, 0.78);
+  for (const [id, x, color] of [
+    ['porch-planter-left', -7.36, '#c6a18b'],
+    ['porch-planter-right', -3.14, '#a7ad91'],
+  ] as const) {
+    const pot = part(set, id);
+    pot.position.y = PORCH_DECK_TOP_Y - 0.12;
+    pot.scale.set(0.85, 1, 0.85);
+    planter(a, pot, x, -2.34, color);
+  }
+  const seat = (name: string, x: number, z = frontZ, y = PORCH_DECK_TOP_Y) => {
+    const group = part(set, `porch-seat-${name}`);
+    group.position.set(x, y, z);
     return group;
   };
   if (choice === 'rockingChairs') {
-    for (const x of [-6.72, -3.98]) {
-      const chair = seat(`rocker-${x < centerX ? 'left' : 'right'}`);
-      a.box(chair, wood, x, 0.47, frontZ, 0.58, 0.12, 0.55);
-      const back = a.box(chair, wood, x, 0.82, frontZ - 0.24, 0.55, 0.65, 0.1);
+    for (const x of [-6.72, -3.4]) {
+      const chair = seat(`rocker-${x < centerX ? 'left' : 'right'}`, x);
+      a.box(chair, wood, 0, 0.47, 0, 0.58, 0.12, 0.55);
+      const back = a.box(chair, wood, 0, 0.82, -0.24, 0.55, 0.65, 0.1);
       back.rotation.x = -0.12;
       for (const side of [-1, 1]) {
-        a.box(chair, wood, x + side * 0.3, 0.6, frontZ, 0.07, 0.38, 0.5);
+        a.box(chair, wood, side * 0.3, 0.6, 0, 0.07, 0.38, 0.5);
         const rocker = a.mesh(
           chair,
           a.cachedGeometry(
@@ -208,9 +214,9 @@ function porch(set: PieceSet, choice: string) {
             () => new T.TorusGeometry(0.2, 0.035, 5, 16, Math.PI),
           ),
           wood,
-          x + side * 0.22,
+          side * 0.22,
           0.235,
-          frontZ,
+          0,
           0.8,
           1,
           1,
@@ -218,97 +224,143 @@ function porch(set: PieceSet, choice: string) {
         rocker.rotation.z = Math.PI;
       }
     }
-    planter(a, planters, -3.25, frontZ, '#c6a18b');
   } else if (choice === 'porchSwing') {
-    const swing = seat('swing-left'),
-      swingX = -6.65;
-    for (const x of [swingX - 0.48, swingX + 0.48]) {
-      a.box(swing, wood, x, 1.35, frontZ - 0.09, 0.055, 2.2, 0.055);
-      a.cylinder(swing, '#4d544a', x, 2.45, frontZ - 0.09, 0.025, 0.18);
-    }
-    a.box(swing, wood, swingX, 0.47, frontZ, 1.32, 0.15, 0.46);
-    const back = a.box(swing, wood, swingX, 0.8, frontZ - 0.2, 1.32, 0.5, 0.12);
+    const swingX = -6.72,
+      swingSeat = seat('swing-left', swingX);
+    a.box(swingSeat, wood, 0, 0.52, 0, 1.02, 0.15, 0.46);
+    const back = a.box(swingSeat, wood, 0, 0.84, -0.2, 1.02, 0.5, 0.12);
     back.rotation.x = -0.08;
-    planter(a, planters, -3.25, frontZ, '#a7ad91');
+    const suspension = part(set, 'porch-swing-suspension'),
+      roofAnchorY = houseStyle === 'cream' ? 2.92 : 2.86,
+      ropeEndY = PORCH_DECK_TOP_Y + 0.595;
+    suspension.userData['roofAnchorY'] = roofAnchorY;
+    for (const x of [swingX - 0.36, swingX + 0.36]) {
+      a.cylinder(
+        suspension,
+        '#50483c',
+        x,
+        (roofAnchorY + ropeEndY) / 2,
+        frontZ - 0.09,
+        0.022,
+        roofAnchorY - ropeEndY,
+      );
+      a.box(suspension, '#6f5b44', x, roofAnchorY - 0.025, frontZ - 0.09, 0.1, 0.05, 0.09);
+    }
   } else {
-    const bench = seat('entry-bench');
-    a.bench(bench, -6.8, frontZ, Math.PI);
-    for (const x of [-6.18, -4.52]) a.lantern(details, x, 1.92, -2.37, false, false);
-    planter(a, planters, -3.25, frontZ, '#a7ad91');
+    const bench = seat('entry-bench', -6.65, -2.0);
+    a.bench(bench, 0, 0, Math.PI / 2);
+    bench.scale.z = 0.83;
+    for (const [id, x] of [
+      ['porch-entry-lantern-left', -5.95],
+      ['porch-entry-lantern-right', -4.75],
+    ] as const) {
+      const lamp = part(set, id);
+      lamp.position.y = PORCH_DECK_TOP_Y - 0.15;
+      a.lantern(lamp, x, 0, -2.15, false, false);
+    }
   }
 }
 
 function retreat(set: PieceSet, choice: string) {
   const { a } = set;
-  const ground = part(set, 'patio-and-path');
-  const structure = part(set, 'shelter-or-seating');
-  const details = part(set, 'furnishings');
-  const planting = part(set, 'retreat-planting');
   const x = -5.18,
     z = -10.22,
     paving = surface(a, 'paving', '#b8ad96'),
     wood = surface(a, 'wood', '#98734e');
+  const ground = part(set, 'retreat-patio-base');
   a.box(ground, paving, x, 0.13, z, 3.48, 0.12, 2.55);
-  for (let xx = -1.4; xx <= 1.4; xx += 0.7)
-    for (let zz = -0.9; zz <= 0.9; zz += 0.65)
-      a.box(ground, '#c8bea7', x + xx, 0.2, z + zz, 0.025, 0.018, 0.025);
+  for (let row = 0; row < 3; row++) {
+    const inlay = part(set, `retreat-patio-inlay-${row + 1}`);
+    for (let xx = -1.4; xx <= 1.4; xx += 0.7)
+      a.box(inlay, '#c8bea7', x + xx, 0.2, z - 0.65 + row * 0.65, 0.025, 0.018, 0.025);
+  }
   if (choice === 'pergolaSeating') {
-    for (const dx of [-1.32, 1.32])
-      for (const dz of [-0.84, 0.84]) {
-        a.box(structure, wood, x + dx, 1.42, z + dz, 0.15, 2.7, 0.15);
-        a.box(structure, '#b7a081', x + dx, 2.8, z + dz, 0.24, 0.12, 0.24);
-      }
-    for (let dx = -1.4; dx <= 1.4; dx += 0.35)
-      a.box(structure, wood, x + dx, 2.68, z, 0.08, 0.1, 1.95);
-    for (const dz of [-0.87, 0.87]) a.box(structure, wood, x, 2.6, z + dz, 3, 0.17, 0.16);
-    a.bench(details, x, z + 0.22, Math.PI);
-    a.box(details, '#d5c5a4', x, 0.68, z - 0.18, 0.52, 0.52, 0.52);
-  } else if (choice === 'stonePatio') {
-    a.box(structure, '#a7a18f', x, 0.43, z, 0.92, 0.1, 0.82);
-    a.cylinder(structure, wood, x, 0.82, z, 0.36, 0.62);
-    a.cylinder(structure, '#d2c6ae', x, 1.16, z, 0.58, 0.11);
-    for (const dx of [-1.05, 1.05]) {
-      a.box(details, wood, x + dx, 0.47, z - 0.08, 0.48, 0.12, 0.46);
-      a.box(details, '#dfd4bd', x + dx, 0.56, z - 0.08, 0.4, 0.09, 0.36);
-      for (const side of [-1, 1])
-        a.box(details, wood, x + dx + side * 0.21, 0.28, z - 0.08, 0.04, 0.42, 0.04);
+    for (const [index, [dx, dz]] of [
+      [-1.32, -0.84],
+      [-1.32, 0.84],
+      [1.32, -0.84],
+      [1.32, 0.84],
+    ].entries()) {
+      const post = part(set, `pergola-post-${index + 1}`);
+      a.box(post, wood, x + dx, 1.42, z + dz, 0.15, 2.7, 0.15);
+      a.box(post, '#b7a081', x + dx, 2.8, z + dz, 0.24, 0.12, 0.24);
     }
-    const umbrella = a.group(details, x, 0, z);
-    umbrella.name = 'retreat-umbrella';
-    umbrella.userData['staticBatchBoundary'] = true;
-    umbrella.userData['polePassesThroughTable'] = true;
-    const base = a.cylinder(umbrella, '#6c685e', 0, 0.31, 0, 0.32, 0.22);
-    base.name = 'umbrella-base';
-    const pole = a.cylinder(umbrella, '#776448', 0, 1.53, 0, 0.045, 2.48);
-    pole.name = 'umbrella-pole';
+    for (const [index, dz] of [-0.87, 0.87].entries()) {
+      const beam = part(set, `pergola-beam-${index + 1}`);
+      a.box(beam, wood, x, 2.6, z + dz, 3, 0.17, 0.16);
+    }
+    for (let half = 0; half < 2; half++) {
+      const slats = part(set, `pergola-roof-slats-${half + 1}`);
+      for (let index = 0; index < 5; index++) {
+        const dx = -1.4 + (half * 5 + index) * 0.35;
+        a.box(slats, wood, x + dx, 2.68, z, 0.08, 0.1, 1.95);
+      }
+    }
+    const bench = part(set, 'pergola-bench');
+    a.bench(bench, x, z + 0.22, Math.PI);
+    const table = part(set, 'pergola-side-table');
+    a.box(table, '#d5c5a4', x, 0.68, z - 0.18, 0.52, 0.52, 0.52);
+  } else if (choice === 'stonePatio') {
+    const tableBase = part(set, 'patio-table-base');
+    a.box(tableBase, '#a7a18f', x, 0.43, z, 0.92, 0.1, 0.82);
+    a.cylinder(tableBase, wood, x, 0.82, z, 0.36, 0.62);
+    const tableTop = part(set, 'patio-table-top');
+    a.cylinder(tableTop, '#d2c6ae', x, 1.16, z, 0.58, 0.11);
+    for (const [index, dx] of [-1.05, 1.05].entries()) {
+      const chair = part(set, `patio-chair-${index + 1}`);
+      a.box(chair, wood, x + dx, 0.47, z - 0.08, 0.48, 0.12, 0.46);
+      a.box(chair, '#dfd4bd', x + dx, 0.56, z - 0.08, 0.4, 0.09, 0.36);
+      for (const side of [-1, 1])
+        a.box(chair, wood, x + dx + side * 0.21, 0.28, z - 0.08, 0.04, 0.42, 0.04);
+    }
+    const umbrellaBase = part(set, 'retreat-umbrella-base');
+    umbrellaBase.userData['polePassesThroughTable'] = true;
+    a.cylinder(umbrellaBase, '#6c685e', x, 0.31, z, 0.32, 0.22);
+    const umbrellaPole = part(set, 'retreat-umbrella-pole');
+    umbrellaPole.userData['polePassesThroughTable'] = true;
+    a.cylinder(umbrellaPole, '#776448', x, 1.53, z, 0.045, 2.48);
+    const umbrellaCanopy = part(set, 'retreat-umbrella-canopy');
     const canopy = a.mesh(
-      umbrella,
+      umbrellaCanopy,
       a.cachedGeometry('retreat-umbrella-canopy', () => new T.ConeGeometry(1.08, 0.5, 12)),
       '#d0c2a3',
-      0,
+      x,
       2.62,
-      0,
+      z,
     );
     canopy.name = 'umbrella-canopy';
     canopy.castShadow = false;
   } else {
-    const lounge = a.group(structure, 0, 0, 0);
-    lounge.name = 'garden-lounge-shelter';
-    for (const dx of [-1.15, 1.15]) {
-      a.box(lounge, wood, x + dx, 1.27, z, 0.12, 2.35, 0.12);
-      a.box(lounge, '#b69c78', x + dx, 2.46, z, 0.2, 0.1, 0.18);
+    for (const [index, dx] of [-1.15, 1.15].entries()) {
+      const post = part(set, `lounge-post-${index + 1}`);
+      a.box(post, wood, x + dx, 1.27, z, 0.12, 2.35, 0.12);
+      a.box(post, '#b69c78', x + dx, 2.46, z, 0.2, 0.1, 0.18);
     }
-    a.box(lounge, '#a89573', x, 2.45, z, 2.48, 0.12, 1.65);
-    for (let dx = -1.1; dx <= 1.1; dx += 0.35)
-      a.box(lounge, wood, x + dx, 2.36, z, 0.055, 0.16, 1.55);
-    a.bench(details, x - 0.25, z + 0.24, Math.PI / 2);
-    a.box(details, '#c1b29c', x - 0.22, 0.78, z + 0.18, 1.1, 0.24, 0.56);
-    a.box(details, '#d9c9ae', x - 1.28, 0.83, z + 0.2, 0.2, 0.28, 0.62);
-    a.box(details, '#d9c9ae', x + 0.84, 0.83, z + 0.2, 0.2, 0.28, 0.62);
-    planter(a, details, x - 1.45, z + 0.78, '#d3a49a');
-    planter(a, details, x + 1.45, z + 0.78, '#a9b493');
+    const canopy = part(set, 'lounge-roof');
+    a.box(canopy, '#a89573', x, 2.45, z, 2.48, 0.12, 1.65);
+    for (let half = 0; half < 2; half++) {
+      const slats = part(set, `lounge-roof-slats-${half + 1}`);
+      for (let index = 0; index < 4; index++) {
+        const dx = -1.1 + (half * 4 + index) * 0.31;
+        a.box(slats, wood, x + dx, 2.36, z, 0.055, 0.16, 1.55);
+      }
+    }
+    const bench = part(set, 'lounge-bench');
+    a.bench(bench, x - 0.25, z + 0.24, Math.PI / 2);
+    const cushions = part(set, 'lounge-cushions');
+    a.box(cushions, '#c1b29c', x - 0.22, 0.78, z + 0.18, 1.1, 0.24, 0.56);
+    a.box(cushions, '#d9c9ae', x - 1.28, 0.83, z + 0.2, 0.2, 0.28, 0.62);
+    a.box(cushions, '#d9c9ae', x + 0.84, 0.83, z + 0.2, 0.2, 0.28, 0.62);
+    for (const [index, [dx, color]] of (
+      [
+        [-1.45, '#d3a49a'],
+        [1.45, '#a9b493'],
+      ] as const
+    ).entries()) {
+      const pot = part(set, `lounge-planter-${index + 1}`);
+      planter(a, pot, x + dx, z + 0.78, color);
+    }
   }
-  for (const dx of [-1.92, 1.92]) shrub(a, planting, x + dx, z + 0.85, 0.35, true, dx + 159);
 }
 
 function flowerStem(
@@ -340,13 +392,24 @@ function flowerStem(
 function gardenExpansion(set: PieceSet, choice: string) {
   const { a } = set;
   const bed = part(set, 'long-garden-bed');
-  const edging = part(set, 'stone-edging');
-  const plants = part(set, 'layered-planting');
   const x = -11.25,
     z = -1.45;
   a.box(bed, '#766044', x, 0.1, z, 2.2, 0.1, 1.8);
-  for (const dx of [-1.12, 1.12]) a.box(edging, '#b2a890', x + dx, 0.18, z, 0.06, 0.13, 1.88);
-  for (const dz of [-0.92, 0.92]) a.box(edging, '#b2a890', x, 0.18, z + dz, 2.28, 0.13, 0.08);
+  for (const [id, edgeX, edgeZ, width, depth] of [
+    ['garden-edge-west', x - 1.12, z, 0.06, 1.88],
+    ['garden-edge-east', x + 1.12, z, 0.06, 1.88],
+    ['garden-edge-north', x, z - 0.92, 2.28, 0.08],
+    ['garden-edge-south', x, z + 0.92, 2.28, 0.08],
+  ] as const) {
+    const edge = part(set, id);
+    a.box(edge, '#b2a890', edgeX, 0.18, edgeZ, width, 0.13, depth);
+  }
+  const plants = [
+    part(set, 'garden-cluster-west'),
+    part(set, 'garden-cluster-center'),
+    part(set, 'garden-cluster-east'),
+  ];
+  const cluster = (dx: number) => plants[dx < -0.3 ? 0 : dx > 0.3 ? 2 : 1];
   if (choice === 'evergreenShrubs') {
     for (const [index, [dx, dz]] of [
       [-0.62, -0.45],
@@ -358,36 +421,66 @@ function gardenExpansion(set: PieceSet, choice: string) {
       [0, 0.53],
       [0.62, 0.53],
     ].entries())
-      shrub(a, plants, x + dx, z + dz, index % 3 === 0 ? 0.28 : 0.24, false, 211 + index);
+      shrub(a, cluster(dx), x + dx, z + dz, index % 3 === 0 ? 0.28 : 0.24, false, 211 + index);
   } else if (choice === 'flowerBeds') {
-    // Deliberate low rows create a dense, colorful border that reads as tended planting.
-    for (const [index, [dx, dz]] of [
-      [-0.74, -0.55],
-      [-0.25, -0.55],
-      [0.25, -0.55],
-      [0.74, -0.55],
+    // Use one merged low-poly foliage mesh per section so the finished lot stays within its
+    // mobile draw-call budget while preserving separate, reversible construction pieces.
+    const flowerColors = [
+      ['#c57979', '#ead9b2'],
+      ['#897fa4', '#d89c83'],
+      ['#c57979', '#e1c36f'],
+    ];
+    const flowerSpots = [
+      [-0.5, -0.28],
+      [-0.2, -0.32],
+      [0.16, -0.28],
+      [0.48, -0.22],
+      [-0.43, 0.22],
+      [-0.08, 0.3],
+      [0.27, 0.2],
+      [0.5, 0.28],
+    ];
+    for (const [index, center] of [
       [-0.74, 0],
-      [-0.25, 0],
-      [0.25, 0],
+      [0, 0],
       [0.74, 0],
-      [-0.74, 0.55],
-      [-0.25, 0.55],
-      [0.25, 0.55],
-      [0.74, 0.55],
     ].entries()) {
-      shrub(a, plants, x + dx, z + dz, 0.2, false, 231 + index);
-      const heights = [0.37, 0.43, 0.4, 0.46];
-      const colors = ['#c57979', '#ead9b2', '#897fa4', '#d89c83', '#e1c36f'];
-      flowerStem(
-        a,
-        plants,
-        x + dx + (index % 2 ? 0.1 : -0.1),
-        z + dz + (index % 3 === 0 ? 0.09 : -0.08),
-        heights[index % heights.length],
-        colors[index % colors.length],
-        0,
-        0.09,
+      const group = plants[index];
+      const mound = a.mesh(
+        group,
+        a.cachedGeometry('phase4-flowering-bed-mound', () => {
+          const lobes = [
+            [-0.28, 0.02, -0.12, 0.37],
+            [-0.08, 0.08, 0.1, 0.42],
+            [0.19, 0.03, -0.08, 0.39],
+            [0.34, 0.06, 0.12, 0.31],
+          ].map(([lx, ly, lz, radius]) => {
+            const blob = new T.IcosahedronGeometry(1, 0);
+            blob.scale(radius, radius * 0.72, radius * 0.84);
+            blob.translate(lx, ly, lz);
+            return blob;
+          });
+          const merged = mergeGeometries(lobes, false)!;
+          lobes.forEach((blob) => blob.dispose());
+          return merged;
+        }),
+        '#65784f',
+        x + center[0],
+        0.32,
+        z,
       );
+      mound.castShadow = false;
+      const colors = flowerColors[index];
+      for (const [spot, [dx, dz]] of flowerSpots.entries())
+        flower(
+          a,
+          group,
+          x + center[0] + dx * 0.62,
+          0.62 + (spot % 2) * 0.035,
+          z + dz,
+          colors[spot % 2],
+          0.085,
+        );
     }
   } else {
     // Irregular clusters, taller stems and scattered grasses distinguish the meadow-like option.
@@ -405,7 +498,16 @@ function gardenExpansion(set: PieceSet, choice: string) {
       [0.57, 0.62, 1.08, '#b4819a', -0.11],
     ];
     for (const [index, [dx, dz, height, color, lean]] of blooms.entries())
-      flowerStem(a, plants, x + dx, z + dz, height, color, lean, index % 3 === 0 ? 0.095 : 0.08);
+      flowerStem(
+        a,
+        cluster(dx),
+        x + dx,
+        z + dz,
+        height,
+        color,
+        lean,
+        index % 3 === 0 ? 0.095 : 0.08,
+      );
     const grass = a.cachedGeometry(
       'phase4-wildflower-grass',
       () => new T.CylinderGeometry(0.005, 0.018, 1, 4),
@@ -425,7 +527,7 @@ function gardenExpansion(set: PieceSet, choice: string) {
       [0.42, 0.4, 0.58, -0.12],
     ].entries()) {
       const blade = a.mesh(
-        plants,
+        cluster(dx),
         grass,
         index % 2 ? '#73845a' : '#899468',
         x + dx,
@@ -442,7 +544,7 @@ function gardenExpansion(set: PieceSet, choice: string) {
 }
 
 function clippedHedge(a: AssetLibrary, parent: T.Object3D, x: number, z: number, scale = 1) {
-  const colors = ['#4c6247', '#566c4d', '#607550'];
+  const colors = ['#566c4d', '#566c4d', '#566c4d'];
   for (let i = 0; i < colors.length; i++)
     a.sphere(
       parent,
@@ -458,80 +560,94 @@ function clippedHedge(a: AssetLibrary, parent: T.Object3D, x: number, z: number,
 
 function boundary(set: PieceSet, choice: string) {
   const { a } = set;
-  const perimeter = part(set, 'property-perimeter');
-  const details = part(set, 'open-gate-details');
-  const planting = part(set, 'boundary-planting');
   const lowStone = choice === 'stoneWall';
   const hedge = choice === 'trimmedHedge';
-  const material = choice === 'picketFence' ? '#e6e1d1' : lowStone ? '#999589' : '#667b58';
-  const post = (x: number, z: number, vertical = false) => {
+  const material = choice === 'picketFence' ? '#e6e1d1' : lowStone ? '#999589' : '#566c4d';
+  const addSpan = (id: string, axis: 'x' | 'z', start: number, end: number, fixed: number) => {
+    const span = part(set, id),
+      vertical = axis === 'z',
+      length = end - start,
+      mid = (start + end) / 2,
+      x = vertical ? fixed : mid,
+      z = vertical ? mid : fixed;
     if (hedge) {
-      clippedHedge(a, perimeter, x, z, 0.82);
+      for (let value = start + 0.28; value < end - 0.15; value += 0.38)
+        clippedHedge(a, span, vertical ? fixed : value, vertical ? value : fixed, 0.72);
     } else if (lowStone) {
-      a.box(perimeter, material, x, 0.34, z, vertical ? 0.34 : 0.5, 0.58, vertical ? 0.5 : 0.34);
-      a.box(perimeter, '#beb8a7', x, 0.66, z, vertical ? 0.42 : 0.56, 0.1, vertical ? 0.56 : 0.42);
+      a.box(span, material, x, 0.34, z, vertical ? 0.34 : length, 0.58, vertical ? length : 0.34);
+      a.box(span, material, x, 0.69, z, vertical ? 0.42 : length, 0.12, vertical ? length : 0.42);
+      a.box(span, material, x, 0.4, z, vertical ? 0.48 : 0.42, 0.7, vertical ? 0.42 : 0.48);
+      a.box(span, material, x, 0.79, z, vertical ? 0.54 : 0.48, 0.08, vertical ? 0.48 : 0.54);
     } else {
-      a.box(perimeter, '#eee8d8', x, 0.53, z, vertical ? 0.1 : 0.58, 1, vertical ? 0.58 : 0.1);
-      a.box(perimeter, '#eee8d8', x, 0.92, z, vertical ? 0.17 : 0.65, 0.12, vertical ? 0.65 : 0.17);
+      const step = 0.64;
+      for (let value = start + 0.32; value < end - 0.1; value += step) {
+        const postX = vertical ? fixed : value,
+          postZ = vertical ? value : fixed;
+        a.box(span, material, postX, 0.53, postZ, vertical ? 0.1 : 0.58, 1, vertical ? 0.58 : 0.1);
+        a.box(
+          span,
+          material,
+          postX,
+          0.92,
+          postZ,
+          vertical ? 0.17 : 0.65,
+          0.12,
+          vertical ? 0.65 : 0.17,
+        );
+      }
+      if (axis === 'x') {
+        for (const y of [0.36, 0.73]) a.box(span, material, x, y, z, length, 0.08, 0.07);
+      } else {
+        for (const y of [0.36, 0.73]) a.box(span, material, x, y, z, 0.07, 0.08, length);
+      }
     }
+    span.traverse((object) => {
+      if (object instanceof T.Mesh) object.castShadow = false;
+    });
   };
-  const line = (
-    axis: 'x' | 'z',
-    start: number,
-    end: number,
-    fixed: number,
-    gap?: [number, number],
-  ) => {
-    const hedgeInset = hedge && axis === 'x' ? 0.36 : 0,
-      from = start + hedgeInset,
-      to = end - hedgeInset;
-    for (let value = from; value <= to + 0.001; value += hedge ? 0.32 : 0.64) {
-      if (gap && value > gap[0] && value < gap[1]) continue;
-      const x = axis === 'x' ? value : fixed;
-      const z = axis === 'z' ? value : fixed;
-      post(x, z, axis === 'z');
-    }
-    if (hedge) return;
-    const length = end - start;
-    const mid = (start + end) / 2;
-    if (axis === 'x') {
-      if (lowStone) a.box(perimeter, '#b5ad9b', mid, 0.63, fixed, length, 0.12, 0.42);
-      else
-        for (const y of [0.36, 0.73])
-          a.box(perimeter, '#ddd8c8', mid, y, fixed, length, 0.08, 0.07);
-    } else if (lowStone) a.box(perimeter, '#b5ad9b', fixed, 0.63, mid, 0.42, 0.12, length);
-    else
-      for (const y of [0.36, 0.73]) a.box(perimeter, '#ddd8c8', fixed, y, mid, 0.07, 0.08, length);
-  };
-  // Three enclosed edges plus front segments with generous gaps for the existing walk and drive.
-  line('x', -12.55, 0.7, -11.86);
-  line('z', -11.86, 0.98, hedge ? -12.5 : -12.58);
-  line('z', -11.86, 0.98, hedge ? 0.5 : 0.9);
-  line('x', -12.55, -8.85, hedge ? 0.98 : 1.0);
-  line('x', -5.6, -2.45, hedge ? 0.98 : 1.0);
+  const split = (start: number, end: number, count: number) =>
+    Array.from({ length: count }, (_, index) => {
+      const size = (end - start) / count;
+      return [start + index * size, start + (index + 1) * size] as const;
+    });
+  // Five runs split into short, stable pieces; the front keeps clear pedestrian and driveway gates.
+  for (const [index, [start, end]] of split(-12.55, 0.7, 5).entries())
+    addSpan(`boundary-back-${index + 1}`, 'x', start, end, -11.86);
+  for (const [index, [start, end]] of split(-11.86, 0.98, 5).entries()) {
+    addSpan(`boundary-west-${index + 1}`, 'z', start, end, hedge ? -12.5 : -12.58);
+    addSpan(`boundary-east-${index + 1}`, 'z', start, end, hedge ? 0.5 : 0.9);
+  }
+  for (const [index, [start, end]] of split(-12.55, -8.85, 2).entries())
+    addSpan(`boundary-front-walk-${index + 1}`, 'x', start, end, hedge ? 0.98 : 1.0);
+  for (const [index, [start, end]] of split(-5.6, -2.45, 2).entries())
+    addSpan(`boundary-front-drive-${index + 1}`, 'x', start, end, hedge ? 0.98 : 1.0);
   // Gate piers make the open path and driveway intentional in all three boundary styles.
-  for (const [x, z] of [
+  for (const [index, [x, z]] of [
     [-8.85, 1.0],
     [-5.6, 1.0],
     [-2.45, 1.0],
     [hedge ? -12.5 : -12.58, hedge ? 0.98 : 1.0],
     [hedge ? 0.5 : 0.7, hedge ? 0.98 : 1.0],
-  ]) {
-    if (hedge) clippedHedge(a, details, x, z, 0.82);
+  ].entries()) {
+    const pier = part(set, `boundary-gate-pier-${index + 1}`);
+    if (hedge) clippedHedge(a, pier, x, z, 0.82);
     else {
-      a.box(details, lowStone ? '#89877d' : '#ddd8c8', x, 0.46, z, 0.4, 0.9, 0.4);
-      if (!lowStone) a.box(details, '#f2eddf', x, 0.95, z, 0.46, 0.12, 0.46);
+      a.box(pier, material, x, 0.46, z, 0.4, 0.9, 0.4);
+      if (!lowStone) a.box(pier, material, x, 0.95, z, 0.46, 0.12, 0.46);
     }
-  }
-  if (hedge) {
-    for (const x of [-11.9, -11.25, -10.6, -9.95])
-      shrub(a, planting, x, -2.2, 0.26, false, x + 291);
-  } else {
-    for (const x of [-11.9, -11.25, -10.6, -9.95]) shrub(a, planting, x, -2.2, 0.26, true, x + 301);
+    pier.traverse((object) => {
+      if (object instanceof T.Mesh) object.castShadow = false;
+    });
   }
 }
 
-function stringLight(a: AssetLibrary, p: T.Object3D, from: T.Vector3, to: T.Vector3) {
+function stringLight(
+  a: AssetLibrary,
+  cable: T.Object3D,
+  bulbs: T.Object3D,
+  from: T.Vector3,
+  to: T.Vector3,
+) {
   const bulb = a.namedMaterial(
     'phase4-string-light-bulb',
     () =>
@@ -542,17 +658,20 @@ function stringLight(a: AssetLibrary, p: T.Object3D, from: T.Vector3, to: T.Vect
         roughness: 0.42,
       }),
   );
-  const quarter = from.clone().lerp(to, 0.25),
-    middle = from.clone().lerp(to, 0.5),
-    threeQuarter = from.clone().lerp(to, 0.75);
-  quarter.y = threeQuarter.y = 2.59;
-  middle.y = 2.45;
-  const curve = new T.CatmullRomCurve3([from, quarter, middle, threeQuarter, to]);
-  a.mesh(p, a.geometry(new T.TubeGeometry(curve, 14, 0.025, 5, false)), '#685b46', 0, 0, 0);
+  const sag = 0.14,
+    curve = new T.QuadraticBezierCurve3(
+      from,
+      from
+        .clone()
+        .lerp(to, 0.5)
+        .add(new T.Vector3(0, -sag * 2, 0)),
+      to,
+    );
+  a.mesh(cable, a.geometry(new T.TubeGeometry(curve, 14, 0.025, 5, false)), '#685b46', 0, 0, 0);
   for (let i = 0; i < 7; i++) {
     const point = curve.getPoint(i / 6);
     const mesh = a.mesh(
-      p,
+      bulbs,
       a.cachedGeometry('phase4-string-light-globe', () => new T.SphereGeometry(0.075, 8, 6)),
       bulb,
       point.x,
@@ -563,49 +682,32 @@ function stringLight(a: AssetLibrary, p: T.Object3D, from: T.Vector3, to: T.Vect
   }
 }
 
-function wallSconce(
-  set: PieceSet,
-  x: number,
-  y: number,
-  z: number,
-  side: 'front' | 'rear' | 'left' | 'right',
-  style: string,
-) {
-  const { a } = set,
-    rotation = side === 'rear' ? Math.PI : side === 'left' ? -Math.PI / 2 : side === 'right' ? Math.PI / 2 : 0,
-    mount = a.group(set.pieces.get('lighting-hardware')!, x, y, z, rotation);
-  mount.name = `wall-sconce-mount-${side}-${x.toFixed(2)}`;
-  mount.userData['wallSconce'] = { side, style };
-  a.box(mount, '#4f554d', 0, 0, 0, 0.2, 0.28, 0.08);
-  a.box(mount, '#4f554d', 0, -0.02, 0.09, 0.07, 0.08, 0.18);
-  const lamp = a.group(set.pieces.get('warm-light-accents')!, x, y, z, rotation);
-  a.lantern(lamp, 0, 0, 0.18, false, false);
-}
-
-function outdoorLighting(set: PieceSet, choice: string, houseStyle: string) {
+function outdoorLighting(set: PieceSet, choice: string) {
   const { a } = set;
-  const hardware = part(set, 'lighting-hardware');
-  const accents = part(set, 'warm-light-accents');
-  const plants = part(set, 'lighting-garden');
   if (choice === 'stringLights') {
-    for (const x of [-6.5, -3.8])
-      for (const z of [-11.0, -9.45]) a.box(hardware, '#705c43', x, 1.5, z, 0.12, 3, 0.12);
-    const runs = [
-      [new T.Vector3(-6.5, 2.82, -11), new T.Vector3(-3.8, 2.82, -11)],
-      [new T.Vector3(-6.5, 2.82, -9.45), new T.Vector3(-3.8, 2.82, -9.45)],
-    ];
-    accents.userData['stringLightAnchors'] = runs.map(([from, to]) => [from.toArray(), to.toArray()]);
-    for (const [from, to] of runs) stringLight(a, accents, from, to);
-    for (const x of [-6.8, -3.45]) planter(a, plants, x, -9.55, '#d2b18b');
+    const from = new T.Vector3(-8.48, 2.82, -8.34),
+      to = new T.Vector3(-2.52, 2.82, -8.34),
+      west = part(set, 'string-light-post-west'),
+      east = part(set, 'string-light-post-east'),
+      cable = part(set, 'string-light-cable'),
+      bulbs = part(set, 'string-light-bulbs');
+    a.box(west, '#705c43', from.x, from.y / 2, from.z, 0.14, from.y, 0.14);
+    a.box(east, '#705c43', to.x, to.y / 2, to.z, 0.14, to.y, 0.14);
+    const footWest = a.box(west, '#8a765b', from.x, 0.1, from.z, 0.28, 0.2, 0.28),
+      footEast = a.box(east, '#8a765b', to.x, 0.1, to.z, 0.28, 0.2, 0.28);
+    footWest.castShadow = footEast.castShadow = false;
+    cable.userData['stringLightAnchors'] = [[from.toArray(), to.toArray()]];
+    stringLight(a, cable, bulbs, from, to);
   } else if (choice === 'gardenTorches') {
-    for (const [x, z] of [
+    for (const [index, [x, z]] of [
       [-8.8, -6.15],
       [-9.15, -7.15],
       [-6.9, -9.1],
       [-3.35, -9.15],
-    ]) {
-      a.cylinder(hardware, '#76583b', x, 0.72, z, 0.055, 1.35);
-      a.cylinder(hardware, '#a8794c', x, 1.4, z, 0.12, 0.12);
+    ].entries()) {
+      const torch = part(set, `garden-torch-${index + 1}`);
+      a.cylinder(torch, '#76583b', x, 0.72, z, 0.055, 1.35);
+      a.cylinder(torch, '#a8794c', x, 1.4, z, 0.12, 0.12);
       const flameMaterial = a.namedMaterial(
         'phase4-torch-glow',
         () =>
@@ -627,7 +729,7 @@ function outdoorLighting(set: PieceSet, choice: string, houseStyle: string) {
       if (!a.torchFlames.includes(flameMaterial)) a.torchFlames.push(flameMaterial);
       if (!a.torchFlames.includes(innerMaterial)) a.torchFlames.push(innerMaterial);
       const flame = a.mesh(
-        accents,
+        torch,
         a.cachedGeometry('phase4-torch-flame', () => new T.ConeGeometry(0.09, 0.22, 7)),
         flameMaterial,
         x,
@@ -637,7 +739,7 @@ function outdoorLighting(set: PieceSet, choice: string, houseStyle: string) {
       flame.castShadow = false;
       flame.name = 'visible-torch-flame';
       const core = a.mesh(
-        accents,
+        torch,
         a.cachedGeometry('phase4-torch-core', () => new T.ConeGeometry(0.046, 0.14, 6)),
         innerMaterial,
         x,
@@ -646,19 +748,18 @@ function outdoorLighting(set: PieceSet, choice: string, houseStyle: string) {
       );
       core.castShadow = false;
     }
-    planter(a, plants, -7.15, -7.8, '#ad9580');
-    planter(a, plants, -3.1, -8.5, '#c0a18a');
   } else {
-    const frontLocal = houseStyle === 'cream' ? [-2.15, 1.65] : [-1.02, 0.55],
-      rearLocal = [-1.0, 0.56];
-    for (const localX of frontLocal)
-      wallSconce(set, -5 + localX, 1.95, -2.4, 'front', houseStyle);
-    for (const localX of rearLocal)
-      wallSconce(set, -5 + localX, 1.9, -6.8, 'rear', houseStyle);
-    wallSconce(set, -7.9, 1.85, -4.6, 'left', houseStyle);
-    wallSconce(set, -2.1, 1.85, -4.6, 'right', houseStyle);
-    planter(a, plants, -7.85, -1.0, '#c0a18d');
-    planter(a, plants, -2.82, -1.0, '#a7ad91');
+    for (const [index, [x, z]] of [
+      [-6.08, 0.18],
+      [-6.08, 0.5],
+      [-6.08, 0.85],
+      [-4.62, 0.18],
+      [-4.62, 0.5],
+      [-4.62, 0.85],
+    ].entries()) {
+      const fixture = part(set, `pathway-lantern-${index + 1}`);
+      a.lantern(fixture, x, 1.1, z, true, false);
+    }
   }
 }
 
@@ -739,7 +840,7 @@ function compose(set: PieceSet, choice: string, houseStyle: string) {
       break;
     }
     case 'porch':
-      porch(set, choice);
+      porch(set, choice, houseStyle);
       break;
     case 'retreat':
       retreat(set, choice);
@@ -751,7 +852,7 @@ function compose(set: PieceSet, choice: string, houseStyle: string) {
       boundary(set, choice);
       break;
     case 'outdoorLighting':
-      outdoorLighting(set, choice, houseStyle);
+      outdoorLighting(set, choice);
       break;
     case 'signature':
       signature(set, choice);

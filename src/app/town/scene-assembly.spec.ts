@@ -158,9 +158,13 @@ it('reveals a selected milestone composition, focuses its lot zone and returns h
     staggerMs: 0,
     concurrency: 1,
   });
+  const firstPiece = f.projectPieces.get('beds')!;
+  expect(firstPiece.position.y).toBeGreaterThan(2);
+  expect(f.cameraSet).not.toHaveBeenCalled();
   f.frame(0);
-  expect(f.projectPieces.get('beds')?.position.y).toBeGreaterThan(2);
-  f.frame(400);
+  expect(firstPiece.position.y).toBeGreaterThan(2);
+  f.frame(300);
+  expect(firstPiece.position.y).toBeGreaterThan(2);
   expect(f.cameraSet).toHaveBeenCalledWith(
     expect.objectContaining({
       x: expect.any(Number),
@@ -171,6 +175,7 @@ it('reveals a selected milestone composition, focuses its lot zone and returns h
   const focus = f.cameraSet.mock.calls.at(-1)?.[0];
   expect(focus.x).toBeLessThan(4);
   expect(focus.z).toBeLessThan(2);
+  expect(focus).not.toEqual({ x: -7, z: -5, zoom: 1.35, angle: 0 });
   f.frame(1000);
   expect(f.done).toHaveBeenCalledOnce();
   expect(f.projectPieces.get('beds')?.position.y).toBe(2);
@@ -229,7 +234,9 @@ it('replays every production Phase 4 recipe ten times without drift or duplicate
       [...PROJECTS.map((project) => project.id), 'chapter'].sort(),
     );
     for (const asset of assets) {
-      expect([...asset.pieces.keys()], asset.id).toEqual(asset.recipe.pieces.map((piece) => piece.id));
+      expect([...asset.pieces.keys()], asset.id).toEqual(
+        asset.recipe.pieces.map((piece) => piece.id),
+      );
       const count = meshCount(asset.root),
         baseline = asset.recipe.pieces.map(({ id }) => {
           const piece = asset.pieces.get(id)!;
