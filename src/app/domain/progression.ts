@@ -1,17 +1,24 @@
 import { AppState, Choice, Project } from './models';
 import { lifetimeStars } from './habits';
-const choice = (id: string, name: string, description: string, color: string): Choice => ({
-  id,
-  name,
-  description,
-  color,
-});
+
+const choice = (
+  id: string,
+  name: string,
+  description: string,
+  color: string,
+  set?: 'A' | 'B' | 'C',
+): Choice => ({ id, name, description, color, set });
+
+export const CHAPTER_COMPLETE_THRESHOLD = 100;
+
+/** The current, continuous original-home progression. */
 export const PROJECTS: Project[] = [
   {
     id: 'home',
     name: 'Your First Home',
     threshold: 0,
     icon: 'home',
+    zone: 'home',
     description: 'Your first healthy step unlocks a home. Choose where your story begins.',
     choices: [
       choice(
@@ -19,49 +26,308 @@ export const PROJECTS: Project[] = [
         'Classic Cottage',
         'Cream clapboard, dark shingles, twin dormers and a welcoming white porch.',
         '#d7d0ba',
+        'A',
       ),
       choice(
         'cream',
         'Modern Craftsman',
         'Warm timber, layered gables and stone porch supports.',
         '#ae8b62',
+        'B',
       ),
       choice(
         'blue',
         'Traditional Brick',
         'Warm brick, charcoal shingles, white trim and a classic entrance.',
         '#a66f55',
+        'C',
+      ),
+    ],
+  },
+  {
+    id: 'frontGarden',
+    name: 'A Garden at the Door',
+    threshold: 10,
+    icon: 'leaf',
+    zone: 'front-garden',
+    description: 'A welcoming planting bed brings color to the front of your home.',
+    choices: [
+      choice(
+        'roses',
+        'Red Rose Bushes',
+        'A low, full border of classic red roses.',
+        '#a75654',
+        'A',
+      ),
+      choice(
+        'orange',
+        'Orange Flowering Bushes',
+        'Warm orange blossoms and deep green foliage.',
+        '#d18a50',
+        'B',
+      ),
+      choice(
+        'blue',
+        'Blue Flowering Bushes',
+        'Cool blue flowers softened by leafy groundcover.',
+        '#7f97aa',
+        'C',
+      ),
+    ],
+  },
+  {
+    id: 'centerpiece',
+    name: 'A Garden Centerpiece',
+    threshold: 20,
+    icon: 'tree',
+    zone: 'centerpiece',
+    description: 'A small feature gives the front garden a quiet focal point.',
+    choices: [
+      choice(
+        'floweringTree',
+        'Flowering Ornamental Tree',
+        'A softly flowering tree in a neat garden bed.',
+        '#c18c8b',
+        'A',
+      ),
+      choice(
+        'fountain',
+        'Small Stone Fountain',
+        'A modest carved-stone fountain ringed with planting.',
+        '#a6ada1',
+        'B',
+      ),
+      choice(
+        'birdbath',
+        'Birdbath and Garden Bed',
+        'A stone birdbath with a compact flowering border.',
+        '#98a596',
+        'C',
       ),
     ],
   },
   {
     id: 'backyard',
-    name: 'Your backyard retreat',
-    threshold: 5,
+    name: 'A Backyard Favorite',
+    threshold: 30,
     icon: 'sun',
-    description: 'Make a little space for the things that make you happy.',
+    zone: 'backyard-attraction',
+    description: 'Make a little space for play and the things that make you happy.',
     choices: [
-      choice('pool', 'Quiet waters', 'A blue plunge pool with a stone surround.', '#8dbfc4'),
-      choice(
-        'fort',
-        'Woodland fort',
-        'A cedar play fort, ladder and tiny pitched roof.',
-        '#b58c61',
-      ),
+      choice('pool', 'Swimming Pool', 'A blue plunge pool with a stone surround.', '#8dbfc4', 'A'),
       choice(
         'trampoline',
-        'A little lift',
+        'Residential Trampoline',
         'A garden trampoline with a soft safety net.',
         '#8faaa1',
+        'B',
+      ),
+      choice(
+        'fort',
+        'Wooden Play Fort',
+        'A cedar play fort, ladder and tiny pitched roof.',
+        '#b58c61',
+        'C',
       ),
     ],
   },
   {
+    id: 'porch',
+    name: 'A Welcoming Porch',
+    threshold: 40,
+    icon: 'home',
+    zone: 'porch',
+    description: 'Thoughtful seating and a little planting make the entry feel like yours.',
+    choices: [
+      choice(
+        'rockingChairs',
+        'Rocking Chairs and Planters',
+        'A pair of wooden rockers with seasonal porch planters.',
+        '#aa8664',
+        'A',
+      ),
+      choice(
+        'porchSwing',
+        'Porch Swing and Planters',
+        'A timber swing and coordinated porch planters.',
+        '#ad9273',
+        'B',
+      ),
+      choice(
+        'benchLanterns',
+        'Bench and Lanterns',
+        'A simple entry bench with warm, low-glare lanterns.',
+        '#c49e6d',
+        'C',
+      ),
+    ],
+  },
+  {
+    id: 'retreat',
+    name: 'A Place to Unwind',
+    threshold: 50,
+    icon: 'leaf',
+    zone: 'backyard-retreat',
+    description: 'Create a peaceful outdoor place to pause and enjoy the garden.',
+    choices: [
+      choice(
+        'pergolaSeating',
+        'Pergola Seating',
+        'A compact cedar pergola over a small seating nook.',
+        '#a98b68',
+        'A',
+      ),
+      choice(
+        'stonePatio',
+        'Stone Patio Seating',
+        'A neat stone terrace with a comfortable table and chairs.',
+        '#a5a195',
+        'B',
+      ),
+      choice(
+        'gardenLounge',
+        'Garden Lounge',
+        'A leafy lounge nook with a small outdoor settee.',
+        '#8f9f8c',
+        'C',
+      ),
+    ],
+  },
+  {
+    id: 'gardenExpansion',
+    name: 'Room to Bloom',
+    threshold: 60,
+    icon: 'leaf',
+    zone: 'garden-expansion',
+    description: 'Extend the planting around your home with a complete garden composition.',
+    choices: [
+      choice(
+        'flowerBeds',
+        'Colorful Flowering Beds',
+        'Layered perennial beds with a gentle mix of color.',
+        '#c58d81',
+        'A',
+      ),
+      choice(
+        'evergreenShrubs',
+        'Evergreen Shrubs',
+        'Structured evergreen planting with soft groundcover.',
+        '#87967b',
+        'B',
+      ),
+      choice(
+        'wildflowerBeds',
+        'Natural Wildflower Beds',
+        'A loose, natural border of grasses and wildflowers.',
+        '#a9a075',
+        'C',
+      ),
+    ],
+  },
+  {
+    id: 'boundary',
+    name: 'A Gentle Property Edge',
+    threshold: 70,
+    icon: 'home',
+    zone: 'boundary',
+    description: 'A quiet, welcoming boundary ties the garden together.',
+    choices: [
+      choice(
+        'picketFence',
+        'Picket Fence',
+        'A low painted fence with an open garden gate.',
+        '#e4e0d2',
+        'A',
+      ),
+      choice(
+        'trimmedHedge',
+        'Trimmed Hedge',
+        'A tidy, low green hedge around the property.',
+        '#657b57',
+        'B',
+      ),
+      choice(
+        'stoneWall',
+        'Low Stone Wall',
+        'A modest dry-stone edge with softened planting.',
+        '#aaa395',
+        'C',
+      ),
+    ],
+  },
+  {
+    id: 'outdoorLighting',
+    name: 'A Warm Welcome After Dark',
+    threshold: 80,
+    icon: 'sun',
+    zone: 'outdoor-lighting',
+    description: 'Low, warm lighting makes the garden welcoming in the evening.',
+    choices: [
+      choice(
+        'stringLights',
+        'Overhead String Lights',
+        'A modest strand of warm lights above the backyard retreat.',
+        '#d6b980',
+        'A',
+      ),
+      choice(
+        'gardenTorches',
+        'Garden Torches',
+        'A few restrained, warm garden lanterns along the path.',
+        '#c88b5e',
+        'B',
+      ),
+      choice(
+        'wallSconces',
+        'Exterior Wall Sconces',
+        'Warm, low-intensity lights attached to the house exterior.',
+        '#ddbd80',
+        'C',
+      ),
+    ],
+  },
+  {
+    id: 'signature',
+    name: 'Your Garden Signature',
+    threshold: 90,
+    icon: 'tree',
+    zone: 'signature',
+    description: 'Finish your original home with one small, special garden feature.',
+    choices: [
+      choice(
+        'pond',
+        'Decorative Pond',
+        'A small stone-edged pond with quiet water and planting.',
+        '#7fa8a4',
+        'A',
+      ),
+      choice(
+        'gazebo',
+        'Garden Gazebo',
+        'A compact timber gazebo tucked into the garden.',
+        '#ad9273',
+        'B',
+      ),
+      choice(
+        'displayGarden',
+        'Ornamental Display Garden',
+        'A shaped planting bed with a stone focal point.',
+        '#a4a079',
+        'C',
+      ),
+    ],
+  },
+];
+
+/** Previous catalog retained solely for players who had already earned it. */
+export const LEGACY_PROJECTS: Project[] = [
+  {
     id: 'exterior',
-    name: 'A fresh welcome',
+    name: 'A Fresh Welcome',
     threshold: 12,
     icon: 'paint',
     description: 'A new roof and thoughtful details for your little home.',
+    legacy: true,
     choices: [
       choice(
         'clay',
@@ -71,13 +337,13 @@ export const PROJECTS: Project[] = [
       ),
       choice(
         'slate',
-        'Evening slate',
+        'Evening Slate',
         'A deep blue-grey roof and lavender at the doorstep.',
         '#657682',
       ),
       choice(
         'moss',
-        'Forest green',
+        'Forest Green',
         'A muted moss roof with terracotta pots and a bench.',
         '#6e8065',
       ),
@@ -85,10 +351,11 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 'neighbor',
-    name: 'Hello, neighbor',
+    name: 'Hello, Neighbor',
     threshold: 24,
     icon: 'home',
     description: 'Another porch. Another patch of garden. Your street is growing.',
+    legacy: true,
     choices: [
       choice('cream', 'Buttercream', 'A cream bungalow with a russet roof.', '#ddcda8'),
       choice('rose', 'Rosewood', 'Muted rose siding with a charcoal roof.', '#b99386'),
@@ -97,43 +364,45 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 'garden',
-    name: 'Room to bloom',
+    name: 'Room to Bloom',
     threshold: 40,
     icon: 'leaf',
     description: 'Turn the corner of your street into a lush pocket garden.',
+    legacy: true,
     choices: [
       choice(
         'meadow',
-        'Wildflower meadow',
+        'Wildflower Meadow',
         'Daisies, tall grasses and a quiet garden seat.',
         '#bdbe87',
       ),
       choice(
         'orchard',
-        'Little orchard',
+        'Little Orchard',
         'Fruit trees and raised beds along a gravel path.',
         '#9fae70',
       ),
-      choice('roses', 'Rose garden', 'Rose beds, clipped hedges and a timber pergola.', '#c38f9b'),
+      choice('roses', 'Rose Garden', 'Rose beds, clipped hedges and a timber pergola.', '#c38f9b'),
     ],
   },
   {
     id: 'street',
-    name: 'The scenic route',
+    name: 'The Scenic Route',
     threshold: 60,
     icon: 'road',
     description: 'A few everyday details make this feel like home.',
+    legacy: true,
     choices: [
       choice(
         'lanterns',
-        'Lantern walk',
+        'Lantern Walk',
         'Warm street lamps, stone planters and timber benches.',
         '#c5b48f',
       ),
-      choice('avenue', 'Leafy avenue', 'An avenue of shade trees and planted verges.', '#91a675'),
+      choice('avenue', 'Leafy Avenue', 'An avenue of shade trees and planted verges.', '#91a675'),
       choice(
         'flowers',
-        'Flower lane',
+        'Flower Lane',
         'Bright flower planters, benches and welcoming lights.',
         '#c49f9d',
       ),
@@ -141,52 +410,80 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 'house2',
-    name: 'Good company',
+    name: 'Good Company',
     threshold: 85,
     icon: 'home',
     description: 'A third home brings a little more life to the neighborhood.',
+    legacy: true,
     choices: [
       choice(
         'cream',
-        'Linen house',
+        'Linen House',
         'Pale plaster, a clay roof and deep green shutters.',
         '#ded2b8',
       ),
-      choice('sage', 'Garden house', 'Soft sage siding and a slate roof.', '#98ad94'),
-      choice('blue', 'Harbor house', 'Blue-grey siding and a charcoal roof.', '#8fa4b5'),
+      choice('sage', 'Garden House', 'Soft sage siding and a slate roof.', '#98ad94'),
+      choice('blue', 'Harbor House', 'Blue-grey siding and a charcoal roof.', '#8fa4b5'),
     ],
   },
   {
     id: 'circle',
-    name: 'Our little cul-de-sac',
+    name: 'Our Little Cul-de-sac',
     threshold: 115,
     icon: 'tree',
     description: 'A peaceful turning circle. A place your good habits built.',
+    legacy: true,
     choices: [
-      choice('oak', 'The old oak', 'A broad oak in a planted turning-circle island.', '#8b9b6b'),
-      choice('fountain', 'Water garden', 'A small stone fountain framed by flowers.', '#9eb8b5'),
+      choice('oak', 'The Old Oak', 'A broad oak in a planted turning-circle island.', '#8b9b6b'),
+      choice('fountain', 'Water Garden', 'A small stone fountain framed by flowers.', '#9eb8b5'),
       choice(
         'gazebo',
-        'Gathering place',
+        'Gathering Place',
         'A timber gazebo with a pitched roof and garden seats.',
         '#b99c7e',
       ),
     ],
   },
 ];
+
+/** Legacy unlock thresholds are frozen so migration preserves earned access exactly. */
+export const LEGACY_UNLOCK_THRESHOLDS: Readonly<Record<string, number>> = {
+  backyard: 5,
+  ...Object.fromEntries(LEGACY_PROJECTS.map(({ id, threshold }) => [id, threshold])),
+};
+
+export function legacyUnlocksFor(state: AppState): string[] {
+  const stars = lifetimeStars(state);
+  return Object.entries(LEGACY_UNLOCK_THRESHOLDS)
+    .filter(([id, threshold]) => stars >= threshold || Object.hasOwn(state.designs || {}, id))
+    .map(([id]) => id);
+}
+
 export function isProjectUnlocked(
   state: AppState,
   project: Project,
   stars = lifetimeStars(state),
 ): boolean {
-  return project.id === 'home' ? state.onboarding.firstHomeUnlocked : stars >= project.threshold;
+  if (project.id === 'home') return state.onboarding.firstHomeUnlocked;
+  if (project.legacy) return state.legacyUnlocks?.includes(project.id) ?? false;
+  if (state.legacyUnlocks?.includes(project.id)) return true;
+  return stars >= project.threshold;
 }
+
 export function unlockedProjects(state: AppState, stars = lifetimeStars(state)): Project[] {
-  return PROJECTS.filter((p) => isProjectUnlocked(state, p, stars));
+  return [...PROJECTS, ...LEGACY_PROJECTS].filter((project) =>
+    isProjectUnlocked(state, project, stars),
+  );
 }
+
 export function selectDesign(state: AppState, projectId: string, choiceId: string): AppState {
-  const p = unlockedProjects(state).find((p) => p.id === projectId);
-  if (!p || !p.choices.some((c) => c.id === choiceId))
+  const project = [...PROJECTS, ...LEGACY_PROJECTS].find((candidate) => candidate.id === projectId);
+  if (
+    !project ||
+    !isProjectUnlocked(state, project) ||
+    !project.choices.some((candidate) => candidate.id === choiceId)
+  ) {
     throw new Error('That design is not available yet.');
+  }
   return { ...state, designs: { ...state.designs, [projectId]: choiceId } };
 }

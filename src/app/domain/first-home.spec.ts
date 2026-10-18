@@ -7,7 +7,7 @@ const DATE = '2026-10-17';
 describe('first healthy step and save migration', () => {
   it('starts genuinely new profiles with an empty, locked home lot', () => {
     const s = initialState(DATE);
-    expect(s).toMatchObject({ version: 2, onboarding: { firstHomeUnlocked: false }, designs: {} });
+    expect(s).toMatchObject({ version: 3, onboarding: { firstHomeUnlocked: false }, designs: {} });
     expect(s.designs['home']).toBeUndefined();
     expect(unlockedProjects(s)).toEqual([]);
     expect(() => selectDesign(s, 'home', 'sage')).toThrow();
@@ -86,7 +86,7 @@ describe('first healthy step and save migration', () => {
     delete (old as { onboarding?: unknown }).onboarding;
     const migrated = importState(JSON.stringify(old));
     expect(migrated).toMatchObject({
-      version: 2,
+      version: 3,
       onboarding: { firstHomeUnlocked: true },
       designs: { home: 'blue' },
       extension: old.extension,

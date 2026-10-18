@@ -1,10 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FoundationsStore } from './state.service';
-import { initialState, STORAGE_KEY, MIGRATION_BACKUP_KEY } from './domain/state';
+import {
+  initialState,
+  STORAGE_KEY,
+  MIGRATION_BACKUP_KEY,
+  MIGRATION_BACKUP_V3_KEY,
+} from './domain/state';
 import { importState, exportState } from './domain/state';
 import { completeHabit } from './domain/habits';
 
-describe('safe v2 upgrade and durable first house', () => {
+describe('safe schema migration and durable first house', () => {
   const stores: FoundationsStore[] = [];
   const make = () => {
     const s = new FoundationsStore();
@@ -30,7 +35,7 @@ describe('safe v2 upgrade and durable first house', () => {
     expect(localStorage.getItem(MIGRATION_BACKUP_KEY)).toBe(raw);
     expect(s.state().designs['home']).toBe('blue');
     expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toMatchObject({
-      version: 2,
+      version: 3,
       onboarding: { firstHomeUnlocked: true },
       futureExtension: { keep: true },
     });
@@ -54,6 +59,44 @@ describe('safe v2 upgrade and durable first house', () => {
     make();
     make();
     expect(localStorage.getItem(MIGRATION_BACKUP_KEY)).toBe(raw);
+  });
+  it('keeps an exact v2 backup before migrating the chapter catalog', () => {
+    const raw = JSON.stringify({
+      ...initialState('2026-09-01'),
+      version: 2,
+      legacyUnlocks: undefined,
+      onboarding: { firstHomeUnlocked: true },
+      designs: { home: 'blue', backyard: 'fort', exterior: 'moss' },
+      lifetimeExtension: { keep: true },
+    });
+    localStorage.setItem(STORAGE_KEY, raw);
+    const s = make();
+    expect(localStorage.getItem(MIGRATION_BACKUP_V3_KEY)).toBe(raw);
+    expect(localStorage.getItem(STORAGE_KEY)).not.toBe(raw);
+    expect(s.state().designs).toEqual({ home: 'blue', backyard: 'fort', exterior: 'moss' });
+    expect(s.state().legacyUnlocks).toEqual(expect.arrayContaining(['backyard', 'exterior']));
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).lifetimeExtension).toEqual({
+      keep: true,
+    });
+  });
+  it('does not overwrite the v2 source if its migration backup cannot be written', () => {
+    const raw = JSON.stringify({
+      ...initialState('2026-09-01'),
+      version: 2,
+      legacyUnlocks: undefined,
+      onboarding: { firstHomeUnlocked: true },
+      designs: { home: 'sage' },
+    });
+    localStorage.setItem(STORAGE_KEY, raw);
+    const write = Storage.prototype.setItem;
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(function (this: Storage, key, value) {
+      if (key === MIGRATION_BACKUP_V3_KEY) throw new Error('quota');
+      write.call(this, key, value);
+    });
+    const s = make();
+    expect(localStorage.getItem(STORAGE_KEY)).toBe(raw);
+    expect(s.state().designs['home']).toBe('sage');
+    expect(s.warning()).toContain('open tab');
   });
   it('saves unlock and completion together before selection and reload', async () => {
     const s = make();

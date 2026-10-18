@@ -442,9 +442,14 @@
         <button class="text-button" (click)="store.exportBackup(true)">
           Export original storage for recovery
         </button>
-        @if (store.migrationBackupAvailable()) {
+        @if (store.migrationBackupAvailable(1)) {
           <button class="text-button" (click)="exportUpgradeBackup()">
-            Export pre-upgrade backup
+            Export original v1 backup
+          </button>
+        }
+        @if (store.migrationBackupAvailable(2)) {
+          <button class="text-button" (click)="exportUpgradeBackup(2)">
+            Export original v2 backup
           </button>
         }
         <hr />

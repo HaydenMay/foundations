@@ -36,11 +36,13 @@ export interface Preferences {
   camera: CameraState;
 }
 export interface AppState {
-  version: 2;
+  version: 3;
   onboarding: { firstHomeUnlocked: boolean };
   habits: Habit[];
   completions: Completion[];
   designs: Record<string, string>;
+  /** Legacy milestone access captured during the v2 → v3 migration. */
+  legacyUnlocks: string[];
   preferences: Preferences;
 }
 export interface HabitInput {
@@ -54,6 +56,7 @@ export interface Choice {
   name: string;
   description: string;
   color: string;
+  set?: 'A' | 'B' | 'C';
 }
 export interface Project {
   id: string;
@@ -62,4 +65,8 @@ export interface Project {
   description: string;
   icon: string;
   choices: Choice[];
+  /** Stable lot region used by the renderer and camera focus. */
+  zone?: string;
+  /** Legacy projects remain available to migrated profiles only. */
+  legacy?: boolean;
 }

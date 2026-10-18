@@ -1,12 +1,13 @@
 import { AppState } from './models';
 import { createHabit, STAR_VALUES, validateInput } from './habits';
 import { isDate, weekStart } from './dates';
-import { selectDesign } from './progression';
+import { LEGACY_UNLOCK_THRESHOLDS, legacyUnlocksFor, selectDesign } from './progression';
 export const STORAGE_KEY = 'foundations.v1';
 export const MIGRATION_BACKUP_KEY = 'foundations.pre-v2';
+export const MIGRATION_BACKUP_V3_KEY = 'foundations.pre-v3';
 export function initialState(date: string): AppState {
   return {
-    version: 2,
+    version: 3,
     onboarding: { firstHomeUnlocked: false },
     habits: [
       createHabit(
@@ -42,6 +43,7 @@ export function initialState(date: string): AppState {
     ],
     completions: [],
     designs: {},
+    legacyUnlocks: [],
     preferences: {
       panelOpen: true,
       lighting: 'auto',
@@ -64,7 +66,7 @@ export function importState(json: string): AppState {
   const version = (s as { version: number })?.version;
   requireValid(
     s &&
-      (version === 1 || version === 2) &&
+      (version === 1 || version === 2 || version === 3) &&
       Array.isArray(s.habits) &&
       s.habits.length <= 10000 &&
       Array.isArray(s.completions) &&
@@ -144,8 +146,9 @@ export function importState(json: string): AppState {
   if (version === 1) {
     requireValid(Object.hasOwn(s.designs, 'home'));
     // Every v1 profile already owned a home, even with no earned stars.
-    s.version = 2;
+    s.version = 3;
     s.onboarding = { ...s.onboarding, firstHomeUnlocked: true };
+    s.legacyUnlocks = legacyUnlocksFor(s);
   } else {
     requireValid(
       s.onboarding &&
@@ -154,6 +157,23 @@ export function importState(json: string): AppState {
         typeof s.onboarding.firstHomeUnlocked === 'boolean',
     );
     if (s.completions.length || s.designs['home']) s.onboarding.firstHomeUnlocked = true;
+    if (version === 3) {
+      const allowedLegacyIds = Object.keys(LEGACY_UNLOCK_THRESHOLDS);
+      requireValid(
+        Array.isArray(s.legacyUnlocks) &&
+          s.legacyUnlocks.length <= allowedLegacyIds.length &&
+          s.legacyUnlocks.every(
+            (id, index) =>
+              typeof id === 'string' &&
+              allowedLegacyIds.includes(id) &&
+              s.legacyUnlocks.indexOf(id) === index,
+          ),
+      );
+    } else {
+      // Freeze prior access before the new threshold schedule is applied.
+      s.legacyUnlocks = legacyUnlocksFor(s);
+      s.version = 3;
+    }
   }
   for (const [id, choice] of Object.entries(s.designs)) selectDesign(s, id, choice);
   // Parse into a fresh object so the caller cannot mutate a previously validated backup.

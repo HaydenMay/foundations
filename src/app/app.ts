@@ -234,8 +234,8 @@ export class App {
     this.cancelHome();
     this.previewPanelOpen.set(true);
   }
-  exportUpgradeBackup() {
-    this.act(async () => this.store.exportMigrationBackup());
+  exportUpgradeBackup(version: 1 | 2 = 1) {
+    this.act(async () => this.store.exportMigrationBackup(version));
   }
   complete(h: Habit) {
     this.act(async () => {

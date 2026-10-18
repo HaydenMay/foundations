@@ -6,6 +6,14 @@ describe('visual production compatibility', () => {
   it('retains all legacy home IDs, history and backyard choices through free changes', () => {
     let state = initialState('2026-10-17');
     for (const h of state.habits) state = completeHabit(state, h.id, '2026-10-17');
+    state = importState(
+      JSON.stringify({
+        ...state,
+        version: 2,
+        onboarding: { firstHomeUnlocked: true },
+        designs: { home: 'sage' },
+      }),
+    );
     const history = JSON.stringify(state.completions, null, 2);
     for (const home of ['sage', 'cream', 'blue'])
       for (const backyard of ['pool', 'fort', 'trampoline']) {

@@ -9,6 +9,7 @@ import {
   initialState,
   STORAGE_KEY,
   MIGRATION_BACKUP_KEY,
+  MIGRATION_BACKUP_V3_KEY,
 } from './domain/state';
 import {
   copyPreview,
@@ -78,7 +79,7 @@ export class FoundationsStore implements OnDestroy {
     try {
       if (saved) {
         this.real.set(importState(saved));
-        if (JSON.parse(saved).version === 1) this.initializeStorage();
+        if (JSON.parse(saved).version < 3) this.initializeStorage();
       } else if (!this.storageBlocked) this.initializeStorage();
     } catch {
       this.corrupt = true;
@@ -122,12 +123,17 @@ export class FoundationsStore implements OnDestroy {
       return false;
     }
     try {
-      if (
-        this.persistedBaseline &&
-        JSON.parse(this.persistedBaseline).version === 1 &&
-        !localStorage.getItem(MIGRATION_BACKUP_KEY)
-      ) {
-        localStorage.setItem(MIGRATION_BACKUP_KEY, this.persistedBaseline);
+      if (this.persistedBaseline) {
+        const previousVersion = JSON.parse(this.persistedBaseline).version;
+        const backupKey =
+          previousVersion === 1
+            ? MIGRATION_BACKUP_KEY
+            : previousVersion === 2
+              ? MIGRATION_BACKUP_V3_KEY
+              : undefined;
+        if (backupKey && !localStorage.getItem(backupKey)) {
+          localStorage.setItem(backupKey, this.persistedBaseline);
+        }
       }
       const serialized = exportState(state);
       localStorage.setItem(STORAGE_KEY, serialized);
@@ -274,14 +280,16 @@ export class FoundationsStore implements OnDestroy {
     }
     return text;
   }
-  exportMigrationBackup(): void {
-    const text = localStorage.getItem(MIGRATION_BACKUP_KEY);
+  exportMigrationBackup(version: 1 | 2 = 1): void {
+    const text = localStorage.getItem(
+      version === 1 ? MIGRATION_BACKUP_KEY : MIGRATION_BACKUP_V3_KEY,
+    );
     if (!text) throw new Error('No pre-upgrade backup is stored in this browser.');
-    this.download(text, 'pre-upgrade-');
+    this.download(text, `pre-v${version}-`);
   }
-  migrationBackupAvailable(): boolean {
+  migrationBackupAvailable(version: 1 | 2 = 1): boolean {
     try {
-      return !!localStorage.getItem(MIGRATION_BACKUP_KEY);
+      return !!localStorage.getItem(version === 1 ? MIGRATION_BACKUP_KEY : MIGRATION_BACKUP_V3_KEY);
     } catch {
       return false;
     }

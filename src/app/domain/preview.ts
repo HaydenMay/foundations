@@ -1,7 +1,14 @@
 import { AppState } from './models';
 import { completeHabit, lifetimeStars } from './habits';
 import { initialState } from './state';
-import { PROJECTS, selectDesign } from './progression';
+import {
+  CHAPTER_COMPLETE_THRESHOLD,
+  LEGACY_PROJECTS,
+  LEGACY_UNLOCK_THRESHOLDS,
+  PROJECTS,
+  selectDesign,
+} from './progression';
+import { Project } from './models';
 
 export type PreviewScenario = 'new' | 'ready' | 'home' | 'several' | 'all';
 export interface PreviewSession {
@@ -26,7 +33,8 @@ export function previewDesign(
   project: string,
   choice: string,
 ): PreviewSession {
-  if (!PROJECTS.find((p) => p.id === project)?.choices.some((c) => c.id === choice))
+  const definition = [...PROJECTS, ...LEGACY_PROJECTS].find((p) => p.id === project);
+  if (!definition?.choices.some((c) => c.id === choice))
     throw new Error('Choose an existing preview design.');
   return {
     ...session,
@@ -37,6 +45,9 @@ export function previewDesign(
         firstHomeUnlocked: project === 'home' || session.state.onboarding.firstHomeUnlocked,
       },
       designs: { ...session.state.designs, [project]: choice },
+      legacyUnlocks: definition.legacy
+        ? [...new Set([...session.state.legacyUnlocks, project])]
+        : session.state.legacyUnlocks,
     },
     hiddenDesigns: { ...session.hiddenDesigns, [project]: choice },
   };
@@ -50,7 +61,8 @@ export function previewVisible(
     return previewDesign(
       session,
       project,
-      session.hiddenDesigns[project] || PROJECTS.find((p) => p.id === project)!.choices[0].id,
+      session.hiddenDesigns[project] ||
+        [...PROJECTS, ...LEGACY_PROJECTS].find((p) => p.id === project)!.choices[0].id,
     );
   const designs = { ...session.state.designs };
   delete designs[project];
@@ -61,24 +73,52 @@ export function previewVisible(
   };
 }
 export function jumpPreview(session: PreviewSession, projectId: string): PreviewSession {
-  const target = PROJECTS.find((p) => p.id === projectId);
+  const target: Project | undefined =
+    projectId === 'chapter'
+      ? {
+          id: 'chapter',
+          name: 'Chapter complete',
+          threshold: CHAPTER_COMPLETE_THRESHOLD,
+          description: 'Reveal the next empty lot.',
+          icon: 'home',
+          choices: [],
+        }
+      : [...PROJECTS, ...LEGACY_PROJECTS].find((p) => p.id === projectId);
   if (!target) throw new Error('Choose an existing milestone.');
+  const threshold = target.threshold;
   const designs: Record<string, string> = {};
-  for (const p of PROJECTS.filter((p) => p.threshold <= target.threshold))
+  for (const p of PROJECTS.filter((p) => p.threshold <= threshold))
     designs[p.id] = session.hiddenDesigns[p.id] || p.choices[0].id;
+  const legacyUnlocks =
+    target.legacy || target.id === 'chapter'
+      ? Object.entries(LEGACY_UNLOCK_THRESHOLDS)
+          .filter(([, required]) => (target.legacy ? required <= threshold : false))
+          .map(([id]) => id)
+      : [];
+  if (target.legacy) {
+    for (const project of LEGACY_PROJECTS.filter((p) => p.threshold <= threshold)) {
+      designs[project.id] = session.hiddenDesigns[project.id] || project.choices[0].id;
+    }
+    if (legacyUnlocks.includes('backyard') && !designs['backyard']) {
+      designs['backyard'] =
+        session.hiddenDesigns['backyard'] ||
+        PROJECTS.find((p) => p.id === 'backyard')!.choices[0].id;
+    }
+  }
   return {
     ...session,
-    stars: target.threshold,
+    stars: threshold,
     state: {
       ...session.state,
       onboarding: { ...session.state.onboarding, firstHomeUnlocked: true },
       designs,
+      legacyUnlocks,
       preferences: {
         ...session.state.preferences,
         camera: {
-          x: target.threshold >= 24 ? 3 : 0,
+          x: threshold >= 30 ? 3 : 0,
           z: 0,
-          zoom: target.threshold >= 85 ? 0.6 : target.threshold >= 24 ? 0.8 : 1,
+          zoom: threshold >= 90 ? 0.6 : threshold >= 30 ? 0.8 : 1,
           angle: Math.PI / 4,
         },
       },
@@ -93,7 +133,7 @@ export function scenarioPreview(kind: PreviewScenario, date: string): PreviewSes
   if (kind === 'ready') return copyPreview(state);
   state = selectDesign(state, 'home', 'sage');
   const session = copyPreview(state);
-  if (kind === 'several') return jumpPreview(session, 'garden');
-  if (kind === 'all') return jumpPreview(session, 'circle');
+  if (kind === 'several') return jumpPreview(session, 'retreat');
+  if (kind === 'all') return jumpPreview(session, 'chapter');
   return session;
 }

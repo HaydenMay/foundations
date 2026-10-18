@@ -149,32 +149,37 @@ describe('construction and backups', () => {
   });
   it('keeps every unlocked project pending until a choice is made', () => {
     const s = earn(4);
-    expect(unlockedProjects(s).map((p) => p.id)).toEqual(['home', 'backyard']);
+    expect(unlockedProjects(s).map((p) => p.id)).toEqual(['home', 'frontGarden']);
     expect(s.designs['backyard']).toBeUndefined();
   });
   it('allows free reversible customization without spending stars', () => {
-    const s = earn(4);
+    let s = fixture(10);
+    for (const date of ['2026-10-19', '2026-10-20', '2026-10-21'])
+      for (const h of s.habits) s = completeHabit(s, h.id, date);
     const a = selectDesign(s, 'backyard', 'pool');
     const b = selectDesign(a, 'backyard', 'fort');
     expect(b.designs['backyard']).toBe('fort');
-    expect(lifetimeStars(b)).toBe(10);
+    expect(lifetimeStars(b)).toBe(30);
   });
   it('rejects locked projects and invalid design IDs', () => {
     const s = initialState(MON);
     expect(() => selectDesign(s, 'neighbor', 'cream')).toThrow();
     expect(() => selectDesign(s, 'home', 'missing')).toThrow();
   });
-  it('ships eight distinct projects with three choices each', () => {
-    expect(PROJECTS).toHaveLength(8);
+  it('ships ten distinct current projects with three choices each', () => {
+    expect(PROJECTS).toHaveLength(10);
     expect(PROJECTS.every((p) => p.choices.length === 3)).toBe(true);
   });
   it('round-trips habits, history, stars, designs and preferences', () => {
-    const s = selectDesign(earn(4), 'backyard', 'pool');
+    let earned = fixture(10);
+    for (const date of ['2026-10-19', '2026-10-20', '2026-10-21'])
+      for (const h of earned.habits) earned = completeHabit(earned, h.id, date);
+    const s = selectDesign(earned, 'backyard', 'pool');
     s.preferences.panelOpen = false;
     s.preferences.lighting = 'night';
     const restored = importState(exportState(s));
     expect(restored).toEqual(s);
-    expect(lifetimeStars(restored)).toBe(10);
+    expect(lifetimeStars(restored)).toBe(30);
   });
   it.each(['{}', '{', '{"version":99}', '{"version":1,"habits":[]}'])(
     'rejects malformed or unsupported backup %s',

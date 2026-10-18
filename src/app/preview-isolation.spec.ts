@@ -44,6 +44,15 @@ describe('disposable Developer Preview boundary', () => {
     for (const p of [
       'home',
       'backyard',
+      'frontGarden',
+      'centerpiece',
+      'porch',
+      'retreat',
+      'gardenExpansion',
+      'boundary',
+      'outdoorLighting',
+      'signature',
+      'chapter',
       'exterior',
       'neighbor',
       'garden',
@@ -79,7 +88,7 @@ describe('disposable Developer Preview boundary', () => {
     const real = structuredClone(s.state());
     s.enterPreview();
     s.previewScenario('all');
-    expect(s.stars()).toBe(115);
+    expect(s.stars()).toBe(100);
     const reopened = make();
     expect(reopened.preview()).toBeNull();
     expect(reopened.state()).toEqual(real);
@@ -96,7 +105,7 @@ describe('disposable Developer Preview boundary', () => {
       raw = exportState(other);
     localStorage.setItem(STORAGE_KEY, raw);
     window.dispatchEvent(new StorageEvent('storage', { key: STORAGE_KEY, newValue: raw }));
-    expect(s.stars()).toBe(115);
+    expect(s.stars()).toBe(100);
     expect(JSON.parse(s.backupJSON())).toEqual(other);
     s.exitPreview();
     expect(s.state()).toEqual(other);
