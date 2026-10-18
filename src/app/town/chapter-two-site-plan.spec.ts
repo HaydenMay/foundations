@@ -6,9 +6,14 @@ import {
   chapterTwoRoadCenterZAt,
   createChapterTwoNeighborhoodPlot,
   CHAPTER_TWO_SITE_PLAN,
-  type ChapterTwoSiteLot,
 } from './chapter-two-site-plan';
-import { resolvePlotPoint, validatePlot, type PlotDefinition } from './plot-framework';
+import {
+  plotFootprintPolygon,
+  plotPolygonClearance,
+  resolvePlotPoint,
+  validatePlot,
+  type PlotDefinition,
+} from './plot-framework';
 import { buildWorld } from './world';
 
 const chapterOnePlot: PlotDefinition = {
@@ -34,35 +39,6 @@ const chapterOnePlot: PlotDefinition = {
 
 function sitePlan(): PlotDefinition {
   return createChapterTwoNeighborhoodPlot(chapterOnePlot);
-}
-
-function corners(definition: PlotDefinition, nodeId: string) {
-  const node = definition.nodes.find((candidate) => candidate.id === nodeId)!;
-  const footprint = node.footprint;
-  const width = footprint?.width ?? node.dimensions.width;
-  const depth = footprint?.depth ?? node.dimensions.depth;
-  const offsetX = footprint?.offsetX ?? 0;
-  const offsetZ = footprint?.offsetZ ?? 0;
-  return [
-    resolvePlotPoint(definition, nodeId, [offsetX - width / 2, 0, offsetZ - depth / 2]),
-    resolvePlotPoint(definition, nodeId, [offsetX + width / 2, 0, offsetZ + depth / 2]),
-  ];
-}
-
-function bounds(definition: PlotDefinition, lot: ChapterTwoSiteLot) {
-  const [first, last] = corners(definition, lot.nodeId);
-  return {
-    minX: Math.min(first.x, last.x),
-    maxX: Math.max(first.x, last.x),
-    minZ: Math.min(first.z, last.z),
-    maxZ: Math.max(first.z, last.z),
-  };
-}
-
-function rectangleGap(a: ReturnType<typeof bounds>, b: ReturnType<typeof bounds>) {
-  const dx = Math.max(a.minX - b.maxX, b.minX - a.maxX, 0);
-  const dz = Math.max(a.minZ - b.maxZ, b.minZ - a.maxZ, 0);
-  return Math.hypot(dx, dz);
 }
 
 describe('production Chapter 2 neighborhood site plan', () => {
@@ -182,27 +158,22 @@ describe('production Chapter 2 neighborhood site plan', () => {
   it('leaves measurable property gaps and keeps every public feature out of private lots', () => {
     const definition = sitePlan();
     const privateLots = [
-      {
-        minX: -12.85,
-        maxX: 1.15,
-        minZ: -12.2,
-        maxZ: 1.3,
-      },
-      ...CHAPTER_TWO_SITE_PLAN.lots.map((lot) => bounds(definition, lot)),
-    ];
+      'chapter1-property',
+      ...CHAPTER_TWO_SITE_PLAN.lots.map((lot) => lot.nodeId),
+    ].map((nodeId) => plotFootprintPolygon(definition, nodeId));
 
-    expect(rectangleGap(privateLots[0], privateLots[1])).toBeGreaterThanOrEqual(2.25);
+    expect(plotPolygonClearance(privateLots[0], privateLots[1])).toBeCloseTo(2.27, 1);
     for (let index = 0; index < privateLots.length; index++) {
       for (let other = index + 1; other < privateLots.length; other++) {
-        expect(rectangleGap(privateLots[index], privateLots[other])).toBeGreaterThan(0);
+        expect(plotPolygonClearance(privateLots[index], privateLots[other])).toBeGreaterThan(0);
       }
     }
 
     for (const publicId of ['ch2-community-park', 'ch2-landmark', 'ch2-entrance']) {
-      const publicPlot = bounds(definition, { nodeId: publicId } as ChapterTwoSiteLot);
+      const publicPlot = plotFootprintPolygon(definition, publicId);
       for (const privateLot of privateLots)
         expect(
-          rectangleGap(publicPlot, privateLot),
+          plotPolygonClearance(publicPlot, privateLot),
           `${publicId} overlaps a private lot`,
         ).toBeGreaterThan(0);
     }

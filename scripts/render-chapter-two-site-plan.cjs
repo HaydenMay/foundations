@@ -21,7 +21,44 @@ const {
   chapterTwoRoadCenterZAt,
   createChapterTwoNeighborhoodPlot,
 } = require('../src/app/town/chapter-two-site-plan.ts');
+const { plotFootprintPolygon, plotPolygonClearance } = require('../src/app/town/plot-framework.ts');
 const { CHAPTER_ONE_PROPERTY_BOUNDS: chapterOneBounds } = require('../src/app/town/plot-blueprints.ts');
+
+const chapterOnePlot = {
+  nodes: [
+    {
+      id: 'chapter1-property',
+      role: 'lot',
+      dimensions: {
+        width: chapterOneBounds.maxX - chapterOneBounds.minX,
+        depth: chapterOneBounds.maxZ - chapterOneBounds.minZ,
+        height: 10,
+      },
+      localTransform: {
+        position: [
+          (chapterOneBounds.minX + chapterOneBounds.maxX) / 2,
+          0,
+          (chapterOneBounds.minZ + chapterOneBounds.maxZ) / 2,
+        ],
+      },
+      occupancy: 'none',
+    },
+    {
+      id: 'chapter1-home',
+      role: 'structure',
+      parentId: 'chapter1-property',
+      dimensions: { width: 8.851957, depth: 7.865, height: 6.58 },
+      localTransform: { position: [0.85, 0.13, 0.85] },
+      footprint: {
+        width: 8.851957,
+        depth: 7.865,
+        offsetX: 1.1759785,
+        offsetZ: 0.6175,
+      },
+    },
+  ],
+};
+const plotDefinition = createChapterTwoNeighborhoodPlot(chapterOnePlot);
 
 const destination = path.resolve(process.argv[2] || 'docs/evidence/chapter2-production-conversion/site-plan.svg');
 fs.mkdirSync(path.dirname(destination), { recursive: true });
@@ -88,20 +125,17 @@ function corners(cx, cz, w, d, rotation = 0) {
     return [cx + c*x + s*z, cz - s*x + c*z];
   });
 }
-function gap(a,b) {
-  const dx = Math.max(a.minX-b.maxX,b.minX-a.maxX,0);
-  const dz = Math.max(a.minZ-b.maxZ,b.minZ-a.maxZ,0);
-  return Math.hypot(dx,dz);
-}
-function axisBounds(cx,cz,w,d) { return {minX:cx-w/2,maxX:cx+w/2,minZ:cz-d/2,maxZ:cz+d/2}; }
+const plotVectors = (nodeId) => plotFootprintPolygon(plotDefinition, nodeId);
+const plotPoints = (nodeId) => plotVectors(nodeId).map((point) => [point.x, point.z]);
+const centerOf = (points) => points.reduce((sum, [x,z]) => [sum[0]+x/points.length,sum[1]+z/points.length],[0,0]);
 
-// Existing Chapter 1 lot is drawn from its measured production contract.
-rect((chapterOneBounds.minX+chapterOneBounds.maxX)/2,(chapterOneBounds.minZ+chapterOneBounds.maxZ)/2,
-  chapterOneBounds.maxX-chapterOneBounds.minX,chapterOneBounds.maxZ-chapterOneBounds.minZ,'#f0ead7','#456b58',3,'10 5');
+// Existing Chapter 1 property and home follow the same transformed plot contract as the neighbors.
+polygon(plotPoints('chapter1-property'),'#f0ead7','#456b58',3,'10 5');
 label(-5.85, -11.1, 'CHAPTER 1 · EXISTING HOME', '14 × 13.5 m private property');
-// Chapter 1 building footprint from measured asset standard and production transform.
-polygon(corners(-3.8240215,-3.9825,8.851957,7.865), '#d9c9ab','#5e5547',2);
-label(-3.82,-3.95,'HOME','unchanged');
+const chapterOneHomePolygon = plotPoints('chapter1-home');
+polygon(chapterOneHomePolygon,'#d9c9ab','#5e5547',2);
+const chapterOneHomeCenter = centerOf(chapterOneHomePolygon);
+label(chapterOneHomeCenter[0],chapterOneHomeCenter[1],'HOME','unchanged');
 
 // The complete residential road corridor is sampled from the same centripetal spline as runtime.
 const curve = new THREE.CatmullRomCurve3(roadPoints.map(([x,z]) => new THREE.Vector3(x+24,0,z-1.5)),false,'centripetal',0.5);
@@ -133,10 +167,6 @@ add(`<path d="${pathD(center.filter((_,i)=>i%12===0))}" fill="none" stroke="#eee
 label(5.4, 8.4, 'CURVED RESIDENTIAL STREET', '6.3 m carriageway · continuous public sidewalks');
 
 // Properties, planned building footprints, front orientation, driveway/walk routes and mailbox points.
-const propertyBounds = [axisBounds(-5.85,-5.45,14,13.5)];
-const structureBounds = [axisBounds(-3.8240215,-3.9825,8.851957,7.865)];
-const structureLabels = ['Chapter 1 home'];
-const lotItems = [{name:'CHAPTER 1 PROPERTY', lot:{x:-5.85,z:-5.45,width:14,depth:13.5,rotation:0},color:'#f0ead7'}];
 for(const lot of plan.lots){
   const lotCorners=corners(lot.x,lot.z,lot.width,lot.depth,lot.rotation);
   polygon(lotCorners,'#e5ebd9','#456b58',3,'10 5');
@@ -144,24 +174,19 @@ for(const lot of plan.lots){
   polygon(corners(centerHouse[0],centerHouse[1],lot.house.width,lot.house.depth,lot.rotation),'#e8ddc8','#6e5841',2);
   miniLabel(centerHouse[0],centerHouse[1],`NEIGHBOR ${lot.index}`,`${lot.house.width} × ${lot.house.depth} m`);
   const front=transformLocal(lot,lot.house.offsetX+lot.house.entryX-lot.house.offsetX,lot.house.offsetZ+lot.house.entryZ);
-  const frontVector=transformLocal(lot,0,2.2);
   const frontEnd=transformLocal(lot,0,lot.depth/2+1.2);
   add(`<path d="M ${round(X(front[0]))} ${round(Y(front[1]))} L ${round(X(frontEnd[0]))} ${round(Y(frontEnd[1]))}" stroke="#31594b" stroke-width="2.5" marker-end="url(#arrow)"/>`);
   const sidewalkLocal=lot.depth/2+(plan.street.propertyFrontageOffset-plan.street.sidewalkOffset);
   const driveStart=lot.house.drivewayStartZ;
   const driveCenter=transformLocal(lot,lot.house.drivewayX,(driveStart+sidewalkLocal)/2);
-  rect(driveCenter[0],driveCenter[1],lot.lot==='l-shaped'?2.8:2.4,sidewalkLocal-driveStart,'#c2c0b6','#77786e',1);
+  polygon(corners(driveCenter[0],driveCenter[1],lot.house.drivewayWidth,sidewalkLocal-driveStart,lot.rotation),'#c2c0b6','#77786e',1);
   const walkStart=lot.house.offsetZ+lot.house.entryZ;
   const walkCenter=transformLocal(lot,lot.house.entryX,(walkStart+sidewalkLocal)/2);
-  rect(walkCenter[0],walkCenter[1],1.1,sidewalkLocal-walkStart,'#ebe5d5','#858176',1);
+  polygon(corners(walkCenter[0],walkCenter[1],1.1,sidewalkLocal-walkStart,lot.rotation),'#ebe5d5','#858176',1);
   const mailbox=transformLocal(lot,-lot.width*.39,lot.depth/2-.5);
   add(`<circle cx="${round(X(mailbox[0]))}" cy="${round(Y(mailbox[1]))}" r="5" fill="#6f5640" stroke="#fff" stroke-width="1.5"/>`);
   const plotTag=transformLocal(lot,-lot.width/2+0.9,-lot.depth/2+0.8);
   miniLabel(plotTag[0],plotTag[1],`PLOT ${lot.index}`,`${lot.width} × ${lot.depth} m`);
-  propertyBounds.push(axisBounds(lot.x,lot.z,lot.width,lot.depth));
-  structureBounds.push(axisBounds(centerHouse[0],centerHouse[1],lot.house.width,lot.house.depth));
-  structureLabels.push(`Neighbor ${lot.index}`);
-  lotItems.push({name:`PLOT ${lot.index}`,lot,color:'#e5ebd9'});
 }
 
 for(const site of plan.publicSites){
@@ -179,16 +204,14 @@ add(`<path d="${pathD([[promenade.startX,promenade.z],[promenade.endX,promenade.
 label(22.4,-11.7,'PUBLIC PARK APPROACH','connected to entrance and park');
 label(45.5,-30.4,'PUBLIC PROMENADE','connects park to landmark');
 
-// Explicit 2.35 m west-east property clearance from the original lot to neighbor 1.
-const c1Right=chapterOneBounds.maxX;
-const n1Left=plan.lots[0].x-plan.lots[0].width/2;
-add(`<line x1="${round(X(c1Right))}" y1="${round(Y(-5.4))}" x2="${round(X(n1Left))}" y2="${round(Y(-5.4))}" stroke="#ad513e" stroke-width="2.5" marker-start="url(#arrow)" marker-end="url(#arrow)"/>`);
-
 // Evidence metadata is calculated from the source plan, not copied into a static presentation.
 const gapRows=[];
 const labels=['Chapter 1',...plan.lots.map((lot)=>`Neighbor ${lot.index}`)];
-for(let i=0;i<propertyBounds.length;i++)for(let j=i+1;j<propertyBounds.length;j++)gapRows.push({a:labels[i],b:labels[j],gap:round(gap(propertyBounds[i],propertyBounds[j]))});
+const propertyPolygons=['chapter1-property',...plan.lots.map((lot)=>lot.nodeId)].map(plotVectors);
+for(let i=0;i<propertyPolygons.length;i++)for(let j=i+1;j<propertyPolygons.length;j++)gapRows.push({a:labels[i],b:labels[j],gap:round(plotPolygonClearance(propertyPolygons[i],propertyPolygons[j]))});
 const minGap=Math.min(...gapRows.map((row)=>row.gap));
+const structureLabels=['Chapter 1 home',...plan.lots.map((lot)=>`Neighbor ${lot.index}`)];
+const structurePolygons=['chapter1-home',...plan.lots.map((lot)=>`${lot.projectId}-house`)].map(plotVectors);
 const tableTop=height-margin.bottom+17;
 add(`<rect x="${margin.left}" y="${tableTop-26}" width="${width-margin.left-margin.right}" height="98" rx="8" fill="#fffdf7" stroke="#d2d0c5"/>`);
 add(`<text x="${margin.left+18}" y="${tableTop}" font-family="Segoe UI,Arial" font-size="14" font-weight="700" fill="#253d35">MEASURED CLEARANCES · property-edge to property-edge (m)</text>`);
@@ -213,12 +236,12 @@ const report={
   sidewalkWidth:plan.street.sidewalkWidth,
   minimumPropertyGapMeters:minGap,
   propertyGaps:gapRows.sort((a,b)=>a.gap-b.gap),
-  houseClearances:structureBounds.flatMap((a,index)=>structureBounds.slice(index+1).map((b,offset)=>({
-    a:structureLabels[index],b:structureLabels[index+offset+1],gap:round(gap(a,b)),
+  houseClearances:structurePolygons.flatMap((a,index)=>structurePolygons.slice(index+1).map((b,offset)=>({
+    a:structureLabels[index],b:structureLabels[index+offset+1],gap:round(plotPolygonClearance(a,b)),
   }))).sort((a,b)=>a.gap-b.gap),
   publicClearances:plan.publicSites.map((site)=>{
-    const publicBounds=axisBounds(site.x,site.z,site.width,site.depth);
-    const nearest=propertyBounds.map((privateBounds,index)=>({parcel:labels[index],gap:round(gap(publicBounds,privateBounds))})).sort((a,b)=>a.gap-b.gap)[0];
+    const publicPolygon=plotVectors(site.nodeId);
+    const nearest=propertyPolygons.map((privatePolygon,index)=>({parcel:labels[index],gap:round(plotPolygonClearance(publicPolygon,privatePolygon))})).sort((a,b)=>a.gap-b.gap)[0];
     return {site:site.projectId,width:site.width,depth:site.depth,nearestPrivate:nearest.parcel,clearance:nearest.gap};
   }),
   lotFrontages:plan.lots.map((lot)=>({id:lot.projectId,side:lot.streetSide,rotation:round(lot.rotation),x:lot.x,z:round(lot.z),width:lot.width,depth:lot.depth,roadZ:round(chapterTwoRoadCenterZAt(lot.x))})),

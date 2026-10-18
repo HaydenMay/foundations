@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import * as T from 'three';
 import {
   createPlotSceneHierarchy,
+  plotFootprintPolygon,
+  plotPolygonClearance,
   resolvePlotPoint,
   validatePlot,
   type PlotDefinition,
@@ -22,7 +24,56 @@ function plot(nodes: PlotNode[], connections: PlotDefinition['connections'] = []
   return { nodes, connections };
 }
 
+function axisBounds(points: readonly T.Vector3[]) {
+  return {
+    minX: Math.min(...points.map((point) => point.x)),
+    maxX: Math.max(...points.map((point) => point.x)),
+    minZ: Math.min(...points.map((point) => point.z)),
+    maxZ: Math.max(...points.map((point) => point.z)),
+  };
+}
+
 describe('universal plot definitions', () => {
+  it('measures rotated footprint clearance from the actual parcel edges', () => {
+    const definition = plot([
+      node('first', {
+        dimensions: { width: 4, depth: 0.5, height: 1 },
+        footprint: { width: 4, depth: 0.5 },
+        localTransform: { position: [0, 0, 0], rotation: [0, Math.PI / 4, 0] },
+      }),
+      node('second', {
+        dimensions: { width: 4, depth: 0.5, height: 1 },
+        footprint: { width: 4, depth: 0.5 },
+        localTransform: { position: [2.6, 0, 2.6], rotation: [0, Math.PI / 4, 0] },
+      }),
+    ]);
+    const first = plotFootprintPolygon(definition, 'first');
+    const second = plotFootprintPolygon(definition, 'second');
+    const firstBounds = axisBounds(first);
+    const secondBounds = axisBounds(second);
+    const aabbsOverlap =
+      firstBounds.minX < secondBounds.maxX &&
+      firstBounds.maxX > secondBounds.minX &&
+      firstBounds.minZ < secondBounds.maxZ &&
+      firstBounds.maxZ > secondBounds.minZ;
+
+    expect(aabbsOverlap).toBe(true);
+    expect(plotPolygonClearance(first, second)).toBeCloseTo(3.18, 1);
+
+    const overlapping = plot([
+      definition.nodes[0],
+      {
+        ...definition.nodes[1],
+        localTransform: { position: [0.2, 0, 0.2], rotation: [0, Math.PI / 4, 0] },
+      },
+    ]);
+    expect(
+      plotPolygonClearance(
+        plotFootprintPolygon(overlapping, 'first'),
+        plotFootprintPolygon(overlapping, 'second'),
+      ),
+    ).toBe(0);
+  });
   it('resolves nested translations and rotations around arbitrary local pivots', () => {
     const definition = plot([
       node('district', {
@@ -308,7 +359,9 @@ describe('universal plot definitions', () => {
       plot(
         [
           node('house', {
-            anchors: [{ id: 'door', type: 'access', position: [0, 0, 0], requiresConnection: true }],
+            anchors: [
+              { id: 'door', type: 'access', position: [0, 0, 0], requiresConnection: true },
+            ],
           }),
           node('walk', {
             anchors: [{ id: 'entry', type: 'access', position: [2, 0, 0] }],

@@ -259,6 +259,103 @@ export function resolvePlotPoint(
   return vector(localPoint).applyMatrix4(matrix);
 }
 
+/** Resolve a plot node's rectangular ground footprint into world-space X/Z polygon corners. */
+export function plotFootprintPolygon(definition: PlotDefinition, nodeId: string): T.Vector3[] {
+  const node = definition.nodes.find((candidate) => candidate.id === nodeId);
+  if (!node) throw new Error(`Cannot resolve unknown plot node "${nodeId}".`);
+  const footprint = node.footprint;
+  const width = footprint?.width ?? node.dimensions.width;
+  const depth = footprint?.depth ?? node.dimensions.depth;
+  const offsetX = footprint?.offsetX ?? 0;
+  const offsetZ = footprint?.offsetZ ?? 0;
+  const corners: PlotVector3[] = [
+    [offsetX - width / 2, 0, offsetZ - depth / 2],
+    [offsetX + width / 2, 0, offsetZ - depth / 2],
+    [offsetX + width / 2, 0, offsetZ + depth / 2],
+    [offsetX - width / 2, 0, offsetZ + depth / 2],
+  ];
+  return corners.map((point) => resolvePlotPoint(definition, nodeId, point));
+}
+
+function cross2D(a: T.Vector3, b: T.Vector3, c: T.Vector3): number {
+  return (b.x - a.x) * (c.z - a.z) - (b.z - a.z) * (c.x - a.x);
+}
+
+function pointOnSegment2D(a: T.Vector3, b: T.Vector3, point: T.Vector3): boolean {
+  return (
+    Math.abs(cross2D(a, b, point)) <= EPSILON &&
+    point.x >= Math.min(a.x, b.x) - EPSILON &&
+    point.x <= Math.max(a.x, b.x) + EPSILON &&
+    point.z >= Math.min(a.z, b.z) - EPSILON &&
+    point.z <= Math.max(a.z, b.z) + EPSILON
+  );
+}
+
+function segmentsIntersect2D(a: T.Vector3, b: T.Vector3, c: T.Vector3, d: T.Vector3): boolean {
+  const abC = cross2D(a, b, c);
+  const abD = cross2D(a, b, d);
+  const cdA = cross2D(c, d, a);
+  const cdB = cross2D(c, d, b);
+  return (
+    (abC > EPSILON && abD < -EPSILON && cdA > EPSILON && cdB < -EPSILON) ||
+    (abC < -EPSILON && abD > EPSILON && cdA < -EPSILON && cdB > EPSILON) ||
+    (Math.abs(abC) <= EPSILON && pointOnSegment2D(a, b, c)) ||
+    (Math.abs(abD) <= EPSILON && pointOnSegment2D(a, b, d)) ||
+    (Math.abs(cdA) <= EPSILON && pointOnSegment2D(c, d, a)) ||
+    (Math.abs(cdB) <= EPSILON && pointOnSegment2D(c, d, b))
+  );
+}
+
+function pointInPolygon2D(polygon: readonly T.Vector3[], point: T.Vector3): boolean {
+  let inside = false;
+  for (let index = 0, previous = polygon.length - 1; index < polygon.length; previous = index++) {
+    const a = polygon[previous];
+    const b = polygon[index];
+    if (pointOnSegment2D(a, b, point)) return true;
+    const crosses = (a.z > point.z) !== (b.z > point.z);
+    if (crosses && point.x < ((b.x - a.x) * (point.z - a.z)) / (b.z - a.z) + a.x)
+      inside = !inside;
+  }
+  return inside;
+}
+
+function pointToSegmentDistance2D(point: T.Vector3, start: T.Vector3, end: T.Vector3): number {
+  const dx = end.x - start.x;
+  const dz = end.z - start.z;
+  const lengthSquared = dx * dx + dz * dz;
+  const projection =
+    lengthSquared === 0
+      ? 0
+      : Math.max(0, Math.min(1, ((point.x - start.x) * dx + (point.z - start.z) * dz) / lengthSquared));
+  return Math.hypot(point.x - start.x - projection * dx, point.z - start.z - projection * dz);
+}
+
+/** Minimum edge clearance between two ground polygons; overlapping polygons return zero. */
+export function plotPolygonClearance(first: readonly T.Vector3[], second: readonly T.Vector3[]): number {
+  if (first.length < 3 || second.length < 3)
+    throw new Error('Plot clearance needs two polygons with at least three corners each.');
+  if (pointInPolygon2D(first, second[0]) || pointInPolygon2D(second, first[0])) return 0;
+
+  let clearance = Number.POSITIVE_INFINITY;
+  for (let index = 0; index < first.length; index++) {
+    const a = first[index];
+    const b = first[(index + 1) % first.length];
+    for (let other = 0; other < second.length; other++) {
+      const c = second[other];
+      const d = second[(other + 1) % second.length];
+      if (segmentsIntersect2D(a, b, c, d)) return 0;
+      clearance = Math.min(
+        clearance,
+        pointToSegmentDistance2D(a, c, d),
+        pointToSegmentDistance2D(b, c, d),
+        pointToSegmentDistance2D(c, a, b),
+        pointToSegmentDistance2D(d, a, b),
+      );
+    }
+  }
+  return clearance;
+}
+
 /** Structural validation for authored plot contracts; this is not arbitrary mesh collision detection. */
 export function validatePlot(definition: PlotDefinition): PlotDiagnostic[] {
   const issues: PlotDiagnostic[] = [];

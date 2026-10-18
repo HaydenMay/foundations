@@ -7,57 +7,57 @@
   },
   "roadWidth": 6.3,
   "sidewalkWidth": 1.48,
-  "minimumPropertyGapMeters": 2.39,
+  "minimumPropertyGapMeters": 2.27,
   "propertyGaps": [
     {
       "a": "Chapter 1",
       "b": "Neighbor 1",
-      "gap": 2.39
+      "gap": 2.27
     },
     {
       "a": "Neighbor 1",
       "b": "Neighbor 2",
-      "gap": 9.97
-    },
-    {
-      "a": "Neighbor 2",
-      "b": "Neighbor 3",
-      "gap": 10.76
+      "gap": 10.55
     },
     {
       "a": "Neighbor 3",
       "b": "Neighbor 4",
-      "gap": 12.48
+      "gap": 11.08
+    },
+    {
+      "a": "Neighbor 2",
+      "b": "Neighbor 3",
+      "gap": 11.37
     },
     {
       "a": "Neighbor 2",
       "b": "Neighbor 4",
-      "gap": 16.63
+      "gap": 15.77
     },
     {
       "a": "Chapter 1",
       "b": "Neighbor 2",
-      "gap": 21.3
+      "gap": 20.85
     },
     {
       "a": "Neighbor 1",
       "b": "Neighbor 3",
-      "gap": 23.38
-    },
-    {
-      "a": "Neighbor 1",
-      "b": "Neighbor 4",
-      "gap": 37.62
+      "gap": 21.91
     },
     {
       "a": "Chapter 1",
       "b": "Neighbor 3",
-      "gap": 38.76
+      "gap": 37.36
+    },
+    {
+      "a": "Neighbor 1",
+      "b": "Neighbor 4",
+      "gap": 37.59
     },
     {
       "a": "Chapter 1",
       "b": "Neighbor 4",
-      "gap": 52.14
+      "gap": 52.19
     }
   ],
   "houseClearances": [
@@ -69,47 +69,47 @@
     {
       "a": "Neighbor 1",
       "b": "Neighbor 2",
-      "gap": 19.41
-    },
-    {
-      "a": "Neighbor 2",
-      "b": "Neighbor 3",
-      "gap": 21.69
+      "gap": 19.71
     },
     {
       "a": "Neighbor 3",
       "b": "Neighbor 4",
-      "gap": 21.89
+      "gap": 21.15
     },
     {
       "a": "Neighbor 2",
       "b": "Neighbor 4",
-      "gap": 21.9
+      "gap": 21.42
+    },
+    {
+      "a": "Neighbor 2",
+      "b": "Neighbor 3",
+      "gap": 21.96
     },
     {
       "a": "Chapter 1 home",
       "b": "Neighbor 2",
-      "gap": 26.13
+      "gap": 26.01
     },
     {
       "a": "Neighbor 1",
       "b": "Neighbor 3",
-      "gap": 29.76
+      "gap": 28.9
     },
     {
       "a": "Chapter 1 home",
       "b": "Neighbor 3",
-      "gap": 42.67
+      "gap": 41.82
     },
     {
       "a": "Neighbor 1",
       "b": "Neighbor 4",
-      "gap": 45.48
+      "gap": 45.46
     },
     {
       "a": "Chapter 1 home",
       "b": "Neighbor 4",
-      "gap": 56.17
+      "gap": 56.19
     }
   ],
   "publicClearances": [
@@ -118,21 +118,21 @@
       "width": 8.4,
       "depth": 3.2,
       "nearestPrivate": "Neighbor 1",
-      "clearance": 2.76
+      "clearance": 2.65
     },
     {
       "site": "ch2-community-park",
       "width": 20,
       "depth": 16,
       "nearestPrivate": "Neighbor 3",
-      "clearance": 3.71
+      "clearance": 4.71
     },
     {
       "site": "ch2-landmark",
       "width": 12,
       "depth": 10,
       "nearestPrivate": "Neighbor 3",
-      "clearance": 5.3
+      "clearance": 6.28
     }
   ],
   "lotFrontages": [

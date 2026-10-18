@@ -298,8 +298,8 @@ export function buildWorld(
       put(`${projectId}-lot`, asset?.root);
       put(`${projectId}-house`, asset?.renderObjects?.get('house') ?? asset?.pieces.get('house'));
       put(`${projectId}-yard`, asset?.pieces.get('front-garden'));
-      put(`${projectId}-driveway`, asset?.pieces.get('driveway-and-walk'));
-      put(`${projectId}-walkway`, asset?.pieces.get('driveway-and-walk'));
+      put(`${projectId}-driveway`, asset?.renderObjects?.get('driveway'));
+      put(`${projectId}-walkway`, asset?.renderObjects?.get('walkway'));
       put(`${projectId}-mailbox`, asset?.pieces.get('mailbox-and-yard-tree'));
     }
     for (const projectId of ['ch2-entrance', 'ch2-community-park', 'ch2-landmark']) {

@@ -330,6 +330,8 @@ function buildNeighbor(
   routes.userData['connectsToSidewalk'] = true;
   const driveway = a.group(routes, lot.house.drivewayX, 0.12, drivewayCenter);
   driveway.name = 'plot-driveway';
+  driveway.userData['staticBatchBoundary'] = true;
+  set.renderObjects.set('driveway', driveway);
   a.box(driveway, paving, 0, 0, 0, lot.house.drivewayWidth, 0.11, drivewayLength);
   a.box(driveway, '#c9c3b2', 0, 0.015, 0, 0.16, 0.12, drivewayLength);
   for (let i = 0; i < 7; i++) {
@@ -349,6 +351,8 @@ function buildNeighbor(
   const walkLength = sidewalkLocalZ - walkStart;
   const walkway = a.group(routes, lot.house.entryX, 0.14, (walkStart + sidewalkLocalZ) / 2);
   walkway.name = 'plot-front-walkway';
+  walkway.userData['staticBatchBoundary'] = true;
+  set.renderObjects.set('walkway', walkway);
   walkway.userData['connectsToSidewalk'] = true;
   a.box(walkway, '#bcb7a8', 0, 0, 0, 1.1, 0.1, walkLength);
   const stepCount = Math.max(3, Math.floor(walkLength / 0.72));

@@ -14,23 +14,23 @@ This is the authored overhead site-plan view rendered directly from `CHAPTER_TWO
 
 The curved carriageway is 6.3 m wide, with 1.48 m public sidewalks centered 4.02 m from the road centerline. The district contract is 132 × 90 m. Neighbor frontage is placed 5.6 m from the road centerline.
 
-The minimum private property edge clearance is **2.39 m**, between the unchanged Chapter 1 property and Neighbor 1. The nearest five measured pair clearances are:
+The minimum private property edge clearance is **2.27 m**, between the unchanged Chapter 1 property and Neighbor 1. The nearest five measured pair clearances are:
 
 | Property pair | Edge clearance |
 |---|---:|
-| Chapter 1 ↔ Neighbor 1 | 2.39 m |
-| Neighbor 1 ↔ Neighbor 2 | 9.97 m |
-| Neighbor 2 ↔ Neighbor 3 | 10.76 m |
-| Neighbor 3 ↔ Neighbor 4 | 12.48 m |
-| Neighbor 2 ↔ Neighbor 4 | 16.63 m |
+| Chapter 1 ↔ Neighbor 1 | 2.27 m |
+| Neighbor 1 ↔ Neighbor 2 | 10.55 m |
+| Neighbor 3 ↔ Neighbor 4 | 11.08 m |
+| Neighbor 2 ↔ Neighbor 3 | 11.37 m |
+| Neighbor 2 ↔ Neighbor 4 | 15.77 m |
 
 Public feature footprints and nearest private-property clearances:
 
 | Public site | Width × depth | Nearest private-property clearance |
 |---|---:|---:|
-| entrance | 8.4 × 3.2 | 2.76 m to Neighbor 1 |
-| community-park | 20 × 16 | 3.71 m to Neighbor 3 |
-| landmark | 12 × 10 | 5.30 m to Neighbor 3 |
+| entrance | 8.4 × 3.2 | 2.65 m to Neighbor 1 |
+| community-park | 20 × 16 | 4.71 m to Neighbor 3 |
+| landmark | 12 × 10 | 6.28 m to Neighbor 3 |
 
 Driveways and front walks remain owned by their residential lot and cross the front boundary, the 0.84 m planted verge, and the sidewalk apron to meet the public route. House footprints remain behind the curved sidewalk. The entrance connects the north sidewalk to the park approach; the park and landmark share a public promenade. The original Chapter 1 property and home coordinates remain unchanged. No vehicle assets are included.
 
