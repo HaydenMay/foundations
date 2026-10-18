@@ -1,0 +1,560 @@
+{
+  "source": "http://127.0.0.1:4200/foundations/",
+  "sourceCommit": "b09e0069ac915a04def8593e6f680d6741fa8b76",
+  "capturedAt": "2026-10-18T07:41:14.798Z",
+  "profile": "Fresh synthetic browser profile; all simulated progress stayed in Developer Preview.",
+  "note": "Production app rendered by headless Chromium with emulated desktop viewport. This is not physical-device or Safari testing.",
+  "errors": [],
+  "captures": [
+    {
+      "name": "empty-lot",
+      "note": "Brand-new player scenario before the first home.",
+      "file": "docs/evidence/phase-4-1/empty-lot.png",
+      "constructionAtCapture": "idle",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "drawCalls": 21,
+      "triangles": 80678,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "house-cottage-porch-rockers",
+      "note": "cottage with rockers porch.",
+      "file": "docs/evidence/phase-4-1/house-cottage-porch-rockers.png",
+      "constructionAtCapture": "idle",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "idle",
+      "camera": [
+        -4.999999999999909,
+        29.8,
+        29.4
+      ],
+      "zoom": 1,
+      "drawCalls": 101,
+      "triangles": 136078,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "house-cottage-porch-swing",
+      "note": "cottage with swing porch.",
+      "file": "docs/evidence/phase-4-1/house-cottage-porch-swing.png",
+      "constructionAtCapture": "idle",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "idle",
+      "camera": [
+        -4.999999999999909,
+        29.8,
+        29.4
+      ],
+      "zoom": 1,
+      "drawCalls": 95,
+      "triangles": 135486,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "house-cottage-porch-bench",
+      "note": "cottage with bench porch.",
+      "file": "docs/evidence/phase-4-1/house-cottage-porch-bench.png",
+      "constructionAtCapture": "idle",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "idle",
+      "camera": [
+        -4.999999999999909,
+        29.8,
+        29.4
+      ],
+      "zoom": 1,
+      "drawCalls": 98,
+      "triangles": 135474,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "house-craftsman-porch-rockers",
+      "note": "craftsman with rockers porch.",
+      "file": "docs/evidence/phase-4-1/house-craftsman-porch-rockers.png",
+      "constructionAtCapture": "idle",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "idle",
+      "camera": [
+        -4.999999999999909,
+        29.8,
+        29.4
+      ],
+      "zoom": 1,
+      "drawCalls": 102,
+      "triangles": 134418,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "house-craftsman-porch-swing",
+      "note": "craftsman with swing porch.",
+      "file": "docs/evidence/phase-4-1/house-craftsman-porch-swing.png",
+      "constructionAtCapture": "idle",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "idle",
+      "camera": [
+        -4.999999999999909,
+        29.8,
+        29.4
+      ],
+      "zoom": 1,
+      "drawCalls": 96,
+      "triangles": 133826,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "house-craftsman-porch-bench",
+      "note": "craftsman with bench porch.",
+      "file": "docs/evidence/phase-4-1/house-craftsman-porch-bench.png",
+      "constructionAtCapture": "idle",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "idle",
+      "camera": [
+        -4.999999999999909,
+        29.8,
+        29.4
+      ],
+      "zoom": 1,
+      "drawCalls": 99,
+      "triangles": 133814,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "house-brick-porch-rockers",
+      "note": "brick with rockers porch.",
+      "file": "docs/evidence/phase-4-1/house-brick-porch-rockers.png",
+      "constructionAtCapture": "idle",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "idle",
+      "camera": [
+        -4.999999999999909,
+        29.8,
+        29.4
+      ],
+      "zoom": 1,
+      "drawCalls": 100,
+      "triangles": 135010,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "house-brick-porch-swing",
+      "note": "brick with swing porch.",
+      "file": "docs/evidence/phase-4-1/house-brick-porch-swing.png",
+      "constructionAtCapture": "idle",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "idle",
+      "camera": [
+        -4.999999999999909,
+        29.8,
+        29.4
+      ],
+      "zoom": 1,
+      "drawCalls": 94,
+      "triangles": 134418,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "house-brick-porch-bench",
+      "note": "brick with bench porch.",
+      "file": "docs/evidence/phase-4-1/house-brick-porch-bench.png",
+      "constructionAtCapture": "idle",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "idle",
+      "camera": [
+        -4.999999999999909,
+        29.8,
+        29.4
+      ],
+      "zoom": 1,
+      "drawCalls": 97,
+      "triangles": 134406,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "animation-wildflower-beds-initial",
+      "note": "Natural wildflower beds: before replay.",
+      "file": "docs/evidence/phase-4-1/animation-wildflower-beds-initial.png",
+      "constructionAtCapture": "idle",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "drawCalls": 95,
+      "triangles": 134359,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "animation-wildflower-beds-middle",
+      "note": "Natural wildflower beds: in ordered assembly.",
+      "file": "docs/evidence/phase-4-1/animation-wildflower-beds-middle.png",
+      "constructionAtCapture": "active",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "active",
+      "camera": [
+        12.816630560342613,
+        29.8,
+        22.616630560342617
+      ],
+      "zoom": 1.28,
+      "drawCalls": 93,
+      "triangles": 134287,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "animation-wildflower-beds-completed",
+      "note": "Natural wildflower beds: construction settled.",
+      "file": "docs/evidence/phase-4-1/animation-wildflower-beds-completed.png",
+      "constructionAtCapture": "idle",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "drawCalls": 95,
+      "triangles": 134359,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "animation-backyard-fort-initial",
+      "note": "Wooden play fort: before replay.",
+      "file": "docs/evidence/phase-4-1/animation-backyard-fort-initial.png",
+      "constructionAtCapture": "idle",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "drawCalls": 98,
+      "triangles": 142182,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "animation-backyard-fort-middle",
+      "note": "Wooden play fort: in ordered assembly.",
+      "file": "docs/evidence/phase-4-1/animation-backyard-fort-middle.png",
+      "constructionAtCapture": "active",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "active",
+      "camera": [
+        13.321630560342614,
+        29.8,
+        14.391630560342618
+      ],
+      "zoom": 1.28,
+      "drawCalls": 95,
+      "triangles": 142146,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "animation-backyard-fort-completed",
+      "note": "Wooden play fort: construction settled.",
+      "file": "docs/evidence/phase-4-1/animation-backyard-fort-completed.png",
+      "constructionAtCapture": "idle",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "drawCalls": 98,
+      "triangles": 142182,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "animation-string-lights-initial",
+      "note": "Lighting and supported cable runs: before replay.",
+      "file": "docs/evidence/phase-4-1/animation-string-lights-initial.png",
+      "constructionAtCapture": "idle",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "drawCalls": 90,
+      "triangles": 139154,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "animation-string-lights-middle",
+      "note": "Lighting and supported cable runs: in ordered assembly.",
+      "file": "docs/evidence/phase-4-1/animation-string-lights-middle.png",
+      "constructionAtCapture": "active",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "active",
+      "camera": [
+        18.066630560342613,
+        29.8,
+        18.71663056034262
+      ],
+      "zoom": 1.28,
+      "drawCalls": 90,
+      "triangles": 139154,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "animation-string-lights-completed",
+      "note": "Lighting and supported cable runs: construction settled.",
+      "file": "docs/evidence/phase-4-1/animation-string-lights-completed.png",
+      "constructionAtCapture": "idle",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "drawCalls": 90,
+      "triangles": 139154,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "garden-expansion-flower-beds",
+      "note": "flowerBeds with day lighting.",
+      "file": "docs/evidence/phase-4-1/garden-expansion-flower-beds.png",
+      "constructionAtCapture": "idle",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "drawCalls": 90,
+      "triangles": 145074,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "garden-expansion-evergreens",
+      "note": "evergreenShrubs with day lighting.",
+      "file": "docs/evidence/phase-4-1/garden-expansion-evergreens.png",
+      "constructionAtCapture": "idle",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "drawCalls": 83,
+      "triangles": 140190,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "continuous-trimmed-hedge",
+      "note": "trimmedHedge with day lighting.",
+      "file": "docs/evidence/phase-4-1/continuous-trimmed-hedge.png",
+      "constructionAtCapture": "idle",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "drawCalls": 87,
+      "triangles": 171330,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "stone-patio-umbrella",
+      "note": "stonePatio with day lighting.",
+      "file": "docs/evidence/phase-4-1/stone-patio-umbrella.png",
+      "constructionAtCapture": "idle",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "day",
+      "construction": "idle",
+      "camera": [
+        -4.999999999999996,
+        29.8,
+        -38.6
+      ],
+      "zoom": 1,
+      "drawCalls": 95,
+      "triangles": 137856,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "wall-sconces-night",
+      "note": "wallSconces with night lighting.",
+      "file": "docs/evidence/phase-4-1/wall-sconces-night.png",
+      "constructionAtCapture": "idle",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "night",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "drawCalls": 91,
+      "triangles": 137994,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "garden-torches-night",
+      "note": "gardenTorches with night lighting.",
+      "file": "docs/evidence/phase-4-1/garden-torches-night.png",
+      "constructionAtCapture": "idle",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "lighting": "night",
+      "construction": "idle",
+      "camera": [
+        -4.999999999999996,
+        29.8,
+        -38.6
+      ],
+      "zoom": 1,
+      "drawCalls": 92,
+      "triangles": 138194,
+      "webglError": 0,
+      "contextLost": false
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "responsive": [
+    {
+      "layout": "portrait",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "documentHeight": 844
+    },
+    {
+      "layout": "landscape",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "documentWidth": 844,
+      "documentHeight": 390
+    }
+  ],
+  "errors": []
+}
