@@ -1,7 +1,7 @@
 {
   "source": "http://127.0.0.1:4200/foundations/",
-  "sourceCommit": "e7657952b108e4bcb9e642d8d65fbffdc231fa9d",
-  "capturedAt": "2026-10-18T06:26:29.624Z",
+  "sourceCommit": "62d5d8f21a269720f4d058c2068ebea4ee792ff8",
+  "capturedAt": "2026-10-18T06:31:44.733Z",
   "profile": "fresh synthetic browser profile; all changes in disposable Developer Preview",
   "note": "Screenshots are from the running production bundle. The built-in orthographic camera keeps a fixed elevated isometric pitch; overview uses wider zoom. Browser viewport emulation is not physical-device testing.",
   "requestHosts": [
