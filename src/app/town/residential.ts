@@ -8,6 +8,11 @@ const STARTING_HOME_Y = 0.13,
   PORCH_DECK_CENTER_Y = 0.3,
   PORCH_DECK_THICKNESS = 0.38;
 export const PORCH_DECK_TOP_Y = STARTING_HOME_Y + PORCH_DECK_CENTER_Y + PORCH_DECK_THICKNESS / 2;
+// Keep a broad, consistent eave on rotated side-gable roofs (about 0.33m per side).
+const GARAGE_ROOF_DEPTH = 2.95,
+  GARAGE_ROOF_RISE = 1.06,
+  CRAFTSMAN_GABLE_ROOF_DEPTH = 3.55,
+  CRAFTSMAN_GABLE_ROOF_RISE = 1.15;
 const ROOF_COLORS: Record<string, string> = { clay: '#886350', slate: '#454f58', moss: '#52634b' };
 type Paint = T.MeshStandardMaterial | string;
 
@@ -242,10 +247,23 @@ function dormer(a: AssetLibrary, g: T.Object3D, x: number, roof: Paint, wall: Pa
 
 function garage(a: AssetLibrary, g: T.Object3D, roof: Paint, wall: Paint, craftsman: boolean) {
   const wing = a.group(g, 4.02, 0, -0.25);
+  wing.name = 'garage-wing';
   a.box(wing, surface(a, 'stone', '#aba594'), 0, 0.22, 0, 2.4, 0.35, 3.8);
-  a.box(wing, wall, 0, 1.4, 0, 2.3, 2.15, 3.5);
+  const garageWall = a.box(wing, wall, 0, 1.4, 0, 2.3, 2.15, 3.5);
+  garageWall.name = 'garage-wall';
   const cap = a.group(wing, 0, 0, 0, Math.PI / 2);
-  pitchedRoof(a, cap, 4, 2.65, 0.95, 2.53, roof, wall, craftsman ? '#97774c' : TRIM);
+  cap.name = 'garage-roof';
+  pitchedRoof(
+    a,
+    cap,
+    4,
+    GARAGE_ROOF_DEPTH,
+    GARAGE_ROOF_RISE,
+    2.53,
+    roof,
+    wall,
+    craftsman ? '#97774c' : TRIM,
+  );
   const doorMaterial = craftsman ? surface(a, 'wood', '#8b633e') : a.material('#dfd8c6');
   a.box(wing, TRIM, 0, 1.33, 1.79, 2.15, 2.2, 0.1);
   a.box(wing, doorMaterial, 0, 1.32, 1.87, 1.97, 2.07, 0.08);
@@ -313,8 +331,20 @@ export function buildStartingHouse(
     a.box(walls, wall, -0.6, 3.7, -0.2, 4.6, 1.5, 4);
     pitchedRoof(a, roofline, 6.35, 5.05, 1.65, 4.33, roof, wall, '#9b7b50');
     const front = a.group(roofline, -1.0, 0, 1.2, Math.PI / 2);
-    pitchedRoof(a, front, 2.8, 3.25, 1.05, 4.5, roof, wall, '#9b7b50');
-    a.box(walls, wall, -1, 3.9, 1.4, 2.9, 1.4, 1.5);
+    front.name = 'craftsman-front-gable-roof';
+    pitchedRoof(
+      a,
+      front,
+      2.8,
+      CRAFTSMAN_GABLE_ROOF_DEPTH,
+      CRAFTSMAN_GABLE_ROOF_RISE,
+      4.5,
+      roof,
+      wall,
+      '#9b7b50',
+    );
+    const frontGableWall = a.box(walls, wall, -1, 3.9, 1.4, 2.9, 1.4, 1.5);
+    frontGableWall.name = 'craftsman-front-gable-wall';
     window(a, openings, -1.55, 4.0, 2.2, 0.82, 1.04, 0, '#ab8a5b');
     window(a, openings, -0.35, 4.0, 2.2, 0.82, 1.04, 0, '#ab8a5b');
     for (const x of [-1.8, -0.2]) a.box(openings, '#765035', x, 4.9, 2.24, 0.08, 0.55, 0.08);

@@ -28,15 +28,15 @@ const EXPECTED_CHOREOGRAPHY: Record<string, string[]> = {
 const BASELINE_BOUNDS: Record<string, { min: number[]; max: number[] }> = {
   sage: {
     min: [-8.25, 0.13, -7.915],
-    max: [0.451954, 5.86, -0.05],
+    max: [0.601957, 5.86, -0.05],
   },
   cream: {
     min: [-8.225, 0.13, -7.915],
-    max: [0.451954, 6.71, -0.05],
+    max: [0.601957, 6.71, -0.05],
   },
   blue: {
     min: [-8.25, 0.13, -7.915],
-    max: [0.451954, 5.86, -0.05],
+    max: [0.601957, 5.86, -0.05],
   },
 };
 
