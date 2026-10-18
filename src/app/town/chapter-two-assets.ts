@@ -303,8 +303,9 @@ function buildNeighbor(
   parcel.add(edge);
   for (const side of [-1, 1]) {
     a.box(edge, '#aaa48f', (side * lot.width) / 2, 0.18, 0, 0.13, 0.16, lot.depth);
-    a.box(edge, '#aaa48f', 0, 0.18, (side * lot.depth) / 2, lot.width, 0.16, 0.13);
   }
+  // Local +Z faces the street; leave that boundary open for each lot's driveway and front walk.
+  a.box(edge, '#aaa48f', 0, 0.18, -lot.depth / 2, lot.width, 0.16, 0.13);
   const house = renderPart(set, 'house');
   parcel.add(house);
   const houseParent = a.group(house, lot.house.offsetX, 0, lot.house.offsetZ);
