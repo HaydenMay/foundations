@@ -11,6 +11,13 @@ const choice = (
 
 export const CHAPTER_COMPLETE_THRESHOLD = 100;
 
+export function chapterLotVisible(
+  stars: number,
+  designs: Readonly<Record<string, string>>,
+): boolean {
+  return stars >= CHAPTER_COMPLETE_THRESHOLD && !designs['neighbor'];
+}
+
 /** The current, continuous original-home progression. */
 export const PROJECTS: Project[] = [
   {

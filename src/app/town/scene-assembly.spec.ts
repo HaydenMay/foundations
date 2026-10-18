@@ -34,6 +34,23 @@ function sceneFixture(recipePieces: readonly string[] = ['walls', 'roof']) {
   }
   const home = new Group();
   home.add(root);
+  const projectRoot = new Group(),
+    projectPieces = new Map<string, Group>();
+  for (const id of ['beds', 'focal']) {
+    const piece = new Group();
+    piece.position.set(0, 2, 0);
+    projectRoot.add(piece);
+    projectPieces.set(id, piece);
+  }
+  const projectAsset = {
+    root: projectRoot,
+    pieces: projectPieces,
+    recipe: {
+      pieces: ['beds', 'focal'].map((id, order) => ({ id, order })),
+      config: { durationMs: 1000, dropHeight: 10, staggerMs: 0, concurrency: 1 },
+    },
+    focus: { x: -7, z: -5, zoom: 1.35 },
+  };
   const shadowMap = { needsUpdate: false };
   const done = vi.fn();
   const cameraSet = vi.fn();
@@ -47,6 +64,7 @@ function sceneFixture(recipePieces: readonly string[] = ['walls', 'roof']) {
         pieces: recipePieces.map((id, order) => ({ id, order })),
         config: { durationMs: 1000, dropHeight: 10, staggerMs: 0, concurrency: 1 },
       },
+      projectAssets: new Map([['frontGarden', projectAsset]]),
     },
     renderer: { shadowMap },
     camera: {
@@ -58,7 +76,20 @@ function sceneFixture(recipePieces: readonly string[] = ['walls', 'roof']) {
     active: true,
     render: vi.fn(),
   });
-  return { scene, root, home, assemblies, frames, frame, done, cameraSet, cameraHome, shadowMap };
+  return {
+    scene,
+    root,
+    home,
+    assemblies,
+    projectRoot,
+    projectPieces,
+    frames,
+    frame,
+    done,
+    cameraSet,
+    cameraHome,
+    shadowMap,
+  };
 }
 
 it('plays stable house assemblies from elapsed scene time and restores completed transforms', () => {
@@ -113,4 +144,51 @@ it('finishes safely when a required assembly binding is unavailable', () => {
   expect(f.done).toHaveBeenCalledOnce();
   expect(f.frames.size).toBe(0);
   expect(f.assemblies.get('walls')?.position.y).toBe(2);
+});
+
+it('reveals a selected milestone composition, focuses its lot zone and returns home', () => {
+  const f = sceneFixture();
+  f.scene.celebrateProject('frontGarden', f.done, {
+    durationMs: 1000,
+    dropHeight: 10,
+    staggerMs: 0,
+    concurrency: 1,
+  });
+  f.frame(0);
+  expect(f.projectPieces.get('beds')?.position.y).toBeGreaterThan(2);
+  f.frame(400);
+  expect(f.cameraSet).toHaveBeenCalledWith(
+    expect.objectContaining({
+      x: expect.any(Number),
+      z: expect.any(Number),
+      zoom: expect.any(Number),
+    }),
+  );
+  const focus = f.cameraSet.mock.calls.at(-1)?.[0];
+  expect(focus.x).toBeLessThan(4);
+  expect(focus.z).toBeLessThan(2);
+  f.frame(1000);
+  expect(f.done).toHaveBeenCalledOnce();
+  expect(f.projectPieces.get('beds')?.position.y).toBe(2);
+  expect(f.cameraHome).toHaveBeenCalledOnce();
+});
+
+it('focuses in-world previews temporarily and restores the original camera without saving it', () => {
+  const f = sceneFixture(),
+    original = { x: 4, z: 2, zoom: 0.8, angle: 0 },
+    suppression: boolean[] = [];
+  f.cameraSet.mockImplementation(() => {
+    suppression.push(
+      (f.scene as unknown as { suppressCameraPersistence: boolean }).suppressCameraPersistence,
+    );
+  });
+
+  f.scene.focusProjectPreview('frontGarden');
+  expect((f.scene as unknown as { previewCamera: unknown }).previewCamera).toEqual(original);
+  expect(f.cameraSet).toHaveBeenCalledWith({ x: -7, z: -5, zoom: 1.35, angle: 0 });
+  f.scene.restoreProjectPreviewCamera();
+  expect((f.scene as unknown as { previewCamera: unknown }).previewCamera).toBeUndefined();
+  expect(f.cameraSet).toHaveBeenLastCalledWith(original);
+  expect(suppression).toEqual([true, true]);
+  expect(f.scene.render).toHaveBeenCalledTimes(2);
 });

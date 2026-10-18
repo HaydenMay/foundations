@@ -54,9 +54,20 @@ export function previewDesign(
 }
 export function previewVisible(
   session: PreviewSession,
-  project: 'home' | 'backyard',
+  project: string,
   visible: boolean,
 ): PreviewSession {
+  if (
+    project !== 'chapter' &&
+    ![...PROJECTS, ...LEGACY_PROJECTS].some((definition) => definition.id === project)
+  )
+    throw new Error('Choose an existing preview project.');
+  if (project === 'chapter') {
+    const hiddenDesigns = { ...session.hiddenDesigns };
+    if (visible) delete hiddenDesigns['chapter'];
+    else hiddenDesigns['chapter'] = '__hidden__';
+    return { ...session, hiddenDesigns };
+  }
   if (visible)
     return previewDesign(
       session,

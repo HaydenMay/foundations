@@ -79,6 +79,43 @@ function circle(a: AssetLibrary, g: T.Group, choice: string) {
   }
 }
 
+function buildChapterLot(a: AssetLibrary, parent: T.Group): MilestoneAsset {
+  const root = a.group(parent),
+    ground = a.group(root),
+    marker = a.group(root);
+  root.name = 'chapter-empty-lot';
+  root.userData['staticBatchBoundary'] = true;
+  ground.name = 'empty-lot-clearing';
+  marker.name = 'empty-lot-parcel-marker';
+  a.box(ground, surface(a, 'grass', '#89996a'), 5.8, 0.09, -3.3, 11.2, 0.1, 9.8);
+  for (const x of [0.35, 11.25])
+    for (const z of [-8.1, 1.5]) a.box(ground, '#b8b29b', x, 0.17, z, 0.18, 0.24, 0.18);
+  // The little marker makes the reserved empty parcel legible without implying a building.
+  a.box(marker, '#796346', 0.55, 0.52, 1.14, 0.11, 0.82, 0.11);
+  a.box(marker, '#b8a27b', 0.55, 0.97, 1.14, 0.72, 0.28, 0.2);
+  a.box(marker, '#e1d4b5', 0.55, 0.99, 1.025, 0.54, 0.13, 0.025);
+  for (const piece of [ground, marker]) {
+    batchStatic(piece, (geometry) => a.geometry(geometry));
+    piece.userData['staticBatchBoundary'] = true;
+  }
+  const pieces = new Map([
+    ['clearing', ground],
+    ['marker', marker],
+  ]);
+  return {
+    root,
+    pieces,
+    recipe: {
+      pieces: [
+        { id: 'clearing', order: 0, durationMs: 1400, dropHeight: 0.35 },
+        { id: 'marker', order: 1, delayMs: 220, durationMs: 1200, dropHeight: 0.45 },
+      ],
+      config: { durationMs: 1550, staggerMs: 220, concurrency: 1, settleMeters: 0.025 },
+    },
+    focus: { x: 10.8, z: 1.3, zoom: 1.05 },
+  };
+}
+
 const PROJECT_ASSETS: Record<string, ProjectFactory> = {
   garden,
   street,
@@ -184,6 +221,8 @@ export function buildWorld(designs: Record<string, string>): TownWorld {
       legacyAssets.set(id, legacy);
     }
   }
+  if (designs['chapter'] === 'reveal' && !designs['neighbor'])
+    projectAssets.set('chapter', buildChapterLot(a, group));
   batchStatic(group, (geometry) => a.geometry(geometry));
   return { group, assets: a, home, homeAssemblies, homeRecipe, projectAssets, legacyAssets };
 }

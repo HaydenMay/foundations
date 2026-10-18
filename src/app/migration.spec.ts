@@ -120,6 +120,22 @@ describe('safe schema migration and durable first house', () => {
     expect(s.state().designs['home']).toBeUndefined();
     expect(localStorage.getItem(STORAGE_KEY)).toBe(before);
   });
+  it('keeps a Phase 4 project choice pending if it cannot be durably saved', async () => {
+    let earned = initialState('2026-10-01');
+    for (const date of ['2026-10-01', '2026-10-02', '2026-10-03', '2026-10-04', '2026-10-05'])
+      earned = completeHabit(earned, earned.habits[0].id, date);
+    earned.onboarding.firstHomeUnlocked = true;
+    earned.designs['home'] = 'sage';
+    localStorage.setItem(STORAGE_KEY, exportState(earned));
+    const s = make();
+    const before = localStorage.getItem(STORAGE_KEY);
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('quota');
+    });
+    await expect(s.design('frontGarden', 'roses')).rejects.toThrow('save');
+    expect(s.state().designs['frontGarden']).toBeUndefined();
+    expect(localStorage.getItem(STORAGE_KEY)).toBe(before);
+  });
   it('acknowledges first construction only for the first confirmed writer', async () => {
     const s = make();
     await s.complete(s.state().habits[1].id);

@@ -256,7 +256,7 @@ export class FoundationsStore implements OnDestroy {
         return selectDesign(s, project, choice);
       },
       false,
-      project === 'home',
+      true,
     );
     return first;
   }
@@ -333,7 +333,7 @@ export class FoundationsStore implements OnDestroy {
   previewDesign(project: string, choice: string): void {
     this.changePreview((s) => previewDesign(s, project, choice));
   }
-  previewVisible(project: 'home' | 'backyard', visible: boolean): void {
+  previewVisible(project: string, visible: boolean): void {
     this.changePreview((s) => previewVisible(s, project, visible));
   }
   ngOnDestroy() {

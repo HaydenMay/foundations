@@ -5,7 +5,7 @@ import { lightAt } from './lighting';
 import { buildWorld, TownWorld } from './world';
 import { AssemblyAnimator } from './assembly';
 import type { AssemblyConfigOverride } from './assembly';
-import { homeTransition } from './construction';
+import { homeTransition, projectTransition } from './construction';
 
 export class TownScene {
   readonly renderer: T.WebGLRenderer;
@@ -20,11 +20,14 @@ export class TownScene {
   private lightKey = '';
   private readonly timer: ReturnType<typeof setInterval>;
   private active = true;
+  private suppressCameraPersistence = false;
+  private previewCamera?: CameraState;
   private construction?: {
     request: number;
     started: number;
     last: number;
     from: CameraState;
+    focus?: { x: number; z: number; zoom: number };
     animator: AssemblyAnimator;
     visibility: boolean[];
     done: () => void;
@@ -83,7 +86,14 @@ export class TownScene {
     this.ground.position.y = -0.96;
     this.ground.receiveShadow = true;
     this.scene.add(this.ground);
-    this.camera = new TownCamera(canvas, initial, changed, () => this.render());
+    this.camera = new TownCamera(
+      canvas,
+      initial,
+      (state) => {
+        if (!this.suppressCameraPersistence && !this.previewCamera) changed(state);
+      },
+      () => this.render(),
+    );
     this.setDesigns(designs);
     this.observer = new ResizeObserver(() => this.resize());
     this.observer.observe(container);
@@ -103,19 +113,68 @@ export class TownScene {
     this.updateLight();
   }
   celebrate(done: () => void, override: AssemblyConfigOverride = {}) {
-    this.cancelConstruction();
     const home = this.world?.home,
       assemblies = this.world?.homeAssemblies,
       recipe = this.world?.homeRecipe;
-    if (!home || !assemblies || !recipe) {
+    this.celebrateAsset(home, assemblies, recipe, undefined, done, override);
+  }
+  celebrateProject(projectId: string, done: () => void, override: AssemblyConfigOverride = {}) {
+    this.previewCamera = undefined;
+    const asset = this.world?.projectAssets.get(projectId);
+    if (!asset) {
+      this.cancelConstruction();
+      this.suppressCameraPersistence = true;
       this.camera.home();
+      this.suppressCameraPersistence = false;
+      this.render();
+      done();
+      return;
+    }
+    this.celebrateAsset(asset.root, asset.pieces, asset.recipe, asset.focus, done, override);
+  }
+  focusProjectPreview(projectId: string) {
+    const focus = this.world?.projectAssets.get(projectId)?.focus;
+    if (!focus) return;
+    if (!this.previewCamera) this.previewCamera = this.camera.state();
+    this.setTransientCamera({ ...this.camera.state(), x: focus.x, z: focus.z, zoom: focus.zoom });
+    this.render();
+  }
+  restoreProjectPreviewCamera() {
+    const previous = this.previewCamera;
+    this.previewCamera = undefined;
+    if (!previous) return;
+    this.setTransientCamera(previous);
+    this.render();
+  }
+  private setTransientCamera(state: CameraState) {
+    const previous = this.suppressCameraPersistence;
+    this.suppressCameraPersistence = true;
+    try {
+      this.camera.set(state);
+    } finally {
+      this.suppressCameraPersistence = previous;
+    }
+  }
+  private celebrateAsset(
+    root: T.Object3D | undefined,
+    pieces: ReadonlyMap<string, T.Group> | undefined,
+    recipe: TownWorld['homeRecipe'],
+    focus: { x: number; z: number; zoom: number } | undefined,
+    done: () => void,
+    override: AssemblyConfigOverride,
+  ) {
+    this.cancelConstruction();
+    if (!root || !pieces || !recipe) {
+      this.suppressCameraPersistence = true;
+      this.camera.home();
+      this.suppressCameraPersistence = false;
       this.render();
       done();
       return;
     }
     let animator: AssemblyAnimator;
     try {
-      animator = new AssemblyAnimator(home, assemblies, recipe, {
+      animator = new AssemblyAnimator(root, pieces, recipe, {
         ...override,
         reducedMotion:
           override.reducedMotion ??
@@ -123,8 +182,10 @@ export class TownScene {
             matchMedia('(prefers-reduced-motion: reduce)').matches),
       });
     } catch (error) {
-      console.warn('Home assembly could not start; showing the completed house:', error);
+      console.warn('Assembly could not start; showing the completed project:', error);
+      this.suppressCameraPersistence = true;
       this.camera.home();
+      this.suppressCameraPersistence = false;
       this.renderer.shadowMap.needsUpdate = true;
       this.render();
       done();
@@ -135,17 +196,20 @@ export class TownScene {
       started: performance.now(),
       last: -100,
       from: this.camera.state(),
+      focus,
       animator,
       visibility: animator.pieces.map((piece) => piece.object.visible),
       done,
     };
     this.construction = animation;
+    this.suppressCameraPersistence = true;
     this.camera.controls.enabled = false;
     if (!animator.play(() => this.completeConstruction(animation))) {
       this.construction = undefined;
       animator.dispose();
       this.camera.controls.enabled = true;
       this.camera.home();
+      this.suppressCameraPersistence = false;
       this.renderer.shadowMap.needsUpdate = true;
       this.render();
       done();
@@ -171,8 +235,12 @@ export class TownScene {
       if (visibilityChanged) this.renderer.shadowMap.needsUpdate = true;
       if (visibilityChanged || settled || now - animation.last >= 1000 / 30) {
         animation.last = now;
-        // Shadow maps stay cached; redraw only when a piece is revealed and when the home settles.
-        this.camera.set(homeTransition(animation.from, Math.min(1, elapsed / 750)));
+        // Shadow maps stay cached; only the camera path differs between home and project reveals.
+        this.camera.set(
+          animation.focus
+            ? projectTransition(animation.from, animation.focus, elapsed / 750)
+            : homeTransition(animation.from, elapsed / 750),
+        );
         this.render();
       }
       if (settled) return;
@@ -195,7 +263,9 @@ export class TownScene {
     animation.animator.dispose();
     this.camera.controls.enabled = true;
     this.renderer.shadowMap.needsUpdate = true;
+    this.previewCamera = undefined;
     this.camera.home();
+    this.suppressCameraPersistence = false;
     this.render();
     animation.done();
   }
@@ -208,6 +278,7 @@ export class TownScene {
     animation.animator.dispose();
     this.camera.controls.enabled = true;
     if (resetCamera) this.camera.set(animation.from);
+    this.suppressCameraPersistence = false;
     if (refresh) {
       this.renderer.shadowMap.needsUpdate = true;
       this.render();

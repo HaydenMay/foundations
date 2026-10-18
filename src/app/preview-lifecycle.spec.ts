@@ -178,3 +178,44 @@ it('passes transient preview assembly overrides only to a requested construction
   sync.call(town, designs, preferences, 1, 4, override);
   expect(scene.celebrate).toHaveBeenCalledWith(expect.any(Function), override);
 });
+
+it('dispatches a confirmed milestone construction to its own scene assembly', () => {
+  const preferences = initialState('2026-10-17').preferences;
+  const designs = { home: 'sage', frontGarden: 'roses' },
+    scene = {
+      cancelConstruction: vi.fn(),
+      setDesigns: vi.fn(),
+      setLighting: vi.fn(),
+      camera: { set: vi.fn() },
+      celebrate: vi.fn(),
+      celebrateProject: vi.fn(),
+    };
+  const town: TownComponent = Object.create(TownComponent.prototype);
+  Object.assign(town, {
+    scene,
+    lastSession: 1,
+    lastConstruction: 0,
+    lastDesigns: JSON.stringify(designs),
+    lastCamera: JSON.stringify(preferences.camera),
+    incomingCamera: JSON.stringify(preferences.camera),
+    constructionProject: () => 'frontGarden',
+    building: signal(false),
+  });
+  const sync = (
+    town as unknown as {
+      sync: (
+        d: Record<string, string>,
+        p: typeof preferences,
+        session: number,
+        request: number,
+      ) => void;
+    }
+  ).sync;
+  sync.call(town, designs, preferences, 1, 8);
+  expect(scene.celebrate).not.toHaveBeenCalled();
+  expect(scene.celebrateProject).toHaveBeenCalledWith(
+    'frontGarden',
+    expect.any(Function),
+    undefined,
+  );
+});

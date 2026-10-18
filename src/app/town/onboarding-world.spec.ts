@@ -27,3 +27,16 @@ it('keeps the existing house geometry in a separately animated subtree on the sa
     world.assets.dispose();
   }
 });
+
+it('adds a same-world empty next-lot teaser without replacing a legacy neighbor', () => {
+  const teaser = buildWorld({ chapter: 'reveal' });
+  expect(teaser.group.getObjectByName('chapter-empty-lot')).toBeDefined();
+  expect(teaser.projectAssets.has('chapter')).toBe(true);
+  teaser.assets.dispose();
+
+  const existingNeighbor = buildWorld({ chapter: 'reveal', neighbor: 'rose' });
+  expect(existingNeighbor.group.getObjectByName('legacy-project:neighbor')).toBeDefined();
+  expect(existingNeighbor.group.getObjectByName('chapter-empty-lot')).toBeUndefined();
+  expect(existingNeighbor.projectAssets.has('chapter')).toBe(false);
+  existingNeighbor.assets.dispose();
+});

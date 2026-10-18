@@ -14,8 +14,14 @@ import { HabitEditor } from './components/habit-editor';
 import { Icon } from './components/icon';
 import { TownComponent } from './town/town.component';
 import { AppState, Habit, HabitInput, Lighting, Project, CameraState } from './domain/models';
-import { isCompleted, isScheduled, scheduleLabel, STAR_VALUES } from './domain/habits';
-import { PROJECTS, isProjectUnlocked } from './domain/progression';
+import {
+  isCompleted,
+  isScheduled,
+  lifetimeStars,
+  scheduleLabel,
+  STAR_VALUES,
+} from './domain/habits';
+import { PROJECTS, chapterLotVisible, isProjectUnlocked } from './domain/progression';
 import { importState } from './domain/state';
 import { HomeSelection } from './components/home-selection';
 import { DeveloperPanel } from './components/developer-panel';
@@ -32,19 +38,29 @@ export class App {
   readonly town = viewChild(TownComponent);
   readonly choosingHome = signal(false);
   readonly firstSelection = signal(false);
+  readonly previewingProject = signal(false);
   readonly draftHome = signal('sage');
+  readonly draftProjects = signal<Record<string, string>>({});
   readonly previewPanelOpen = signal(true);
   readonly construction = signal(0);
+  readonly constructionProject = signal('home');
   readonly previewAssemblyOptions = signal<AssemblyConfigOverride>({});
   readonly cameraPosition = signal<{ x: number; y: number; z: number } | null>(null);
-  readonly renderDesigns = computed(() =>
-    this.choosingHome()
-      ? { ...this.store.state().designs, home: this.draftHome() }
-      : this.store.state().designs,
-  );
+  readonly renderDesigns = computed(() => {
+    const designs = { ...this.store.state().designs, ...this.draftProjects() };
+    if (this.choosingHome()) designs['home'] = this.draftHome();
+    const teaserHidden = this.store.preview()?.hiddenDesigns['chapter'] === '__hidden__';
+    if (chapterLotVisible(this.store.stars(), designs) && !teaserHidden)
+      designs['chapter'] = 'reveal';
+    else delete designs['chapter'];
+    return designs;
+  });
   private constructionId = 0;
   private offeredSession = -1;
   private constructionSession = 0;
+  private draftSession = -1;
+  private lastObservedStars = lifetimeStars(this.store.realState());
+  private pendingRealChapterReveal = false;
   readonly sceneLight = signal('day');
   readonly dialog = viewChild.required<ElementRef<HTMLDialogElement>>('dialog');
   readonly overlay = signal('');
@@ -83,11 +99,28 @@ export class App {
   constructor() {
     effect(() => {
       const state = this.store.state(),
-        session = this.store.sessionKey();
+        realState = this.store.realState(),
+        session = this.store.sessionKey(),
+        realStars = lifetimeStars(realState),
+        previewActive = !!this.store.preview();
       untracked(() => {
         if (this.constructionSession !== session) {
           this.constructionSession = session;
           this.construction.set(0);
+        }
+        if (this.draftSession !== session) {
+          this.draftSession = session;
+          this.draftProjects.set({});
+        }
+        const crossedChapterThreshold = this.lastObservedStars < 100 && realStars >= 100;
+        this.lastObservedStars = realStars;
+        if (crossedChapterThreshold && previewActive) this.pendingRealChapterReveal = true;
+        if (!previewActive && (crossedChapterThreshold || this.pendingRealChapterReveal)) {
+          this.pendingRealChapterReveal = false;
+          if (chapterLotVisible(realStars, realState.designs)) {
+            this.constructionProject.set('chapter');
+            this.construction.set(++this.constructionId);
+          }
         }
         // A constructed home has already been offered in this session, including preview hides.
         if (state.designs['home']) this.offeredSession = session;
@@ -120,10 +153,15 @@ export class App {
   show(kind: string) {
     this.error.set('');
     this.overlay.set(kind);
-    if (!this.dialog().nativeElement.open) this.dialog().nativeElement.showModal();
+    const dialog = this.dialog().nativeElement;
+    if (!dialog.open && typeof dialog.showModal === 'function') dialog.showModal();
   }
   close() {
-    this.dialog().nativeElement.close();
+    if (this.previewingProject()) this.town()?.restoreProjectPreviewCamera();
+    this.clearProjectDraft();
+    this.previewingProject.set(false);
+    const dialog = this.dialog().nativeElement;
+    if (dialog.open && typeof dialog.close === 'function') dialog.close();
     this.overlay.set('');
     this.backup.set(null);
   }
@@ -139,6 +177,9 @@ export class App {
     this.show('habit');
   }
   choose(p: Project) {
+    if (this.previewingProject()) this.town()?.restoreProjectPreviewCamera();
+    this.clearProjectDraft();
+    this.previewingProject.set(false);
     if (p.id === 'home') {
       this.close();
       this.openHomeSelection();
@@ -187,17 +228,63 @@ export class App {
       const first = await this.store.design('home', this.draftHome());
       if (session !== this.store.sessionKey()) return;
       this.cancelHome();
-      if (first) this.construction.set(++this.constructionId);
-      else this.notify('Your home, your way. Style saved.');
+      if (first) {
+        this.constructionProject.set('home');
+        this.construction.set(++this.constructionId);
+      } else this.notify('Your home, your way. Style saved.');
     });
+  }
+  private clearProjectDraft(projectId = this.selectedProject().id) {
+    this.draftProjects.update((drafts) => {
+      if (!(projectId in drafts)) return drafts;
+      const next = { ...drafts };
+      delete next[projectId];
+      return next;
+    });
+  }
+  cancelProject() {
+    const wasViewing = this.previewingProject();
+    if (wasViewing) this.town()?.restoreProjectPreviewCamera();
+    this.previewingProject.set(false);
+    this.clearProjectDraft();
+    if (wasViewing) this.notify('Preview closed. Your saved design is unchanged.');
+    else this.show('projects');
+  }
+  viewProjectPreview() {
+    if (!this.draftProjects()[this.selectedProject().id]) return;
+    const dialog = this.dialog().nativeElement;
+    if (dialog.open && typeof dialog.close === 'function') dialog.close();
+    this.overlay.set('');
+    this.previewingProject.set(true);
+    this.town()?.focusProjectPreview(this.selectedProject().id);
+  }
+  confirmProject(): Promise<void> {
+    const project = this.selectedProject(),
+      choice = this.draftProjects()[project.id];
+    if (!choice || this.busy()) return Promise.resolve();
+    return this.act(
+      () => this.store.design(project.id, choice),
+      () => {
+        this.clearProjectDraft(project.id);
+        this.previewingProject.set(false);
+        this.constructionProject.set(project.id);
+        this.close();
+        this.construction.set(++this.constructionId);
+      },
+    );
   }
   constructionFinished(event: { id: number; sessionKey: number }) {
     if (event.id !== this.construction() || event.sessionKey !== this.store.sessionKey()) return;
     this.construction.set(0);
+    const project = this.constructionProject();
     this.notify(
       this.store.preview()
         ? 'Construction preview complete.'
-        : 'A home, built by your first healthy step.',
+        : project === 'home'
+          ? 'A home, built by your first healthy step.'
+          : project === 'chapter'
+            ? 'Your next little lot is ready for the future.'
+            : 'A new piece of your home is ready.',
     );
   }
   constructionCancelled(event: { id: number; sessionKey: number }) {
@@ -211,6 +298,7 @@ export class App {
   enterPreview() {
     this.close();
     this.cancelHome();
+    this.draftProjects.set({});
     this.construction.set(0);
     this.previewAssemblyOptions.set({});
     this.store.enterPreview();
@@ -219,6 +307,7 @@ export class App {
   exitPreview() {
     this.close();
     this.cancelHome();
+    this.draftProjects.set({});
     this.construction.set(0);
     this.previewAssemblyOptions.set({});
     this.store.exitPreview();
@@ -228,6 +317,7 @@ export class App {
     this.previewAssemblyOptions.set(options);
     this.cancelHome();
     this.store.previewVisible('home', true);
+    this.constructionProject.set('home');
     this.construction.set(++this.constructionId);
   }
   showPreviewControls() {
@@ -274,13 +364,14 @@ export class App {
     );
   }
   select(choice: string) {
-    this.act(
-      () => this.store.design(this.selectedProject().id, choice),
-      () => {
-        this.show('projects');
-        this.notify('A little more you. Design saved.');
-      },
-    );
+    const project = this.selectedProject(),
+      current = this.store.state().designs[project.id];
+    this.draftProjects.update((drafts) => {
+      const next = { ...drafts };
+      if (choice === current) delete next[project.id];
+      else next[project.id] = choice;
+      return next;
+    });
   }
   async importFile(event: Event) {
     const input = event.target as HTMLInputElement,

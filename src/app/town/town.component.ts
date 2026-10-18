@@ -224,6 +224,7 @@ export class TownComponent implements OnDestroy {
   readonly preferences = input.required<Preferences>();
   readonly sessionKey = input(0);
   readonly construction = input(0);
+  readonly constructionProject = input('home');
   readonly assemblyOptions = input<AssemblyConfigOverride>({});
   readonly constructionFinished = output<{ id: number; sessionKey: number }>();
   readonly constructionCancelled = output<{ id: number; sessionKey: number }>();
@@ -344,21 +345,29 @@ export class TownComponent implements OnDestroy {
     if (construction && construction !== this.lastConstruction) {
       this.lastConstruction = construction;
       this.building.set(true);
-      this.scene.celebrate(
-        () =>
-          this.zone.run(() => {
-            if (this.sessionKey() === sessionKey && this.construction() === construction) {
-              this.building.set(false);
-              this.constructionFinished.emit({ id: construction, sessionKey });
-            }
-          }),
-        assemblyOptions,
-      );
+      const done = () =>
+        this.zone.run(() => {
+          if (this.sessionKey() === sessionKey && this.construction() === construction) {
+            this.building.set(false);
+            this.constructionFinished.emit({ id: construction, sessionKey });
+          }
+        });
+      const project = this.constructionProject?.() ?? 'home';
+      if (project === 'home') this.scene.celebrate(done, assemblyOptions);
+      else this.scene.celebrateProject(project, done, assemblyOptions);
     }
   }
   skipConstruction() {
     this.scene?.finishConstruction();
     this.building.set(false);
+  }
+  focusProjectPreview(projectId: string) {
+    clearTimeout(this.timer);
+    this.scene?.focusProjectPreview(projectId);
+  }
+  restoreProjectPreviewCamera() {
+    clearTimeout(this.timer);
+    this.scene?.restoreProjectPreviewCamera();
   }
   command(command: string) {
     if (this.building()) this.skipConstruction();

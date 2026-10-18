@@ -99,6 +99,23 @@ button:not(.toggle) {
   min-height: 18px;
   accent-color: var(--green);
 }
+.project-preview {
+  border-top: 1px solid #e5e7dc;
+  padding: 8px 0 4px;
+}
+.project-preview summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4c6854;
+  touch-action: manipulation;
+}
+.project-preview[open] summary {
+  margin-bottom: 4px;
+}
 output {
   font-size: 11px;
   line-height: 1.9;

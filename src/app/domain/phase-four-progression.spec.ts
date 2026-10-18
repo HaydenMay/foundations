@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { AppState } from './models';
 import {
   CHAPTER_COMPLETE_THRESHOLD,
+  chapterLotVisible,
   LEGACY_PROJECTS,
   PROJECTS,
   isProjectUnlocked,
@@ -11,6 +12,11 @@ import { initialState, importState } from './state';
 const DATE = '2026-10-17';
 
 describe('Phase 4 milestone catalog', () => {
+  it('reveals one empty adjacent lot only at 100 stars and preserves an existing neighbor', () => {
+    expect(chapterLotVisible(99, {})).toBe(false);
+    expect(chapterLotVisible(100, {})).toBe(true);
+    expect(chapterLotVisible(100000, { neighbor: 'rose' })).toBe(false);
+  });
   it('uses the approved 1–100 home arc without repurposing legacy milestone IDs', () => {
     expect(PROJECTS.map(({ id, threshold }) => [id, threshold])).toEqual([
       ['home', 0],

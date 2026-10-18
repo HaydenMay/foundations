@@ -9,7 +9,7 @@ A private, portrait-first wellness companion. Healthy habits earn permanent star
 
 ![Classic Cottage in the starting residential lot, with synthetic test progress](docs/evidence/visual-pass-1/final/house-cottage-desktop.png)
 
-Visual Production Pass 1 refines the starting residential lot using the approved cozy miniature references: three house styles, detailed gardens, interchangeable backyards and four lighting moods. The existing eight-project progression remains intact. See the [visual report and screenshot gallery](docs/visual-pass-1-results.md).
+Visual Production Pass 1 refines the starting residential lot using the approved cozy miniature references: three house styles, detailed gardens, interchangeable backyards and four lighting moods. Phase 4 carries that same lot through its first 100 lifetime stars with free, reversible A/B/C compositions. See the [visual report and screenshot gallery](docs/visual-pass-1-results.md) and [Phase 4 results and reference sets](docs/phase-4-results.md).
 
 Phase 2 adds an empty-lot beginning, a first-home choice after the first valid habit completion, and an isolated Developer Preview. Existing players keep their houses. See the [Phase 2 implementation and validation report](docs/phase-2-results.md).
 
@@ -48,24 +48,27 @@ npm exec --yes --package=node@24.15.0 -- npm run build
 - Missed days have no effect. Stars never expire, and there are no consecutive-day bonuses. Lifetime stars are calculated from the persisted reward history, never spent.
 - The device clock defines dates. This is a trust-based personal tool, with no server clock or anti-cheat system. Changing timezones follows the new local date. A tab updates its date on focus and every 30 seconds while open.
 
-|               Lifetime stars | Project               | Design choices                          |
-| ---------------------------: | --------------------- | --------------------------------------- |
-| First valid habit completion | Your First Home       | Classic Cottage, Craftsman, Brick       |
-|                            5 | Backyard retreat      | Pool, wooden fort, trampoline           |
-|                           12 | Exterior improvements | Terracotta, slate, moss roof            |
-|                           24 | Neighboring house     | Buttercream, rosewood, bluebell         |
-|                           40 | Pocket garden         | Meadow, orchard, roses                  |
-|                           60 | Street improvements   | Lantern walk, leafy avenue, flower lane |
-|                           85 | Additional house      | Linen, garden, harbor                   |
-|                          115 | Cul-de-sac            | Oak, fountain, gazebo                   |
+|               Lifetime stars | Project                   | Design choices                                       |
+| ---------------------------: | ------------------------- | ---------------------------------------------------- |
+| First valid habit completion | Your First Home           | Classic Cottage, Modern Craftsman, Traditional Brick |
+|                           10 | A Garden at the Door      | Red roses, orange flowers, blue flowers              |
+|                           20 | A Garden Centerpiece      | Flowering tree, stone fountain, birdbath             |
+|                           30 | A Backyard Favorite       | Swimming pool, trampoline, wooden play fort          |
+|                           40 | A Welcoming Porch         | Rocking chairs, porch swing, bench + lanterns        |
+|                           50 | A Place to Unwind         | Pergola seating, stone patio, garden lounge          |
+|                           60 | Room to Bloom             | Flower beds, evergreen shrubs, wildflowers           |
+|                           70 | A Gentle Property Edge    | Picket fence, trimmed hedge, low stone wall          |
+|                           80 | A Warm Welcome After Dark | String lights, garden torches, exterior wall sconces |
+|                           90 | Your Garden Signature     | Decorative pond, gazebo, ornamental display garden   |
+|                          100 | Chapter completion        | Peaceful reveal of the next empty lot                |
 
-All available projects remain in **Your town** until you choose a design. Nothing is automatically skipped. Construction and every later design change are free. Each choice changes the actual 3D environment.
+All earned projects remain available in **Your town** until you choose a design. Nothing is automatically skipped. Construction and every later design change are free and reversible. Each choice changes the actual 3D environment. The 100-star reveal is an empty lot in the same continuous world, not a new building or a separate map.
 
 Genuinely new profiles start on the same peaceful residential lot with no house. Any valid recorded habit completion unlocks **Your First Home**, including a completion that earns zero stars at the daily cap. Preview each existing house in the live town, then confirm. The home is saved before a short construction celebration begins. Skip finishes immediately; reduced motion shows the completed home directly. Reloading during construction shows the saved house. Choose later leaves the selection available in **Your town**, and **Design Your First Home** reopens the same free selector after construction.
 
 ## Developer Preview
 
-Settings → **Developer Preview** → **Enter Developer Preview** creates a disposable working copy. The green **DEVELOPER PREVIEW** badge and Exit remain visible; tap the badge to reopen controls. Collapse the panel to explore the town. The six control groups cover five scenarios, simulated lifetime stars and existing milestones, three house styles, existing backyard choices/visibility, the existing lighting modes, and camera reset/position/zoom/rotation. Locked designs are available in preview only. No new projects or currency are introduced.
+Settings → **Developer Preview** → **Enter Developer Preview** creates a disposable working copy. The green **DEVELOPER PREVIEW** badge and Exit remain visible; tap the badge to reopen controls. Collapse the panel to explore the town. Controls cover five scenarios, simulated lifetime stars and milestone jumps, all current house and project compositions, backyard choices/visibility, lighting, and camera reset/position/zoom/rotation. Locked designs are available in preview only. No new projects or currency are introduced.
 
 Real state and preview state occupy separate signals. Preview actions, camera updates, construction, and simulated stars never write to storage or other tabs. JSON exports always contain the latest genuine progress; imports are disabled during preview. Real updates from another tab remain authoritative behind the working copy. Exit reveals that genuine state; reload discards preview entirely. This is a client-side visualization tool available in production, not an access-control or security boundary.
 
@@ -79,7 +82,7 @@ Lighting follows the **device's local time**, blending morning, afternoon, sunse
 
 Habits, schedules, completion snapshots, stars, designs, camera and interface preferences live in browser **localStorage**, under `foundations.v1`. The versioned state is validated on load and import. Multiple same-origin tabs synchronize; browsers with Web Locks serialize startup creation, migration and updates to prevent stale writes or duplicate rewards.
 
-The storage key stays unchanged; the JSON schema is now **version 2**. All valid version 1 profiles migrate conservatively as existing homeowners, including zero-star profiles. Habits, history, designs and unknown fields are retained. Before overwriting a stored v1 record, its exact original bytes are copied once to `foundations.pre-v2`; Settings can export that pre-upgrade backup. If that backup cannot be written, the original record is left intact and an unsaved warning appears. Older JSON imports use the same conservative migration. Unsupported or malformed records remain protected. Close stale tabs after an upgrade; an old app version cannot edit the newer schema.
+The storage key stays unchanged; the JSON schema is now **version 3**. Valid older profiles migrate conservatively: v1 saves with a house remain existing homeowners, v2 profiles with completions or a house retain the home, and all habits, history, designs and unknown fields are preserved. Before overwriting a stored v1 or v2 record, its exact original bytes are copied once to `foundations.pre-v2` or `foundations.pre-v3`; Settings can export those backups. If the required backup cannot be written, the original record is left intact and an unsaved warning appears. Older JSON imports use the same conservative migration. Unsupported or malformed records remain protected. Close stale tabs after an upgrade; an old app version cannot edit the newer schema.
 
 **Clearing browser/site storage, private browsing cleanup, changing browser profiles or moving devices can lose progress.** Settings → Export backup downloads a JSON file. Import validates the file and shows a confirmation before replacing current progress. Export your current town first if you want to keep both. Backups contain habit names and history: keep them private and never commit them to this public repository.
 
@@ -98,15 +101,16 @@ Confirming a first home requires a successful durable save. If browser storage i
 - `src/app/app.*` and `src/ui.css`: responsive shell, habit sheet, project inspector, history and settings; native dialogs provide focus trapping and Escape dismissal.
 - `src/app/town/assets.ts`: shared material, geometry, texture and disposal ownership; legacy factories for later projects.
 - `src/app/town/residential.ts`, `landscaping.ts`, `backyards.ts`: replaceable metre-scale starting-house and yard factories, organic tree variants, gardens and furnishings. All three starting houses share their entrance, garage and backyard anchors.
+- `src/app/town/milestone-assets.ts`: deterministic A/B/C property compositions with stable assembly pieces and fixed lot zones; milestone definitions stay separate from player designs.
 - `src/app/town/surfaces.ts`, `batching.ts`: small original generated surface maps and static material batches with baked transforms and world-scale UVs. See [asset conventions](docs/visual-assets.md).
 - `src/app/town/world.ts`: project-ID → asset-factory registry and composed terrain. Add or replace a factory without changing habits or persistence. A future GLTF asset loader can implement the same factory boundary.
-- `src/app/town/camera.ts`, `lighting.ts`, `scene.ts`, `construction.ts`: bounded map controls, clock palettes, renderer lifecycle, shadows and a bounded home animation. The home is separately batched within the same world. Three.js loads as a separate chunk. Habits remain usable if WebGL initialization fails.
+- `src/app/town/camera.ts`, `lighting.ts`, `scene.ts`, `construction.ts`: bounded map controls, clock palettes, renderer lifecycle, shadows, temporary project-preview focus and home/project assembly. The home and projects are separately batched within the same world. Three.js loads as a separate chunk. Habits remain usable if WebGL initialization fails.
 
 No city simulation, traffic, citizens, physics, multiplayer, downloaded art or external fonts are included.
 
 ## GitHub Pages deployment
 
-`.github/workflows/pages.yml` runs on pushes to `main` and manual dispatch. It installs pinned dependencies with `npm ci`, runs the unit tests, builds production assets, uploads `dist/foundations/browser` with `actions/upload-pages-artifact`, and deploys using `actions/deploy-pages`. The deploy job uses the `github-pages` environment with Pages-write and OIDC permissions.
+`.github/workflows/pages.yml` runs on pushes to `main` and manual dispatch. It installs pinned dependencies with `npm ci`, runs the fast unit tests, builds production assets, uploads `dist/foundations/browser` with `actions/upload-pages-artifact`, and deploys using `actions/deploy-pages`. The deploy job uses the `github-pages` environment with Pages-write and OIDC permissions. Browser capture scripts are optional evidence tools and are not deployment checks.
 
 Repository Settings → Pages → Source must be **GitHub Actions**. CLI equivalent after the repository has a default branch:
 

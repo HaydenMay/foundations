@@ -61,6 +61,19 @@ import type { AssemblyConfigOverride } from '../town/assembly';
             }
           </select>
           <button class="wide" (click)="unlockAll()">Unlock all existing milestones</button>
+          <label class="check"
+            ><input
+              type="checkbox"
+              data-preview-visible="chapter"
+              [checked]="
+                store.stars() >= 100 &&
+                store.preview()?.hiddenDesigns?.['chapter'] !== '__hidden__' &&
+                !store.state().designs['neighbor']
+              "
+              [disabled]="store.stars() < 100 || !!store.state().designs['neighbor']"
+              (change)="visible('chapter', $event)"
+            />Show the 100-star empty next lot</label
+          >
           <div class="two">
             <button (click)="setScenarioValue('new')">Return to empty lot</button
             ><button (click)="setScenarioValue('ready')">Preview first-home unlock</button>
@@ -77,7 +90,7 @@ import type { AssemblyConfigOverride } from '../town/assembly';
             "
             (change)="design('home', $event)"
           >
-            @for (c of projects[0].choices; track c.id) {
+            @for (c of homeProject.choices; track c.id) {
               <option [value]="c.id">{{ c.name }}</option>
             }</select
           ><label class="check"
@@ -118,7 +131,7 @@ import type { AssemblyConfigOverride } from '../town/assembly';
             "
             (change)="design('backyard', $event)"
           >
-            @for (c of projects[1].choices; track c.id) {
+            @for (c of backyardProject.choices; track c.id) {
               <option [value]="c.id">{{ c.name }}</option>
             }</select
           ><label class="check"
@@ -128,6 +141,38 @@ import type { AssemblyConfigOverride } from '../town/assembly';
               (change)="visible('backyard', $event)"
             />Show backyard project</label
           >
+        </section>
+        <section>
+          <h3>Other home milestones</h3>
+          <p class="hint">Try every composition without changing the genuine town.</p>
+          @for (p of otherProjects; track p.id) {
+            <details class="project-preview">
+              <summary>{{ p.name }}</summary>
+              <label [attr.for]="'preview-' + p.id">Preview {{ p.name }}</label>
+              <select
+                [id]="'preview-' + p.id"
+                [attr.data-preview-project]="p.id"
+                [value]="
+                  store.state().designs[p.id] ||
+                  store.preview()?.hiddenDesigns?.[p.id] ||
+                  p.choices[0].id
+                "
+                (change)="design(p.id, $event)"
+              >
+                @for (c of p.choices; track c.id) {
+                  <option [value]="c.id">{{ c.name }}</option>
+                }
+              </select>
+              <label class="check"
+                ><input
+                  type="checkbox"
+                  [attr.data-preview-visible]="p.id"
+                  [checked]="!!store.state().designs[p.id]"
+                  (change)="visible(p.id, $event)"
+                />Show {{ p.name }}</label
+              >
+            </details>
+          }
         </section>
         <section>
           <h3>Lighting</h3>
@@ -163,6 +208,11 @@ import type { AssemblyConfigOverride } from '../town/assembly';
 export class DeveloperPanel {
   readonly store = inject(FoundationsStore);
   readonly projects = PROJECTS;
+  readonly homeProject = PROJECTS.find((project) => project.id === 'home')!;
+  readonly backyardProject = PROJECTS.find((project) => project.id === 'backyard')!;
+  readonly otherProjects = PROJECTS.filter(
+    (project) => project.id !== 'home' && project.id !== 'backyard',
+  );
   readonly pi = Math.PI;
   readonly open = input(true);
   readonly position = input<{ x: number; y: number; z: number } | null>(null);
@@ -212,7 +262,7 @@ export class DeveloperPanel {
   design(project: string, e: Event) {
     this.run(() => this.store.previewDesign(project, this.value(e)));
   }
-  visible(project: 'home' | 'backyard', e: Event) {
+  visible(project: string, e: Event) {
     this.run(() => this.store.previewVisible(project, (e.target as HTMLInputElement).checked));
   }
   lighting(e: Event) {

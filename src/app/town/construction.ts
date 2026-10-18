@@ -12,3 +12,20 @@ export function homeTransition(from: CameraState, progress: number): CameraState
     angle: (((from.angle + delta * t) % turn) + turn) % turn,
   };
 }
+
+export function projectTransition(
+  from: CameraState,
+  focus: { x: number; z: number; zoom: number },
+  progress: number,
+): CameraState {
+  const t = clamp(progress),
+    targetAngle = Math.PI / 4,
+    turn = Math.PI * 2,
+    delta = ((targetAngle - from.angle + Math.PI * 3) % turn) - Math.PI;
+  return {
+    x: from.x + (focus.x - from.x) * t,
+    z: from.z + (focus.z - from.z) * t,
+    zoom: from.zoom + (focus.zoom - from.zoom) * t,
+    angle: (((from.angle + delta * t) % turn) + turn) % turn,
+  };
+}

@@ -16,7 +16,7 @@ type PreviewStore = FoundationsStore & {
   previewStars(stars: number): void;
   previewJump(project: string): void;
   previewDesign(project: string, choice: string): void;
-  previewVisible(project: 'home' | 'backyard', visible: boolean): void;
+  previewVisible(project: string, visible: boolean): void;
   backupJSON(): string;
 };
 describe('disposable Developer Preview boundary', () => {
@@ -95,6 +95,40 @@ describe('disposable Developer Preview boundary', () => {
     s.resetPreview();
     expect(s.state()).toEqual(real);
     expect(s.stars()).toBe(1);
+  });
+  it('hides, restores and replaces any milestone only inside the disposable preview', async () => {
+    const s = make();
+    await s.complete(s.state().habits[0].id);
+    const real = structuredClone(s.realState()),
+      saved = localStorage.getItem(STORAGE_KEY),
+      backup = s.backupJSON();
+    s.enterPreview();
+    s.previewScenario('all');
+    const selected = s.state().designs['frontGarden'];
+    expect(selected).toBeDefined();
+    s.previewVisible('frontGarden', false);
+    expect(s.state().designs['frontGarden']).toBeUndefined();
+    expect(s.preview()?.hiddenDesigns['frontGarden']).toBe(selected);
+    s.previewVisible('frontGarden', true);
+    expect(s.state().designs['frontGarden']).toBe(selected);
+    s.previewDesign('frontGarden', 'blue');
+    expect(s.state().designs['frontGarden']).toBe('blue');
+    expect(s.realState()).toEqual(real);
+    expect(localStorage.getItem(STORAGE_KEY)).toBe(saved);
+    expect(s.backupJSON()).toBe(backup);
+  });
+  it('can hide and restore the 100-star teaser without changing genuine data', () => {
+    const s = make(),
+      real = structuredClone(s.realState()),
+      raw = localStorage.getItem(STORAGE_KEY);
+    s.enterPreview();
+    s.previewStars(100);
+    s.previewVisible('chapter', false);
+    expect(s.preview()?.hiddenDesigns['chapter']).toBe('__hidden__');
+    s.previewVisible('chapter', true);
+    expect(s.preview()?.hiddenDesigns['chapter']).toBeUndefined();
+    expect(s.realState()).toEqual(real);
+    expect(localStorage.getItem(STORAGE_KEY)).toBe(raw);
   });
   it('accepts genuine updates from another tab behind the isolated view and exports only real data', async () => {
     const s = make(),

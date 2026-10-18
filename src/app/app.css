@@ -631,6 +631,58 @@ app-town {
   height: 18px;
   color: #7a9871;
 }
+.design-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 16px;
+}
+.design-actions button {
+  min-height: 48px;
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+.design-actions button:first-child {
+  grid-column: 1 / -1;
+}
+.design-actions .secondary {
+  border: 1px solid #dce3d3;
+  background: #fdfdf8;
+  color: var(--ink);
+}
+.design-actions .primary:disabled {
+  opacity: 0.58;
+}
+.design-preview-banner {
+  position: absolute;
+  z-index: 4;
+  top: 82px;
+  right: 18px;
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  max-width: min(440px, calc(100% - 36px));
+  padding: 8px;
+  border: 1px solid #cdd9c6;
+  border-radius: 14px;
+  background: #faf9f4f2;
+  box-shadow: 0 8px 30px #233d3220;
+  backdrop-filter: blur(8px);
+  font-size: 10px;
+  line-height: 1.45;
+}
+.design-preview-banner button {
+  min-height: 44px;
+  padding: 8px 12px;
+  border-radius: 9px;
+  white-space: nowrap;
+  font-size: 11px;
+}
+.design-preview-banner .secondary {
+  border: 1px solid #dce3d3;
+  background: #fdfdf8;
+}
 .manage-row {
   display: flex;
   align-items: center;
@@ -1209,6 +1261,18 @@ app-town {
   .preview-banner button {
     font-size: 9px;
     padding: 0 10px;
+  }
+  .design-preview-banner {
+    left: 10px;
+    right: 10px;
+    top: 108px;
+    max-width: none;
+    gap: 5px;
+    padding: 6px;
+  }
+  .design-preview-banner button {
+    padding: 7px 9px;
+    font-size: 10px;
   }
 }
 @media (orientation: landscape) and (max-height: 550px) {

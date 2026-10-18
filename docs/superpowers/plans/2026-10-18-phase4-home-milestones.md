@@ -56,26 +56,25 @@ Task 2 validation: `npm exec --yes --package=node@24.15.0 -- npm test -- --inclu
 
 **Files:** `src/app/app.ts`, `app.html`, `state.service.ts`, `town/{world,scene,town.component,construction}.ts`, new scene/state tests.
 
-- [ ] Add in-memory draft design selection for normal project review. Render the selected complete option in the actual world; Cancel restores committed visuals; Confirm writes the selected design durably before requesting playback.
-- [ ] Use each project’s stable assembly references and recipe with the existing Phase 3 animator. Handle additions and replacements, camera focus/return, skip, reduced motion, cancellation, rapid selection, reload and disposal without a second RAF loop or leaked assets.
-- [ ] Keep preview camera/light state transient; camera focus must not persist user preferences.
-- [ ] Add tests for side-effect-free preview/cancel, durable-before-animation ordering, free re-selection, replacement animation, skip/reduced motion and cleanup.
+- [x] Add in-memory draft design selection for normal project review. Render the selected complete option in the actual world; Cancel restores committed visuals; Confirm writes the selected design durably before requesting playback.
+- [x] Use each project’s stable assembly references and recipe with the existing Phase 3 animator. Handle additions and replacements, camera focus/return, skip, reduced motion, cancellation, rapid selection, reload and disposal without a second RAF loop or leaked assets.
+- [x] Keep preview camera/light state transient; camera focus must not persist user preferences.
+- [x] Add tests for side-effect-free preview/cancel, durable-before-animation ordering, free re-selection, replacement animation, skip/reduced motion and cleanup.
 
 ### Task 4: Developer Preview and chapter-end reveal
 
 **Files:** `src/app/domain/preview.ts`, `state.service.ts`, `components/developer-panel.ts`, `developer-panel.spec.ts`, `app.ts`, `town/world.ts`, scene tests.
 
-- [ ] Extend the disposable panel to cover the production A/B/C options, visibility, threshold jumps, manual/automatic lighting and the five required scenarios.
-- [ ] Ensure simulated designs/stars and camera/light evaluation never reach real storage, backup exports or other tabs.
-- [ ] At 100 lifetime stars, show a small adjacent empty residential lot in the same world and animate its reveal once when the user crosses the threshold. Never overwrite or hide an existing legacy neighbor construction.
-- [ ] Add tests for scenario coverage, preview isolation and the 100-star reveal boundary.
+- [x] Extend the disposable panel to cover the production A/B/C options, visibility, threshold jumps, manual/automatic lighting and the five required scenarios.
+- [x] Ensure simulated designs/stars and camera/light evaluation never reach real storage, backup exports or other tabs.
+- [x] At 100 lifetime stars, show a small adjacent empty residential lot in the same world and animate its reveal once when the user crosses the threshold. Never overwrite or hide an existing legacy neighbor construction.
+- [x] Add tests for scenario coverage, preview isolation and the 100-star reveal boundary.
 
 ### Task 5: Reference captures and final validation
 
 **Files:** `scripts/capture-phase-4.mjs`, `docs/evidence/phase-4/`, `docs/phase-4-results.md`, `README.md`.
 
-- [ ] Add a manual capture script using a fresh synthetic browser profile and production options. Capture A, B and C full-property sets from front three-quarter, rear three-quarter, elevated overview and night views with comparable framing (at least 12 running-app screenshots).
-- [ ] Produce a labeled contact sheet/HTML gallery and option legend. Capture mixed designs and inspect all three house styles for clipping, color conflicts and clearance.
-- [ ] Record verified versus assumed behavior and compare the procedural result honestly with the supplied references; report actual-device testing as skipped unless performed.
-- [ ] Run `npm test`, `npm run build`, `git diff --check`, local manual visual captures, then push and verify the short Pages workflow and live `/foundations/` app.
-
+- [x] Add a manual capture script using a fresh synthetic browser profile and production options. Capture A, B and C full-property sets from front three-quarter, rear three-quarter, elevated overview and night views with comparable framing (at least 12 running-app screenshots).
+- [x] Produce a labeled contact sheet/HTML gallery and option legend. Capture mixed designs and inspect all three house styles for clipping, color conflicts and clearance. Add portrait/landscape preview-control screenshots; these are manual captures, not E2E tests.
+- [x] Record verified versus assumed behavior and compare the procedural result honestly with the supplied references; report actual-device testing as skipped unless performed.
+- [ ] Run final `npm test`, `npm run build`, `git diff --check`, push, and verify the short Pages workflow and live `/foundations/` app.
