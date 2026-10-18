@@ -287,6 +287,7 @@ export function buildStartingHouse(
   parent: T.Group,
   choice: string,
   roofChoice?: string,
+  position: readonly [number, number, number] = [-5, STARTING_HOME_Y, -4.6],
 ): StartingHouseAsset {
   const craftsman = choice === 'cream',
     brick = choice === 'blue';
@@ -300,7 +301,7 @@ export function buildStartingHouse(
     'shingles',
     ROOF_COLORS[roofChoice || ''] || (craftsman ? '#454944' : '#414b50'),
   );
-  const g = a.group(parent, -5, STARTING_HOME_Y, -4.6);
+  const g = a.group(parent, ...position);
   g.name = 'starting-home';
   const assemblies = new Map<string, T.Group>();
   const assembly = (id: string) => {

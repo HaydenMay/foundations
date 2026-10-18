@@ -1,0 +1,487 @@
+{
+  "source": "http://127.0.0.1:4200/foundations/",
+  "sourceCommit": "41bff641f6ae744dae57b015a14abc361e929315",
+  "capturedAt": "2026-10-18T20:03:53.429Z",
+  "profile": "fresh synthetic browser profile; all changes in disposable Developer Preview",
+  "note": "Screenshots are from the running production bundle. The built-in orthographic camera keeps a fixed elevated isometric pitch; overview uses wider zoom. Browser viewport emulation is not physical-device testing.",
+  "requestHosts": [
+    "127.0.0.1"
+  ],
+  "errors": [],
+  "captures": [
+    {
+      "name": "set-A-front-three-quarter",
+      "view": "front",
+      "light": "day",
+      "file": "docs/evidence/universal-plot-framework/final/chapter-1/set-A-front-three-quarter.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "overflow": false,
+      "lighting": "day",
+      "homeVisible": "true",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "drawCalls": 239,
+      "triangles": 202269,
+      "meshes": 239,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "set-A-rear-three-quarter",
+      "view": "rear",
+      "light": "day",
+      "file": "docs/evidence/universal-plot-framework/final/chapter-1/set-A-rear-three-quarter.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "overflow": false,
+      "lighting": "day",
+      "homeVisible": "true",
+      "construction": "idle",
+      "camera": [
+        -29.04163056034263,
+        29.8,
+        -28.641630560342605
+      ],
+      "zoom": 1,
+      "drawCalls": 239,
+      "triangles": 202269,
+      "meshes": 239,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "set-A-elevated-overview",
+      "view": "overview",
+      "light": "day",
+      "file": "docs/evidence/universal-plot-framework/final/chapter-1/set-A-elevated-overview.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "overflow": false,
+      "lighting": "day",
+      "homeVisible": "true",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 0.8333333333333334,
+      "drawCalls": 239,
+      "triangles": 202269,
+      "meshes": 239,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "set-A-evening-night",
+      "view": "front",
+      "light": "night",
+      "file": "docs/evidence/universal-plot-framework/final/chapter-1/set-A-evening-night.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "overflow": false,
+      "lighting": "night",
+      "homeVisible": "true",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "drawCalls": 239,
+      "triangles": 202269,
+      "meshes": 239,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "set-B-front-three-quarter",
+      "view": "front",
+      "light": "day",
+      "file": "docs/evidence/universal-plot-framework/final/chapter-1/set-B-front-three-quarter.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "overflow": false,
+      "lighting": "day",
+      "homeVisible": "true",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "drawCalls": 233,
+      "triangles": 210165,
+      "meshes": 232,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "set-B-rear-three-quarter",
+      "view": "rear",
+      "light": "day",
+      "file": "docs/evidence/universal-plot-framework/final/chapter-1/set-B-rear-three-quarter.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "overflow": false,
+      "lighting": "day",
+      "homeVisible": "true",
+      "construction": "idle",
+      "camera": [
+        -29.04163056034263,
+        29.8,
+        -28.641630560342605
+      ],
+      "zoom": 1,
+      "drawCalls": 233,
+      "triangles": 210165,
+      "meshes": 232,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "set-B-elevated-overview",
+      "view": "overview",
+      "light": "day",
+      "file": "docs/evidence/universal-plot-framework/final/chapter-1/set-B-elevated-overview.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "overflow": false,
+      "lighting": "day",
+      "homeVisible": "true",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 0.8333333333333334,
+      "drawCalls": 233,
+      "triangles": 210165,
+      "meshes": 232,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "set-B-evening-night",
+      "view": "front",
+      "light": "night",
+      "file": "docs/evidence/universal-plot-framework/final/chapter-1/set-B-evening-night.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "overflow": false,
+      "lighting": "night",
+      "homeVisible": "true",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "drawCalls": 233,
+      "triangles": 210165,
+      "meshes": 232,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "set-C-front-three-quarter",
+      "view": "front",
+      "light": "day",
+      "file": "docs/evidence/universal-plot-framework/final/chapter-1/set-C-front-three-quarter.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "overflow": false,
+      "lighting": "day",
+      "homeVisible": "true",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "drawCalls": 274,
+      "triangles": 182634,
+      "meshes": 274,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "set-C-rear-three-quarter",
+      "view": "rear",
+      "light": "day",
+      "file": "docs/evidence/universal-plot-framework/final/chapter-1/set-C-rear-three-quarter.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "overflow": false,
+      "lighting": "day",
+      "homeVisible": "true",
+      "construction": "idle",
+      "camera": [
+        -29.04163056034263,
+        29.8,
+        -28.641630560342605
+      ],
+      "zoom": 1,
+      "drawCalls": 274,
+      "triangles": 182634,
+      "meshes": 274,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "set-C-elevated-overview",
+      "view": "overview",
+      "light": "day",
+      "file": "docs/evidence/universal-plot-framework/final/chapter-1/set-C-elevated-overview.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "overflow": false,
+      "lighting": "day",
+      "homeVisible": "true",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 0.8333333333333334,
+      "drawCalls": 274,
+      "triangles": 182634,
+      "meshes": 274,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "set-C-evening-night",
+      "view": "front",
+      "light": "night",
+      "file": "docs/evidence/universal-plot-framework/final/chapter-1/set-C-evening-night.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "overflow": false,
+      "lighting": "night",
+      "homeVisible": "true",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "drawCalls": 274,
+      "triangles": 182634,
+      "meshes": 274,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "mixed-front-three-quarter",
+      "view": "front",
+      "light": "day",
+      "file": "docs/evidence/universal-plot-framework/final/chapter-1/mixed-front-three-quarter.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "overflow": false,
+      "lighting": "day",
+      "homeVisible": "true",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "drawCalls": 138,
+      "triangles": 156025,
+      "meshes": 138,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "mixed-rear-three-quarter",
+      "view": "rear",
+      "light": "day",
+      "file": "docs/evidence/universal-plot-framework/final/chapter-1/mixed-rear-three-quarter.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "overflow": false,
+      "lighting": "day",
+      "homeVisible": "true",
+      "construction": "idle",
+      "camera": [
+        -29.04163056034263,
+        29.8,
+        -28.641630560342605
+      ],
+      "zoom": 1,
+      "drawCalls": 138,
+      "triangles": 156025,
+      "meshes": 138,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "mixed-brick-front-three-quarter",
+      "view": "front",
+      "light": "day",
+      "file": "docs/evidence/universal-plot-framework/final/chapter-1/mixed-brick-front-three-quarter.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "overflow": false,
+      "lighting": "day",
+      "homeVisible": "true",
+      "construction": "idle",
+      "camera": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "drawCalls": 190,
+      "triangles": 167347,
+      "meshes": 190,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "mixed-brick-rear-three-quarter",
+      "view": "rear",
+      "light": "day",
+      "file": "docs/evidence/universal-plot-framework/final/chapter-1/mixed-brick-rear-three-quarter.jpg",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "overflow": false,
+      "lighting": "day",
+      "homeVisible": "true",
+      "construction": "idle",
+      "camera": [
+        -29.04163056034263,
+        29.8,
+        -28.641630560342605
+      ],
+      "zoom": 1,
+      "drawCalls": 190,
+      "triangles": 167347,
+      "meshes": 190,
+      "webglError": 0,
+      "contextLost": false
+    }
+  ],
+  "layouts": [
+    {
+      "name": "portrait-expanded",
+      "file": "docs/evidence/universal-plot-framework/final/chapter-1/ui-portrait-expanded.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "document": {
+        "width": 390,
+        "height": 844
+      },
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 455.609375
+      }
+    },
+    {
+      "name": "portrait-collapsed",
+      "file": "docs/evidence/universal-plot-framework/final/chapter-1/ui-portrait-collapsed.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "document": {
+        "width": 390,
+        "height": 844
+      },
+      "canvas": {
+        "x": 0,
+        "y": 74,
+        "width": 390,
+        "height": 714
+      }
+    },
+    {
+      "name": "landscape-expanded",
+      "file": "docs/evidence/universal-plot-framework/final/chapter-1/ui-landscape-expanded.png",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "document": {
+        "width": 844,
+        "height": 390
+      },
+      "canvas": {
+        "x": 320,
+        "y": 59,
+        "width": 524,
+        "height": 331
+      }
+    },
+    {
+      "name": "landscape-collapsed",
+      "file": "docs/evidence/universal-plot-framework/final/chapter-1/ui-landscape-collapsed.png",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "document": {
+        "width": 844,
+        "height": 390
+      },
+      "canvas": {
+        "x": 0,
+        "y": 59,
+        "width": 844,
+        "height": 331
+      }
+    }
+  ]
+}

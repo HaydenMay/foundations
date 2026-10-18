@@ -41,6 +41,7 @@ export class App {
   readonly draftHome = signal('sage');
   readonly draftProjects = signal<Record<string, string>>({});
   readonly previewPanelOpen = signal(true);
+  readonly previewFrameworkProof = signal(false);
   readonly construction = signal(0);
   readonly constructionProject = signal('home');
   readonly previewAssemblyOptions = signal<AssemblyConfigOverride>({});
@@ -313,6 +314,7 @@ export class App {
     this.draftProjects.set({});
     this.construction.set(0);
     this.previewAssemblyOptions.set({});
+    this.previewFrameworkProof.set(false);
     this.store.enterPreview();
     this.previewPanelOpen.set(true);
   }
@@ -322,7 +324,18 @@ export class App {
     this.draftProjects.set({});
     this.construction.set(0);
     this.previewAssemblyOptions.set({});
+    this.previewFrameworkProof.set(false);
     this.store.exitPreview();
+  }
+  setFrameworkProof(enabled: boolean) {
+    if (!this.store.preview()) return;
+    if (enabled) {
+      const style =
+        this.store.state().designs['home'] || this.store.preview()?.hiddenDesigns?.['home'] || 'sage';
+      this.store.previewDesign('home', style);
+      this.store.previewStars(Math.max(100, this.store.stars()));
+    }
+    this.previewFrameworkProof.set(enabled);
   }
   previewConstruction(request: ConstructionPreviewRequest) {
     if (!this.store.preview()) return;
@@ -336,6 +349,10 @@ export class App {
       this.store.previewStars(Math.max(100, this.store.stars()));
       void this.store.acknowledgeChapterNotice('neighborhood');
       this.store.previewVisible('ch2-neighborhood', true);
+    } else if (request.projectId === 'framework-proof-neighbor') {
+      this.setFrameworkProof(true);
+      this.store.previewStars(Math.max(100, this.store.stars()));
+      this.store.previewVisible('home', true);
     } else if (CHAPTER_TWO_PROJECTS.some((project) => project.id === request.projectId)) {
       const project = CHAPTER_TWO_PROJECTS.find((candidate) => candidate.id === request.projectId)!;
       this.store.previewStars(Math.max(100, project.threshold, this.store.stars()));

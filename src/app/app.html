@@ -36,6 +36,7 @@
       [construction]="construction()"
       [constructionProject]="constructionProject()"
       [assemblyOptions]="previewAssemblyOptions()"
+      [frameworkProof]="previewFrameworkProof()"
       (constructionFinished)="constructionFinished($event)"
       (constructionCancelled)="constructionCancelled($event)"
       (cameraChange)="cameraChanged($event)"
@@ -73,8 +74,10 @@
         [class.collapsed]="!previewPanelOpen()"
         [open]="previewPanelOpen()"
         [position]="cameraPosition()"
+        [frameworkProofActive]="previewFrameworkProof()"
         (toggle)="previewPanelOpen.set(!previewPanelOpen())"
         (construct)="previewConstruction($event)"
+        (frameworkProofChange)="setFrameworkProof($event)"
         (home)="town()?.command('home')"
       />
     }

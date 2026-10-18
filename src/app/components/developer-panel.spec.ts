@@ -142,6 +142,44 @@ it('offers each Chapter 2 neighbor style and the continuous road only in the Cha
   expect(store.realState().designs['ch2-neighborhood']).toBeUndefined();
 });
 
+it('offers the isolated Chapter 1-built neighbor toggle and staged build only in Chapter 2', () => {
+  TestBed.configureTestingModule({ imports: [DeveloperPanel] });
+  const fixture = TestBed.createComponent(DeveloperPanel);
+  fixture.detectChanges();
+  const store = fixture.componentInstance.store,
+    real = structuredClone(store.realState()),
+    toggled = vi.fn(),
+    constructed = vi.fn();
+  store.enterPreview();
+  store.previewScenario('neighborhood');
+  fixture.componentInstance.frameworkProofChange.subscribe(toggled);
+  fixture.componentInstance.construct.subscribe(constructed);
+  (
+    fixture.nativeElement.querySelector(
+      '[aria-label="Preview chapter"] button:nth-child(2)',
+    ) as HTMLButtonElement
+  ).click();
+  fixture.detectChanges();
+
+  const toggle = fixture.nativeElement.querySelector(
+    '[data-framework-proof-toggle]',
+  ) as HTMLButtonElement;
+  expect(toggle.textContent).toContain('Preview Chapter 1-built neighbor');
+  toggle.click();
+  expect(toggled).toHaveBeenCalledWith(true);
+  fixture.componentRef.setInput('frameworkProofActive', true);
+  fixture.detectChanges();
+  const build = fixture.nativeElement.querySelector(
+    '[data-build-preview="framework-proof-neighbor"]',
+  ) as HTMLButtonElement;
+  build.click();
+  expect(constructed).toHaveBeenCalledWith({
+    projectId: 'framework-proof-neighbor',
+    override: { speed: 1 },
+  });
+  expect(store.realState()).toEqual(real);
+});
+
 it('replays the Chapter 2 welcome and completion notices in preview state only', () => {
   TestBed.configureTestingModule({ imports: [DeveloperPanel] });
   const fixture = TestBed.createComponent(DeveloperPanel);

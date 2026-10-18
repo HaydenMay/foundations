@@ -10,6 +10,13 @@ import { STARTING_HOME_ASSEMBLY_RECIPES } from './residential-assembly';
 import { buildMilestoneProject, FEATURE_ZONES, MilestoneAsset } from './milestone-assets';
 import { buildChapterTwoProject, buildChapterTwoRoad } from './chapter-two-assets';
 import { CHAPTER_TWO_PROJECTS } from '../domain/progression';
+import { createChapterOnePropertyPlot } from './plot-blueprints';
+import {
+  buildChapterTwoFrameworkProof,
+  frameworkHomeStyleForNeighbor,
+  type FrameworkHomeStyle,
+} from './plot-proof';
+import type { PlotDefinition } from './plot-framework';
 
 export interface TownWorld {
   group: T.Group;
@@ -19,6 +26,11 @@ export interface TownWorld {
   homeRecipe?: AssemblyRecipe;
   projectAssets: Map<string, MilestoneAsset>;
   legacyAssets: Map<string, T.Group>;
+  plotDefinitions: readonly PlotDefinition[];
+}
+export interface WorldBuildOptions {
+  /** Disposable visual proof; only enabled from the isolated Developer Preview UI. */
+  frameworkProof?: boolean;
 }
 type ProjectFactory = (a: AssetLibrary, g: T.Group, choice: string) => void;
 
@@ -145,7 +157,10 @@ const PROJECT_ASSETS: Record<string, ProjectFactory> = {
   },
 };
 
-export function buildWorld(designs: Record<string, string>): TownWorld {
+export function buildWorld(
+  designs: Record<string, string>,
+  options: WorldBuildOptions = {},
+): TownWorld {
   const group = new T.Group(),
     a = new AssetLibrary();
   const chapterTwo = designs['ch2-neighborhood'] === 'reveal';
@@ -176,11 +191,19 @@ export function buildWorld(designs: Record<string, string>): TownWorld {
     homeRecipe: AssemblyRecipe | undefined;
   const projectAssets = new Map<string, MilestoneAsset>(),
     legacyAssets = new Map<string, T.Group>();
+  let frameworkProof: ReturnType<typeof buildChapterTwoFrameworkProof> | undefined;
   if (chapterTwo) {
     const occupied = CHAPTER_TWO_PROJECTS.filter(
       (project) => project.lot && designs[project.id],
     ).map((project) => project.id);
+    if (options.frameworkProof && !occupied.includes('ch2-neighbor-1'))
+      occupied.push('ch2-neighbor-1');
     projectAssets.set('ch2-neighborhood', buildChapterTwoRoad(a, group, occupied));
+    if (options.frameworkProof) {
+      const style = frameworkHomeStyleForNeighbor(designs['ch2-neighbor-1']);
+      frameworkProof = buildChapterTwoFrameworkProof(a, group, style);
+      projectAssets.set('framework-proof-neighbor', frameworkProof.asset);
+    }
   }
   if (designs['home']) {
     a.box(group, '#c8c7b5', -0.8, 0.19, -1.6, 2.6, 0.14, 7.8);
@@ -215,7 +238,7 @@ export function buildWorld(designs: Record<string, string>): TownWorld {
     [-15, -4, 1.15, '#7e9066'],
     [-14.5, 11, 1.25, '#8a986d'],
     [16, -12, 1.35, '#89946a'],
-    [14, -4.5, 1.15, '#7f8f68'],
+    [options.frameworkProof ? 5.4 : 14, -4.5, 1.15, '#7f8f68'],
     [0, -13.2, 1, '#9a9f71'],
     [8, -14, 1.2, '#839268'],
   ];
@@ -228,6 +251,7 @@ export function buildWorld(designs: Record<string, string>): TownWorld {
   if (home) startingLandscape(a, group);
   for (const [id, choice] of Object.entries(designs)) {
     if (id === 'ch2-neighborhood') continue;
+    if (options.frameworkProof && id === 'ch2-neighbor-1') continue;
     if (CHAPTER_TWO_PROJECTS.some((project) => project.id === id))
       projectAssets.set(id, buildChapterTwoProject(a, group, id, choice));
     else if (FEATURE_ZONES[id])
@@ -244,5 +268,24 @@ export function buildWorld(designs: Record<string, string>): TownWorld {
   if (designs['chapter'] === 'reveal' && !designs['neighbor'])
     projectAssets.set('chapter', buildChapterLot(a, group));
   batchStatic(group, (geometry) => a.geometry(geometry));
-  return { group, assets: a, home, homeAssemblies, homeRecipe, projectAssets, legacyAssets };
+  const homeStyle = (
+    ['sage', 'cream', 'blue'].includes(designs['home']) ? designs['home'] : 'sage'
+  ) as FrameworkHomeStyle;
+  const plotDefinitions: PlotDefinition[] = [
+    createChapterOnePropertyPlot(
+      { home, homeAssemblies, homeRecipe, projectAssets, legacyAssets },
+      homeStyle,
+    ),
+  ];
+  if (frameworkProof) plotDefinitions.push(frameworkProof.definition);
+  return {
+    group,
+    assets: a,
+    home,
+    homeAssemblies,
+    homeRecipe,
+    projectAssets,
+    legacyAssets,
+    plotDefinitions,
+  };
 }

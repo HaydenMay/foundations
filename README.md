@@ -104,6 +104,7 @@ Confirming a first home requires a successful durable save. If browser storage i
 - `src/app/town/milestone-assets.ts`: deterministic A/B/C property compositions with stable assembly pieces and fixed lot zones; milestone definitions stay separate from player designs.
 - `src/app/town/surfaces.ts`, `batching.ts`: small original generated surface maps and static material batches with baked transforms and world-scale UVs. See [asset conventions](docs/visual-assets.md).
 - `src/app/town/world.ts`: project-ID → asset-factory registry and composed terrain. Add or replace a factory without changing habits or persistence. A future GLTF asset loader can implement the same factory boundary.
+- `src/app/town/plot-framework.ts`, `plot-blueprints.ts`, and `plot-proof.ts`: parent-relative plot contract, measured Chapter 1 property adapter, and the disposable single-neighbor Chapter 2 proof. See the permanent [plot and assembly authoring rules](docs/plot-architecture.md).
 - `src/app/town/camera.ts`, `lighting.ts`, `scene.ts`, `construction.ts`: bounded map controls, clock palettes, renderer lifecycle, shadows, temporary project-preview focus and home/project assembly. The home and projects are separately batched within the same world. Three.js loads as a separate chunk. Habits remain usable if WebGL initialization fails.
 
 No city simulation, traffic, citizens, physics, multiplayer, downloaded art or external fonts are included.

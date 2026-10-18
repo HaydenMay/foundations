@@ -1,0 +1,132 @@
+{
+  "sourceCommit": "41bff641f6ae744dae57b015a14abc361e929315",
+  "scenario": "Chapter 2, first neighbor, Craftsman design beside a widely spaced starter property.",
+  "proofEnabled": true,
+  "assemblyDiagnostics": {
+    "configuredSpeed": "1",
+    "forceReducedMotion": false,
+    "reducedMotionPreference": false,
+    "constructionAtStart": "active"
+  },
+  "profile": "Fresh browser profile; preview-only state, no genuine save data.",
+  "image": "chapter-2-framework-neighbor-proof.png",
+  "images": [
+    {
+      "name": "chapter-2-framework-proof-early",
+      "elapsedMs": 572,
+      "construction": "active",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "camera": {
+        "position": [
+          27.816630560342613,
+          29.8,
+          15.441630560342618
+        ],
+        "zoom": 0.72
+      },
+      "drawCalls": 279,
+      "triangles": 266730,
+      "meshes": 334,
+      "webglError": 0,
+      "contextLost": false,
+      "image": "chapter-2-framework-proof-early.png"
+    },
+    {
+      "name": "chapter-2-framework-proof-middle",
+      "elapsedMs": 2960,
+      "construction": "active",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "camera": {
+        "position": [
+          27.816630560342613,
+          29.8,
+          15.441630560342618
+        ],
+        "zoom": 0.72
+      },
+      "drawCalls": 296,
+      "triangles": 267298,
+      "meshes": 334,
+      "webglError": 0,
+      "contextLost": false,
+      "image": "chapter-2-framework-proof-middle.png"
+    },
+    {
+      "name": "chapter-2-framework-proof-complete",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "camera": {
+        "position": [
+          29.25,
+          21.6,
+          20
+        ],
+        "zoom": 0.72
+      },
+      "drawCalls": 330,
+      "triangles": 281761,
+      "meshes": 334,
+      "webglError": 0,
+      "contextLost": false,
+      "documentWidth": 390,
+      "construction": "idle"
+    },
+    {
+      "name": "chapter-2-framework-neighbor-proof",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "camera": {
+        "position": [
+          29.25,
+          21.6,
+          20
+        ],
+        "zoom": 0.72
+      },
+      "drawCalls": 330,
+      "triangles": 281761,
+      "meshes": 334,
+      "webglError": 0,
+      "contextLost": false,
+      "documentWidth": 390,
+      "construction": "idle"
+    }
+  ],
+  "errors": [],
+  "warnings": [
+    "[.WebGL-0x1ad400426600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "[.WebGL-0x1ad400426600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "[.WebGL-0x1ad400426600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "[.WebGL-0x1ad400426600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+  ],
+  "name": "chapter-2-framework-neighbor-proof",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "camera": {
+    "position": [
+      29.25,
+      21.6,
+      20
+    ],
+    "zoom": 0.72
+  },
+  "drawCalls": 330,
+  "triangles": 281761,
+  "meshes": 334,
+  "webglError": 0,
+  "contextLost": false,
+  "documentWidth": 390,
+  "construction": "idle"
+}

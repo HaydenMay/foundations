@@ -227,6 +227,34 @@ type PreviewTab = 'chapter1' | 'chapter2' | 'shared';
             </button>
           </section>
           <section>
+            <h3>Universal plot proof</h3>
+            <p class="hint">
+              A disposable Chapter 1-built neighbor beside your home, using the shared house assets
+              and assembly recipe.
+            </p>
+            <button
+              class="wide"
+              data-framework-proof-toggle
+              [attr.aria-pressed]="frameworkProofActive()"
+              (click)="frameworkProofChange.emit(!frameworkProofActive())"
+            >
+              {{
+                frameworkProofActive()
+                  ? 'Restore original neighbor'
+                  : 'Preview Chapter 1-built neighbor'
+              }}
+            </button>
+            @if (frameworkProofActive()) {
+              <button
+                class="wide build-preview"
+                data-build-preview="framework-proof-neighbor"
+                (click)="buildPreview('framework-proof-neighbor')"
+              >
+                ▶ Preview staged construction
+              </button>
+            }
+          </section>
+          <section>
             <h3>Neighborhood homes and shared places</h3>
             <p class="hint">
               Each neighbor has three styles. Selection stays free in the real town.
@@ -337,9 +365,11 @@ export class DeveloperPanel {
   readonly pi = Math.PI;
   readonly open = input(true);
   readonly position = input<{ x: number; y: number; z: number } | null>(null);
+  readonly frameworkProofActive = input(false);
   readonly toggle = output<void>();
   readonly construct = output<ConstructionPreviewRequest>();
   readonly home = output<void>();
+  readonly frameworkProofChange = output<boolean>();
   readonly error = signal('');
   readonly scenario = signal('');
   readonly tab = signal<PreviewTab>('chapter1');
