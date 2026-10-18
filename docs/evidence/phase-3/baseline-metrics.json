@@ -1,0 +1,152 @@
+{
+  "repositoryCommit": "8eededf506e26644aa4cbd200aafd29414e85d8c",
+  "applicationSourceCommit": "c4b6f27",
+  "url": "http://127.0.0.1:4200/foundations/",
+  "lighting": "day",
+  "captures": [
+    {
+      "layout": "portrait",
+      "style": "cottage",
+      "width": 780,
+      "height": 1428,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "homeVisible": "true",
+      "lighting": "day",
+      "overflow": false,
+      "file": "docs/evidence/phase-3/baseline-portrait-cottage.png"
+    },
+    {
+      "layout": "portrait",
+      "style": "craftsman",
+      "width": 780,
+      "height": 1428,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "homeVisible": "true",
+      "lighting": "day",
+      "overflow": false,
+      "file": "docs/evidence/phase-3/baseline-portrait-craftsman.png"
+    },
+    {
+      "layout": "portrait",
+      "style": "brick",
+      "width": 780,
+      "height": 1428,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "homeVisible": "true",
+      "lighting": "day",
+      "overflow": false,
+      "file": "docs/evidence/phase-3/baseline-portrait-brick.png"
+    },
+    {
+      "layout": "landscape",
+      "style": "cottage",
+      "width": 1688,
+      "height": 662,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "homeVisible": "true",
+      "lighting": "day",
+      "overflow": false,
+      "file": "docs/evidence/phase-3/baseline-landscape-cottage.png"
+    },
+    {
+      "layout": "landscape",
+      "style": "craftsman",
+      "width": 1688,
+      "height": 662,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "homeVisible": "true",
+      "lighting": "day",
+      "overflow": false,
+      "file": "docs/evidence/phase-3/baseline-landscape-craftsman.png"
+    },
+    {
+      "layout": "landscape",
+      "style": "brick",
+      "width": 1688,
+      "height": 662,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "homeVisible": "true",
+      "lighting": "day",
+      "overflow": false,
+      "file": "docs/evidence/phase-3/baseline-landscape-brick.png"
+    },
+    {
+      "layout": "desktop",
+      "style": "cottage",
+      "width": 1440,
+      "height": 908,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "homeVisible": "true",
+      "lighting": "day",
+      "overflow": false,
+      "file": "docs/evidence/phase-3/baseline-desktop-cottage.png"
+    },
+    {
+      "layout": "desktop",
+      "style": "craftsman",
+      "width": 1440,
+      "height": 908,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "homeVisible": "true",
+      "lighting": "day",
+      "overflow": false,
+      "file": "docs/evidence/phase-3/baseline-desktop-craftsman.png"
+    },
+    {
+      "layout": "desktop",
+      "style": "brick",
+      "width": 1440,
+      "height": 908,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "homeVisible": "true",
+      "lighting": "day",
+      "overflow": false,
+      "file": "docs/evidence/phase-3/baseline-desktop-brick.png"
+    }
+  ]
+}
