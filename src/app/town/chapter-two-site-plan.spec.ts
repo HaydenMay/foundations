@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import * as T from 'three';
 import {
+  CHAPTER_TWO_ROAD_CONTROL_POINTS,
+  chapterTwoRoadFrameAtX,
   chapterTwoRoadCenterZAt,
   createChapterTwoNeighborhoodPlot,
   CHAPTER_TWO_SITE_PLAN,
@@ -41,16 +44,8 @@ function corners(definition: PlotDefinition, nodeId: string) {
   const offsetX = footprint?.offsetX ?? 0;
   const offsetZ = footprint?.offsetZ ?? 0;
   return [
-    resolvePlotPoint(definition, nodeId, [
-      offsetX - width / 2,
-      0,
-      offsetZ - depth / 2,
-    ]),
-    resolvePlotPoint(definition, nodeId, [
-      offsetX + width / 2,
-      0,
-      offsetZ + depth / 2,
-    ]),
+    resolvePlotPoint(definition, nodeId, [offsetX - width / 2, 0, offsetZ - depth / 2]),
+    resolvePlotPoint(definition, nodeId, [offsetX + width / 2, 0, offsetZ + depth / 2]),
   ];
 }
 
@@ -71,20 +66,117 @@ function rectangleGap(a: ReturnType<typeof bounds>, b: ReturnType<typeof bounds>
 }
 
 describe('production Chapter 2 neighborhood site plan', () => {
+  it('aligns each residential lot with its local curved-street tangent', () => {
+    const road = new T.CatmullRomCurve3(
+      CHAPTER_TWO_ROAD_CONTROL_POINTS.map(([x, z]) => new T.Vector3(x, 0, z)),
+      false,
+      'centripetal',
+      0.5,
+    );
+    const roadSamples = Array.from({ length: 801 }, (_, index) => road.getPointAt(index / 800));
+    const [districtX, , districtZ] = CHAPTER_TWO_SITE_PLAN.district.position;
+
+    for (const lot of CHAPTER_TWO_SITE_PLAN.lots) {
+      const center = new T.Vector3(lot.x - districtX, 0, lot.z - districtZ);
+      let closestIndex = 0;
+      let closestDistance = Number.POSITIVE_INFINITY;
+      for (let index = 0; index < roadSamples.length; index++) {
+        const distance = center.distanceTo(roadSamples[index]);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = index;
+        }
+      }
+      const tangent = road.getTangentAt(closestIndex / (roadSamples.length - 1));
+      const lotAxis = new T.Vector2(Math.cos(lot.rotation), -Math.sin(lot.rotation));
+      const roadAxis = new T.Vector2(tangent.x, tangent.z).normalize();
+
+      expect(
+        Math.abs(lotAxis.cross(roadAxis)),
+        `${lot.projectId} should follow the road tangent`,
+      ).toBeLessThan(0.02);
+    }
+  });
+
+  it('keeps the full lot frontage beyond the outside edge of the curved sidewalk', () => {
+    const road = new T.CatmullRomCurve3(
+      CHAPTER_TWO_ROAD_CONTROL_POINTS.map(([x, z]) => new T.Vector3(x, 0, z)),
+      false,
+      'centripetal',
+      0.5,
+    );
+    const roadSamples = Array.from({ length: 801 }, (_, index) => road.getPointAt(index / 800));
+    const [districtX, , districtZ] = CHAPTER_TWO_SITE_PLAN.district.position;
+    const sidewalkOuterEdge =
+      CHAPTER_TWO_SITE_PLAN.street.sidewalkOffset + CHAPTER_TWO_SITE_PLAN.street.sidewalkWidth / 2;
+
+    for (const lot of CHAPTER_TWO_SITE_PLAN.lots) {
+      let closestFrontageDistance = Number.POSITIVE_INFINITY;
+      for (let sample = 0; sample <= 48; sample++) {
+        const localX = (sample / 48 - 0.5) * lot.width;
+        const cos = Math.cos(lot.rotation);
+        const sin = Math.sin(lot.rotation);
+        const frontage = new T.Vector3(
+          lot.x - districtX + localX * cos + (lot.depth / 2) * sin,
+          0,
+          lot.z - districtZ - localX * sin + (lot.depth / 2) * cos,
+        );
+        const distance = roadSamples.reduce(
+          (nearest, point) => Math.min(nearest, frontage.distanceTo(point)),
+          Number.POSITIVE_INFINITY,
+        );
+        closestFrontageDistance = Math.min(closestFrontageDistance, distance);
+      }
+
+      expect(
+        closestFrontageDistance,
+        `${lot.projectId} frontage should clear the sidewalk plus a small planted verge`,
+      ).toBeGreaterThanOrEqual(sidewalkOuterEdge + 0.25);
+    }
+  });
+
   it('keeps the existing home and all four detached neighbor parcels in one valid ownership graph', () => {
     const definition = sitePlan();
 
     expect(validatePlot(definition)).toEqual([]);
-    expect(definition.nodes.find((node) => node.id === 'chapter1-property')?.localTransform.position)
-      .toEqual([-29.85, 0, -3.95]);
+    expect(
+      definition.nodes.find((node) => node.id === 'chapter1-property')?.localTransform.position,
+    ).toEqual([-29.85, 0, -3.95]);
     expect(CHAPTER_TWO_SITE_PLAN.lots.map((lot) => lot.projectId)).toEqual([
       'ch2-neighbor-1',
       'ch2-neighbor-2',
       'ch2-neighbor-3',
       'ch2-neighbor-4',
     ]);
-    expect(definition.nodes.filter((node) => node.role === 'lot' && node.id.startsWith('ch2-')))
-      .toHaveLength(4);
+    expect(
+      definition.nodes.filter((node) => node.role === 'lot' && node.id.startsWith('ch2-')),
+    ).toHaveLength(4);
+  });
+
+  it('keeps detached-house driveways beside the house footprints instead of under them', () => {
+    for (const lot of CHAPTER_TWO_SITE_PLAN.lots.filter(
+      (candidate) => candidate.lot !== 'l-shaped',
+    )) {
+      const sidewalkLocalZ =
+        lot.depth / 2 +
+        CHAPTER_TWO_SITE_PLAN.street.propertyFrontageOffset -
+        CHAPTER_TWO_SITE_PLAN.street.sidewalkOffset;
+      const houseMinX = lot.house.offsetX - lot.house.width / 2;
+      const houseMaxX = lot.house.offsetX + lot.house.width / 2;
+      const drivewayMinX = lot.house.drivewayX - lot.house.drivewayWidth / 2;
+      const drivewayMaxX = lot.house.drivewayX + lot.house.drivewayWidth / 2;
+      const houseFrontZ = lot.house.offsetZ + lot.house.depth / 2;
+
+      expect(
+        drivewayMaxX <= houseMinX || drivewayMinX >= houseMaxX,
+        `${lot.projectId} driveway should run beside its house`,
+      ).toBe(true);
+      expect(
+        lot.house.drivewayStartZ,
+        `${lot.projectId} driveway should begin beyond the house front`,
+      ).toBeGreaterThanOrEqual(houseFrontZ);
+      expect(sidewalkLocalZ).toBeGreaterThan(lot.house.drivewayStartZ);
+    }
   });
 
   it('leaves measurable property gaps and keeps every public feature out of private lots', () => {
@@ -109,7 +201,10 @@ describe('production Chapter 2 neighborhood site plan', () => {
     for (const publicId of ['ch2-community-park', 'ch2-landmark', 'ch2-entrance']) {
       const publicPlot = bounds(definition, { nodeId: publicId } as ChapterTwoSiteLot);
       for (const privateLot of privateLots)
-        expect(rectangleGap(publicPlot, privateLot), `${publicId} overlaps a private lot`).toBeGreaterThan(0);
+        expect(
+          rectangleGap(publicPlot, privateLot),
+          `${publicId} overlaps a private lot`,
+        ).toBeGreaterThan(0);
     }
   });
 
@@ -139,28 +234,63 @@ describe('production Chapter 2 neighborhood site plan', () => {
     const definition = sitePlan();
     const connections = definition.connections ?? [];
     for (const lot of CHAPTER_TWO_SITE_PLAN.lots) {
-      expect(lot.streetSide).toBe(lot.rotation === 0 ? 'north' : 'south');
-      expect(connections.some((connection) =>
-        connection.from.nodeId === `${lot.projectId}-walkway` &&
-        connection.to.nodeId === `ch2-sidewalk-${lot.streetSide}`,
-      )).toBe(true);
-      expect(connections.some((connection) =>
-        connection.from.nodeId === `${lot.projectId}-driveway` &&
-        connection.to.nodeId === `ch2-sidewalk-${lot.streetSide}`,
-      )).toBe(true);
+      const road = chapterTwoRoadFrameAtX(lot.x);
+      const roadRight = new T.Vector2(road.tangentZ, -road.tangentX);
+      const fromRoadToLot = new T.Vector2(lot.x - road.x, lot.z - road.z);
+      expect(lot.streetSide).toBe(fromRoadToLot.dot(roadRight) > 0 ? 'north' : 'south');
+      expect(
+        connections.some(
+          (connection) =>
+            connection.from.nodeId === `${lot.projectId}-walkway` &&
+            connection.to.nodeId === `ch2-sidewalk-${lot.streetSide}`,
+        ),
+      ).toBe(true);
+      expect(
+        connections.some(
+          (connection) =>
+            connection.from.nodeId === `${lot.projectId}-driveway` &&
+            connection.to.nodeId === `ch2-sidewalk-${lot.streetSide}`,
+        ),
+      ).toBe(true);
+      const roadLink = connections.find(
+        (connection) =>
+          connection.from.nodeId === `ch2-sidewalk-${lot.streetSide}` &&
+          connection.from.refId === `${lot.projectId}-drive-end` &&
+          connection.to.nodeId === 'ch2-road',
+      )!;
+      const sidewalkNode = definition.nodes.find((node) => node.id === roadLink.from.nodeId)!;
+      const roadNode = definition.nodes.find((node) => node.id === roadLink.to.nodeId)!;
+      const sidewalkAnchor = sidewalkNode.anchors!.find(
+        (anchor) => anchor.id === roadLink.from.refId,
+      )!;
+      const roadAnchor = roadNode.anchors!.find((anchor) => anchor.id === roadLink.to.refId)!;
+      const sidewalkPoint = resolvePlotPoint(definition, sidewalkNode.id, sidewalkAnchor.position);
+      const roadPoint = resolvePlotPoint(definition, roadNode.id, roadAnchor.position);
+      expect(
+        sidewalkPoint.distanceTo(roadPoint),
+        `${lot.projectId} sidewalk-to-road crossing`,
+      ).toBeLessThanOrEqual(roadLink.maxDistance!);
     }
-    expect(connections.some((connection) =>
-      connection.from.nodeId === 'ch2-public-walk-to-park' &&
-      connection.to.nodeId === 'ch2-community-park',
-    )).toBe(true);
-    expect(connections.some((connection) =>
-      connection.from.nodeId === 'ch2-public-promenade' &&
-      connection.to.nodeId === 'ch2-landmark',
-    )).toBe(true);
+    expect(
+      connections.some(
+        (connection) =>
+          connection.from.nodeId === 'ch2-public-walk-to-park' &&
+          connection.to.nodeId === 'ch2-community-park',
+      ),
+    ).toBe(true);
+    expect(
+      connections.some(
+        (connection) =>
+          connection.from.nodeId === 'ch2-public-promenade' &&
+          connection.to.nodeId === 'ch2-landmark',
+      ),
+    ).toBe(true);
   });
 
   it('places the neighborhood entrance beside the public sidewalk and starts the park path at its rear edge', () => {
-    const entrance = CHAPTER_TWO_SITE_PLAN.publicSites.find((site) => site.projectId === 'ch2-entrance')!;
+    const entrance = CHAPTER_TWO_SITE_PLAN.publicSites.find(
+      (site) => site.projectId === 'ch2-entrance',
+    )!;
     const approach = CHAPTER_TWO_SITE_PLAN.paths.parkApproach;
     const sidewalkCenter =
       chapterTwoRoadCenterZAt(entrance.x) - CHAPTER_TWO_SITE_PLAN.street.sidewalkOffset;
@@ -168,7 +298,9 @@ describe('production Chapter 2 neighborhood site plan', () => {
     const entrancePathAnchorZ = entrance.z - entrance.depth / 2;
 
     expect(entranceSidewalkAnchorZ).toBeCloseTo(sidewalkCenter, 1);
-    expect(entrance.x - entrance.width / 2).toBeGreaterThan(CHAPTER_TWO_SITE_PLAN.lots[0].x + CHAPTER_TWO_SITE_PLAN.lots[0].width / 2 + 2);
+    expect(entrance.x - entrance.width / 2).toBeGreaterThan(
+      CHAPTER_TWO_SITE_PLAN.lots[0].x + CHAPTER_TWO_SITE_PLAN.lots[0].width / 2 + 2,
+    );
     expect(approach.x).toBeCloseTo(entrance.x - 0.3);
     expect(approach.startZ).toBeCloseTo(entrancePathAnchorZ);
   });
@@ -192,11 +324,18 @@ describe('production Chapter 2 neighborhood site plan', () => {
     const actual = resolvePlotPoint(moved, lotId, [0, 0, 0]);
     const district = definition.nodes.find((node) => node.id === 'chapter-two-district')!;
     const expected = resolvePlotPoint(
-      { ...definition, nodes: [
-        { ...district, localTransform: { position: [39, 0, -5], rotation: [0, Math.PI / 2, 0] } },
-      ] },
+      {
+        ...definition,
+        nodes: [
+          { ...district, localTransform: { position: [39, 0, -5], rotation: [0, Math.PI / 2, 0] } },
+        ],
+      },
       'chapter-two-district',
-      [original.x - district.localTransform.position[0], 0, original.z - district.localTransform.position[2]],
+      [
+        original.x - district.localTransform.position[0],
+        0,
+        original.z - district.localTransform.position[2],
+      ],
     );
 
     expect(actual.x).toBeCloseTo(expected.x);

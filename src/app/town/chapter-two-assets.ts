@@ -4,12 +4,13 @@ import { CHAPTER_TWO_PROJECTS } from '../domain/progression';
 import type { AssemblyPieceRecipe, AssemblyRecipe } from './assembly';
 import type { AssetLibrary } from './assets';
 import { batchStatic } from './batching';
+import { CHAPTER_TWO_HOUSE_BLUEPRINTS } from './chapter-two-blueprints';
 import { buildChapterTwoHouse, type NeighborLot, type NeighborStyle } from './chapter-two-houses';
 import type { MilestoneAsset } from './milestone-assets';
 import { flower, gardenBed, plantTree, shrub } from './landscaping';
 import { surface } from './surfaces';
 import {
-  chapterTwoRoadCenterZAt,
+  chapterTwoRoadFrameAtX,
   CHAPTER_TWO_LOTS,
   CHAPTER_TWO_PUBLIC_SITES,
   CHAPTER_TWO_ROAD_CONTROL_POINTS,
@@ -35,7 +36,12 @@ const colors = {
   warm: '#f2cf83',
 };
 
-type PieceSet = { root: T.Group; pieces: Map<string, T.Group>; a: AssetLibrary };
+type PieceSet = {
+  root: T.Group;
+  pieces: Map<string, T.Group>;
+  renderObjects: Map<string, T.Group>;
+  a: AssetLibrary;
+};
 
 function createSet(
   a: AssetLibrary,
@@ -47,7 +53,7 @@ function createSet(
   const root = a.group(parent, position[0], position[1], position[2], rotation);
   root.name = `project-asset:${id}`;
   root.userData['staticBatchBoundary'] = true;
-  return { root, pieces: new Map(), a };
+  return { root, pieces: new Map(), renderObjects: new Map(), a };
 }
 
 function part(set: PieceSet, id: string) {
@@ -55,6 +61,15 @@ function part(set: PieceSet, id: string) {
   group.name = id;
   group.userData['staticBatchBoundary'] = true;
   set.pieces.set(id, group);
+  set.renderObjects.set(id, group);
+  return group;
+}
+
+function renderPart(set: PieceSet, id: string) {
+  const group = set.a.group(set.root);
+  group.name = id;
+  group.userData['staticBatchBoundary'] = true;
+  set.renderObjects.set(id, group);
   return group;
 }
 
@@ -81,10 +96,62 @@ function finish(
   set: PieceSet,
   focus: { x: number; z: number; zoom: number },
   durationMs = 1900,
+  recipe?: AssemblyRecipe,
 ): MilestoneAsset {
   for (const piece of set.pieces.values())
     batchStatic(piece, (geometry) => set.a.geometry(geometry));
-  return { root: set.root, pieces: set.pieces, recipe: recipeFor(set.pieces, durationMs), focus };
+  return {
+    root: set.root,
+    pieces: set.pieces,
+    renderObjects: set.renderObjects,
+    recipe: recipe ?? recipeFor(set.pieces, durationMs),
+    focus,
+  };
+}
+
+function neighborRecipe(pieces: Map<string, T.Group>, lot: NeighborLot): AssemblyRecipe {
+  const blueprint = CHAPTER_TWO_HOUSE_BLUEPRINTS[lot as keyof typeof CHAPTER_TWO_HOUSE_BLUEPRINTS];
+  const pieceDuration = 500;
+  const dependencyGap = 90;
+  const starts = new Map<string, number>();
+  const ends = new Map<string, number>();
+  for (const step of [...blueprint.assembly].sort((first, second) => first.order - second.order)) {
+    const dependencies = (step.dependsOn ?? []).map((id) => ends.get(id) ?? 0);
+    const start = dependencies.length ? Math.max(...dependencies) + dependencyGap : 0;
+    starts.set(step.id, start);
+    ends.set(step.id, start + pieceDuration);
+  }
+  const houseCompletion = Math.max(0, ...ends.values());
+  let finalTime = houseCompletion + 120 + pieceDuration;
+  const piecesInOrder = [...pieces.keys()];
+  const entries = piecesInOrder.map((id, order) => {
+    let delayMs: number;
+    if (id.startsWith('house-')) delayMs = starts.get(id.slice('house-'.length)) ?? houseCompletion;
+    else if (id === 'lot-and-edge') delayMs = 0;
+    else if (id === 'garden-border') delayMs = dependencyGap;
+    else if (id === 'driveway-and-walk') delayMs = houseCompletion + 120;
+    else if (id === 'front-garden') delayMs = houseCompletion + 240;
+    else if (id === 'mailbox-and-yard-tree') delayMs = houseCompletion + 180;
+    else delayMs = houseCompletion + 120;
+    finalTime = Math.max(finalTime, delayMs + pieceDuration);
+    return {
+      id,
+      order,
+      delayMs,
+      durationMs: pieceDuration,
+      dropHeight: id === 'lot-and-edge' ? 0.25 : 0.62,
+    };
+  });
+  return {
+    pieces: entries,
+    config: {
+      durationMs: finalTime,
+      staggerMs: dependencyGap,
+      concurrency: 3,
+      dropHeight: 0.62,
+      settleMeters: 0.02,
+    },
+  };
 }
 
 function districtPoint(x: number, z: number): readonly [number, number] {
@@ -229,50 +296,58 @@ function buildNeighbor(
   const set = createSet(a, parent, project.id, [lot.x, 0, lot.z], lot.rotation),
     parcel = a.group(set.root);
   parcel.name = 'parcel-anchor';
-  const lotPart = (id: string) => {
-    const group = a.group(parcel);
-    group.name = id;
-    group.userData['staticBatchBoundary'] = true;
-    set.pieces.set(id, group);
-    return group;
-  };
-  const ground = lotPart('lot-and-edge');
+  const ground = part(set, 'lot-and-edge');
+  parcel.add(ground);
   a.box(ground, surface(a, 'grass', '#82905f'), 0, 0.075, 0, lot.width, 0.09, lot.depth);
-  const edge = lotPart('garden-border');
+  const edge = part(set, 'garden-border');
+  parcel.add(edge);
   for (const side of [-1, 1]) {
     a.box(edge, '#aaa48f', (side * lot.width) / 2, 0.18, 0, 0.13, 0.16, lot.depth);
     a.box(edge, '#aaa48f', 0, 0.18, (side * lot.depth) / 2, lot.width, 0.16, 0.13);
   }
-  const house = lotPart('house');
+  const house = renderPart(set, 'house');
+  parcel.add(house);
   const houseParent = a.group(house, lot.house.offsetX, 0, lot.house.offsetZ);
-  buildChapterTwoHouse(a, houseParent, lot.lot, style);
-  const routes = lotPart('driveway-and-walk');
+  const residential = buildChapterTwoHouse(a, houseParent, lot.lot, style);
+  for (const [id, piece] of residential.pieces) set.pieces.set(`house-${id}`, piece);
+  const routes = part(set, 'driveway-and-walk');
+  parcel.add(routes);
   const paving = surface(a, 'paving', '#bbb6a5');
-  const roadZ = chapterTwoRoadCenterZAt(lot.x);
-  const roadEdgeZ = roadZ + (lot.streetSide === 'north' ? -3.15 : 3.15);
-  const sidewalkLocalZ = lot.depth / 2 +
-    (CHAPTER_TWO_SITE_PLAN.street.propertyFrontageOffset - CHAPTER_TWO_SITE_PLAN.street.sidewalkOffset);
+  const road = chapterTwoRoadFrameAtX(lot.x);
+  const lotFrontX = Math.sin(lot.rotation);
+  const lotFrontZ = Math.cos(lot.rotation);
+  const roadEdgeX = road.x - lotFrontX * 3.15;
+  const roadEdgeZ = road.z - lotFrontZ * 3.15;
+  const sidewalkLocalZ =
+    lot.depth / 2 +
+    (CHAPTER_TWO_SITE_PLAN.street.propertyFrontageOffset -
+      CHAPTER_TWO_SITE_PLAN.street.sidewalkOffset);
   const drivewayLength = sidewalkLocalZ - lot.house.drivewayStartZ;
   const drivewayCenter = (sidewalkLocalZ + lot.house.drivewayStartZ) / 2;
+  routes.userData['roadEdgeWorldX'] = roadEdgeX;
   routes.userData['roadEdgeWorldZ'] = roadEdgeZ;
   routes.userData['connectsToRoad'] = true;
   routes.userData['connectsToSidewalk'] = true;
   const driveway = a.group(routes, lot.house.drivewayX, 0.12, drivewayCenter);
   driveway.name = 'plot-driveway';
-  a.box(driveway, paving, 0, 0, 0, lot.lot === 'l-shaped' ? 2.8 : 2.4, 0.11, drivewayLength);
+  a.box(driveway, paving, 0, 0, 0, lot.house.drivewayWidth, 0.11, drivewayLength);
   a.box(driveway, '#c9c3b2', 0, 0.015, 0, 0.16, 0.12, drivewayLength);
   for (let i = 0; i < 7; i++) {
     const z = -drivewayLength / 2 + 0.4 + i * ((drivewayLength - 0.8) / 6);
-    a.box(driveway, '#d1ccbb', 0, 0.07, z, lot.lot === 'l-shaped' ? 2.3 : 1.95, 0.025, 0.055);
+    a.box(
+      driveway,
+      '#d1ccbb',
+      0,
+      0.07,
+      z,
+      Math.min(lot.house.drivewayWidth - 0.25, 2.3),
+      0.025,
+      0.055,
+    );
   }
   const walkStart = lot.house.offsetZ + lot.house.entryZ;
   const walkLength = sidewalkLocalZ - walkStart;
-  const walkway = a.group(
-    routes,
-    lot.house.entryX,
-    0.14,
-    (walkStart + sidewalkLocalZ) / 2,
-  );
+  const walkway = a.group(routes, lot.house.entryX, 0.14, (walkStart + sidewalkLocalZ) / 2);
   walkway.name = 'plot-front-walkway';
   walkway.userData['connectsToSidewalk'] = true;
   a.box(walkway, '#bcb7a8', 0, 0, 0, 1.1, 0.1, walkLength);
@@ -281,19 +356,56 @@ function buildNeighbor(
     const z = -walkLength / 2 + ((index + 0.5) * walkLength) / stepCount;
     a.box(walkway, '#d0cbbb', 0, 0.06, z, 0.94, 0.025, walkLength / stepCount - 0.08);
   }
-  const garden = lotPart('front-garden');
+  const garden = part(set, 'front-garden');
+  parcel.add(garden);
   const gardenZ = lot.depth / 2 - 1.45;
   const driveSide = Math.sign(lot.house.drivewayX) || 1;
-  gardenBed(a, garden, -driveSide * Math.min(2.9, lot.width * 0.23), gardenZ, 2.5, 0.9, 710 + lot.index);
-  gardenBed(a, garden, -driveSide * Math.min(5.3, lot.width * 0.39), gardenZ - 0.35, 2.25, 0.82, 730 + lot.index);
-  const property = lotPart('mailbox-and-yard-tree');
+  gardenBed(
+    a,
+    garden,
+    -driveSide * Math.min(2.9, lot.width * 0.23),
+    gardenZ,
+    2.5,
+    0.9,
+    710 + lot.index,
+  );
+  gardenBed(
+    a,
+    garden,
+    -driveSide * Math.min(5.3, lot.width * 0.39),
+    gardenZ - 0.35,
+    2.25,
+    0.82,
+    730 + lot.index,
+  );
+  const property = part(set, 'mailbox-and-yard-tree');
+  parcel.add(property);
   const frontZ = lot.depth / 2 - 0.5,
     mailboxX = -lot.width * 0.39;
   a.box(property, '#6d5740', mailboxX, 0.48, frontZ, 0.12, 0.78, 0.12);
   a.box(property, '#efe8d5', mailboxX, 0.81, frontZ, 0.56, 0.31, 0.3);
   a.box(property, '#604e3c', mailboxX, 0.8, frontZ + 0.16, 0.35, 0.05, 0.025);
-  plantTree(a, property, lot.width * 0.37, -lot.depth * 0.37, 0.62, lot.index % 2 ? 'flowering' : 'oak', 780 + lot.index);
-  return finish(set, { x: lot.x + (lot.streetSide === 'north' ? 5 : -5), z: lot.z + (lot.streetSide === 'north' ? 4.6 : -4.6), zoom: 1.05 }, 2300);
+  plantTree(
+    a,
+    property,
+    lot.width * 0.37,
+    -lot.depth * 0.37,
+    0.62,
+    lot.index % 2 ? 'flowering' : 'oak',
+    780 + lot.index,
+  );
+  const focusX =
+    lot.x + lot.house.offsetX * Math.cos(lot.rotation) + lot.house.offsetZ * Math.sin(lot.rotation);
+  const focusZ =
+    lot.z - lot.house.offsetX * Math.sin(lot.rotation) + lot.house.offsetZ * Math.cos(lot.rotation);
+  const focusFrontX = Math.sin(lot.rotation);
+  const focusFrontZ = Math.cos(lot.rotation);
+  return finish(
+    set,
+    { x: focusX + focusFrontX * 4.4, z: focusZ + focusFrontZ * 4.4, zoom: 1.05 },
+    4100,
+    neighborRecipe(set.pieces, lot.lot),
+  );
 }
 
 function streetTrees(set: PieceSet, choice: string) {
@@ -410,8 +522,7 @@ function park(set: PieceSet, choice: string) {
     fountain(a, feature, 0, -2.2);
   } else if (choice === 'playground') {
     const wood = surface(a, 'wood', '#9a744a');
-    for (const dx of [-1.2, 1.2])
-      a.box(feature, wood, dx, 1.0, -0.4, 0.16, 2, 0.16);
+    for (const dx of [-1.2, 1.2]) a.box(feature, wood, dx, 1.0, -0.4, 0.16, 2, 0.16);
     a.box(feature, wood, 0, 1.75, -0.4, 3.2, 0.17, 2.2);
     a.roof(feature, 3.5, 2.55, 1.05, 1.84, '#5d6559');
     const slide = a.box(feature, '#a9b7a3', 2.1, 0.77, 0.3, 0.58, 0.12, 3.2);
@@ -422,13 +533,11 @@ function park(set: PieceSet, choice: string) {
     a.bench(feature, 3.2, 1.6, -Math.PI / 2);
     for (const dx of [-3.2, 3.2]) {
       a.box(feature, '#897456', dx, 0.79, -1.8, 1.6, 0.12, 0.9);
-      for (const x of [-0.52, 0.52])
-        a.box(feature, '#79674f', dx + x, 0.42, -1.8, 0.1, 0.76, 0.78);
+      for (const x of [-0.52, 0.52]) a.box(feature, '#79674f', dx + x, 0.42, -1.8, 0.1, 0.76, 0.78);
     }
     a.roof(feature, 4.6, 4.2, 1.28, 3.0, '#565e56');
     for (const x of [-1.8, 1.8])
-      for (const z of [-1.55, 1.55])
-        a.box(feature, '#8e704d', x, 1.5, z, 0.14, 3, 0.14);
+      for (const z of [-1.55, 1.55]) a.box(feature, '#8e704d', x, 1.5, z, 0.14, 3, 0.14);
   }
   for (const [i, [dx, dz]] of [
     [-7, -5],
@@ -436,15 +545,7 @@ function park(set: PieceSet, choice: string) {
     [-7, 5],
     [7, 5],
   ].entries())
-    plantTree(
-      a,
-      planting,
-      dx,
-      dz,
-      0.78 + (i % 2) * 0.12,
-      i === 1 ? 'evergreen' : 'oak',
-      1151 + i,
-    );
+    plantTree(a, planting, dx, dz, 0.78 + (i % 2) * 0.12, i === 1 ? 'evergreen' : 'oak', 1151 + i);
   for (const [i, [dx, dz]] of [
     [-5.8, 0],
     [5.8, 0],
@@ -483,26 +584,8 @@ function landmark(set: PieceSet, choice: string) {
     plaza = part(set, 'landmark-plaza'),
     focal = part(set, 'neighborhood-landmark'),
     planting = part(set, 'landmark-planting');
-  a.box(
-    plaza,
-    surface(a, 'paving', '#bdb8a8'),
-    0,
-    0.12,
-    0,
-    LANDMARK.width,
-    0.11,
-    LANDMARK.depth,
-  );
-  a.box(
-    plaza,
-    '#aaa48f',
-    0,
-    0.2,
-    0,
-    LANDMARK.width - 1.2,
-    0.08,
-    LANDMARK.depth - 1.2,
-  );
+  a.box(plaza, surface(a, 'paving', '#bdb8a8'), 0, 0.12, 0, LANDMARK.width, 0.11, LANDMARK.depth);
+  a.box(plaza, '#aaa48f', 0, 0.2, 0, LANDMARK.width - 1.2, 0.08, LANDMARK.depth - 1.2);
   if (choice === 'fountain-plaza') {
     fountain(a, focal, 0, 0);
     a.box(plaza, '#c9c3b2', 0, 0.22, 0, 4.8, 0.04, 4.8);
@@ -576,9 +659,7 @@ export function buildChapterTwoProject(
     throw new Error(`Unknown Chapter 2 project or design: ${projectId}/${choiceId}`);
   if (definition.lot) return buildNeighbor(a, parent, definition, choiceId as NeighborStyle);
   const site = CHAPTER_TWO_PUBLIC_SITES.find((candidate) => candidate.projectId === projectId);
-  const position = site
-    ? ([site.x, 0, site.z] as const)
-    : CHAPTER_TWO_SITE_PLAN.district.position;
+  const position = site ? ([site.x, 0, site.z] as const) : CHAPTER_TWO_SITE_PLAN.district.position;
   const set = createSet(a, parent, projectId, position);
   switch (projectId) {
     case 'ch2-street-trees':

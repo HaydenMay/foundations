@@ -36,6 +36,7 @@ const PROOF_LOT = Object.freeze({
   // This is an isolated teaching layout, so keep its own frontage aligned to the proof sidewalk
   // instead of inheriting the production street's new, curved-road parcel position.
   z: -3.3,
+  rotation: 0,
   width: PROOF_LOT_WIDTH,
   depth: 9.8,
 });

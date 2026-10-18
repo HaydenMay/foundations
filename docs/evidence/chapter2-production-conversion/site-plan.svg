@@ -23,54 +23,54 @@
 <rect x="266.5" y="407.9" width="334.2" height="49" rx="6" fill="#fffdf7" stroke="#c8c7bd"/>
 <text x="433.6" y="429.4" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" font-weight="700" fill="#23372f">CURVED RESIDENTIAL STREET</text>
 <text x="433.6" y="447.4" text-anchor="middle" font-family="Segoe UI,Arial" font-size="11.5" fill="#58655e">6.3 m carriageway · continuous public sidewalks</text>
-<polygon points="407,713.62 589,713.62 589,545.62 407,545.62" fill="#e5ebd9" stroke="#456b58" stroke-width="3" stroke-dasharray="10 5" />
-<polygon points="446.2,692.62 549.8,692.62 549.8,603.02 446.2,603.02" fill="#e8ddc8" stroke="#6e5841" stroke-width="2"  />
-<rect x="454" y="632.82" width="88" height="30" rx="4" fill="#fffdf7" fill-opacity="0.94" stroke="#d0cec4" stroke-width="0.8"/>
-<text x="498" y="645.82" text-anchor="middle" font-family="Segoe UI,Arial" font-size="10.5" font-weight="700" fill="#334c40">NEIGHBOR 1</text>
-<text x="498" y="657.82" text-anchor="middle" font-family="Segoe UI,Arial" font-size="9.5" fill="#58655e">7.4 × 6.4 m</text>
-<path d="M 498 614.92 L 498 528.82" stroke="#31594b" stroke-width="2.5" marker-end="url(#arrow)"/>
-<rect x="534.4" y="535.26" width="33.6" height="63.56" rx="2" fill="#c2c0b6" stroke="#77786e" stroke-width="1"  />
-<rect x="490.3" y="535.26" width="15.4" height="79.66" rx="2" fill="#ebe5d5" stroke="#858176" stroke-width="1"  />
-<circle cx="427.02" cy="552.62" r="5" fill="#6f5640" stroke="#fff" stroke-width="1.5"/>
-<rect x="375.6" y="687.42" width="88" height="30" rx="4" fill="#fffdf7" fill-opacity="0.94" stroke="#d0cec4" stroke-width="0.8"/>
-<text x="419.6" y="700.42" text-anchor="middle" font-family="Segoe UI,Arial" font-size="10.5" font-weight="700" fill="#334c40">PLOT 1</text>
-<text x="419.6" y="712.42" text-anchor="middle" font-family="Segoe UI,Arial" font-size="9.5" fill="#58655e">13 × 12 m</text>
-<polygon points="837.5,242.03 634.5,242.03 634.5,445.03 837.5,445.03" fill="#e5ebd9" stroke="#456b58" stroke-width="3" stroke-dasharray="10 5" />
-<polygon points="806.7,269.33 672.3,269.33 672.3,385.53 806.7,385.53" fill="#e8ddc8" stroke="#6e5841" stroke-width="2"  />
-<rect x="695.5" y="312.43" width="88" height="30" rx="4" fill="#fffdf7" fill-opacity="0.94" stroke="#d0cec4" stroke-width="0.8"/>
-<text x="739.5" y="325.43" text-anchor="middle" font-family="Segoe UI,Arial" font-size="10.5" font-weight="700" fill="#334c40">NEIGHBOR 2</text>
-<text x="739.5" y="337.43" text-anchor="middle" font-family="Segoe UI,Arial" font-size="9.5" fill="#58655e">9.6 × 8.3 m</text>
-<path d="M 739.5 375.73 L 736 461.83" stroke="#31594b" stroke-width="2.5" marker-end="url(#arrow)"/>
-<rect x="668.1" y="393.23" width="39.2" height="62.16" rx="2" fill="#c2c0b6" stroke="#77786e" stroke-width="1"  />
-<rect x="731.8" y="375.73" width="15.4" height="79.66" rx="2" fill="#ebe5d5" stroke="#858176" stroke-width="1"  />
-<circle cx="815.17" cy="438.03" r="5" fill="#6f5640" stroke="#fff" stroke-width="1.5"/>
-<rect x="780.9" y="238.23" width="88" height="30" rx="4" fill="#fffdf7" fill-opacity="0.94" stroke="#d0cec4" stroke-width="0.8"/>
-<text x="824.9" y="251.23" text-anchor="middle" font-family="Segoe UI,Arial" font-size="10.5" font-weight="700" fill="#334c40">PLOT 2</text>
-<text x="824.9" y="263.23" text-anchor="middle" font-family="Segoe UI,Arial" font-size="9.5" fill="#58655e">14.5 × 14.5 m</text>
-<polygon points="879.5,789.58 1096.5,789.58 1096.5,565.58 879.5,565.58" fill="#e5ebd9" stroke="#456b58" stroke-width="3" stroke-dasharray="10 5" />
-<polygon points="914.5,760.88 1061.5,760.88 1061.5,639.08 914.5,639.08" fill="#e8ddc8" stroke="#6e5841" stroke-width="2"  />
-<rect x="944" y="684.98" width="88" height="30" rx="4" fill="#fffdf7" fill-opacity="0.94" stroke="#d0cec4" stroke-width="0.8"/>
-<text x="988" y="697.98" text-anchor="middle" font-family="Segoe UI,Arial" font-size="10.5" font-weight="700" fill="#334c40">NEIGHBOR 3</text>
-<text x="988" y="709.98" text-anchor="middle" font-family="Segoe UI,Arial" font-size="9.5" fill="#58655e">10.5 × 8.7 m</text>
-<path d="M 988 654.48 L 988 548.78" stroke="#31594b" stroke-width="2.5" marker-end="url(#arrow)"/>
-<rect x="913.1" y="555.22" width="33.6" height="81.06" rx="2" fill="#c2c0b6" stroke="#77786e" stroke-width="1"  />
-<rect x="980.3" y="555.22" width="15.4" height="99.26" rx="2" fill="#ebe5d5" stroke="#858176" stroke-width="1"  />
-<circle cx="903.37" cy="572.58" r="5" fill="#6f5640" stroke="#fff" stroke-width="1.5"/>
-<rect x="848.1" y="763.38" width="88" height="30" rx="4" fill="#fffdf7" fill-opacity="0.94" stroke="#d0cec4" stroke-width="0.8"/>
-<text x="892.1" y="776.38" text-anchor="middle" font-family="Segoe UI,Arial" font-size="10.5" font-weight="700" fill="#334c40">PLOT 3</text>
-<text x="892.1" y="788.38" text-anchor="middle" font-family="Segoe UI,Arial" font-size="9.5" fill="#58655e">15.5 × 16 m</text>
-<polygon points="1303,200.76 1093,200.76 1093,410.76 1303,410.76" fill="#e5ebd9" stroke="#456b58" stroke-width="3" stroke-dasharray="10 5" />
-<polygon points="1276.4,230.16 1119.6,230.16 1119.6,343.56 1276.4,343.56" fill="#e8ddc8" stroke="#6e5841" stroke-width="2"  />
-<rect x="1154" y="271.86" width="88" height="30" rx="4" fill="#fffdf7" fill-opacity="0.94" stroke="#d0cec4" stroke-width="0.8"/>
-<text x="1198" y="284.86" text-anchor="middle" font-family="Segoe UI,Arial" font-size="10.5" font-weight="700" fill="#334c40">NEIGHBOR 4</text>
-<text x="1198" y="296.86" text-anchor="middle" font-family="Segoe UI,Arial" font-size="9.5" fill="#58655e">11.2 × 8.1 m</text>
-<path d="M 1198 328.16 L 1198 427.56" stroke="#31594b" stroke-width="2.5" marker-end="url(#arrow)"/>
-<rect x="1121" y="344.26" width="33.6" height="76.86" rx="2" fill="#c2c0b6" stroke="#77786e" stroke-width="1"  />
-<rect x="1190.3" y="328.16" width="15.4" height="92.96" rx="2" fill="#ebe5d5" stroke="#858176" stroke-width="1"  />
-<circle cx="1279.9" cy="403.76" r="5" fill="#6f5640" stroke="#fff" stroke-width="1.5"/>
-<rect x="1246.4" y="196.96" width="88" height="30" rx="4" fill="#fffdf7" fill-opacity="0.94" stroke="#d0cec4" stroke-width="0.8"/>
-<text x="1290.4" y="209.96" text-anchor="middle" font-family="Segoe UI,Arial" font-size="10.5" font-weight="700" fill="#334c40">PLOT 4</text>
-<text x="1290.4" y="221.96" text-anchor="middle" font-family="Segoe UI,Arial" font-size="9.5" fill="#58655e">15 × 15 m</text>
+<polygon points="405.86,723.59 587.82,727.22 591.17,559.25 409.21,555.62" fill="#e5ebd9" stroke="#456b58" stroke-width="3" stroke-dasharray="10 5" />
+<polygon points="448.12,710.78 546.1,712.73 548.18,608.45 450.2,606.5" fill="#e8ddc8" stroke="#6e5841" stroke-width="2"  />
+<rect x="454.15" y="644.62" width="88" height="30" rx="4" fill="#fffdf7" fill-opacity="0.94" stroke="#d0cec4" stroke-width="0.8"/>
+<text x="498.15" y="657.62" text-anchor="middle" font-family="Segoe UI,Arial" font-size="10.5" font-weight="700" fill="#334c40">NEIGHBOR 1</text>
+<text x="498.15" y="669.62" text-anchor="middle" font-family="Segoe UI,Arial" font-size="9.5" fill="#58655e">7 × 7.45 m</text>
+<path d="M 498.57 638.54 L 500.52 540.64" stroke="#31594b" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="551.03" y="536.67" width="33.6" height="68.32" rx="2" fill="#c2c0b6" stroke="#77786e" stroke-width="1"  />
+<rect x="491.9" y="535.31" width="15.4" height="103.24" rx="2" fill="#ebe5d5" stroke="#858176" stroke-width="1"  />
+<circle cx="429.08" cy="563.02" r="5" fill="#6f5640" stroke="#fff" stroke-width="1.5"/>
+<rect x="374.68" y="697.64" width="88" height="30" rx="4" fill="#fffdf7" fill-opacity="0.94" stroke="#d0cec4" stroke-width="0.8"/>
+<text x="418.68" y="710.64" text-anchor="middle" font-family="Segoe UI,Arial" font-size="10.5" font-weight="700" fill="#334c40">PLOT 1</text>
+<text x="418.68" y="722.64" text-anchor="middle" font-family="Segoe UI,Arial" font-size="9.5" fill="#58655e">13 × 12 m</text>
+<polygon points="870.54,244.68 669.05,220.03 644.39,421.53 845.89,446.18" fill="#e5ebd9" stroke="#456b58" stroke-width="3" stroke-dasharray="10 5" />
+<polygon points="822.55,265.96 694.71,250.32 680.51,366.35 808.36,382" fill="#e8ddc8" stroke="#6e5841" stroke-width="2"  />
+<rect x="707.53" y="301.16" width="88" height="30" rx="4" fill="#fffdf7" fill-opacity="0.94" stroke="#d0cec4" stroke-width="0.8"/>
+<text x="751.53" y="314.16" text-anchor="middle" font-family="Segoe UI,Arial" font-size="10.5" font-weight="700" fill="#334c40">NEIGHBOR 2</text>
+<text x="751.53" y="326.16" text-anchor="middle" font-family="Segoe UI,Arial" font-size="9.5" fill="#58655e">9.2 × 8.35 m</text>
+<path d="M 763.82 344.57 L 743.1 450.53" stroke="#31594b" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="681.78" y="337.21" width="39.2" height="113.15" rx="2" fill="#c2c0b6" stroke="#77786e" stroke-width="1"  />
+<rect x="749.26" y="344.16" width="15.4" height="113.01" rx="2" fill="#ebe5d5" stroke="#858176" stroke-width="1"  />
+<circle cx="824.58" cy="436.52" r="5" fill="#6f5640" stroke="#fff" stroke-width="1.5"/>
+<rect x="812.68" y="239.27" width="88" height="30" rx="4" fill="#fffdf7" fill-opacity="0.94" stroke="#d0cec4" stroke-width="0.8"/>
+<text x="856.68" y="252.27" text-anchor="middle" font-family="Segoe UI,Arial" font-size="10.5" font-weight="700" fill="#334c40">PLOT 2</text>
+<text x="856.68" y="264.27" text-anchor="middle" font-family="Segoe UI,Arial" font-size="9.5" fill="#58655e">14.5 × 14.5 m</text>
+<polygon points="940.5,816.61 1153.4,774.66 1110.1,554.88 897.19,596.83" fill="#e5ebd9" stroke="#456b58" stroke-width="3" stroke-dasharray="10 5" />
+<polygon points="978.2,787.06 1107.31,761.62 1081.06,628.38 951.94,653.82" fill="#e8ddc8" stroke="#6e5841" stroke-width="2"  />
+<rect x="985.63" y="692.72" width="88" height="30" rx="4" fill="#fffdf7" fill-opacity="0.94" stroke="#d0cec4" stroke-width="0.8"/>
+<text x="1029.63" y="705.72" text-anchor="middle" font-family="Segoe UI,Arial" font-size="10.5" font-weight="700" fill="#334c40">NEIGHBOR 3</text>
+<text x="1029.63" y="717.72" text-anchor="middle" font-family="Segoe UI,Arial" font-size="9.5" fill="#58655e">9.4 × 9.7 m</text>
+<path d="M 1023.79 678.08 L 1000.4 559.37" stroke="#31594b" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="908.38" y="569.59" width="33.6" height="85.12" rx="2" fill="#c2c0b6" stroke="#77786e" stroke-width="1"  />
+<rect x="1003.88" y="552.96" width="15.4" height="126.31" rx="2" fill="#ebe5d5" stroke="#858176" stroke-width="1"  />
+<circle cx="921.96" cy="599.09" r="5" fill="#6f5640" stroke="#fff" stroke-width="1.5"/>
+<rect x="906.69" y="788.18" width="88" height="30" rx="4" fill="#fffdf7" fill-opacity="0.94" stroke="#d0cec4" stroke-width="0.8"/>
+<text x="950.69" y="801.18" text-anchor="middle" font-family="Segoe UI,Arial" font-size="10.5" font-weight="700" fill="#334c40">PLOT 3</text>
+<text x="950.69" y="813.18" text-anchor="middle" font-family="Segoe UI,Arial" font-size="9.5" fill="#58655e">15.5 × 16 m</text>
+<polygon points="1300.88,188.06 1090.89,189.96 1092.79,399.95 1302.78,398.05" fill="#e5ebd9" stroke="#456b58" stroke-width="3" stroke-dasharray="10 5" />
+<polygon points="1270.33,214.94 1121.93,216.28 1123.01,335.27 1271.4,333.93" fill="#e8ddc8" stroke="#6e5841" stroke-width="2"  />
+<rect x="1152.67" y="260.11" width="88" height="30" rx="4" fill="#fffdf7" fill-opacity="0.94" stroke="#d0cec4" stroke-width="0.8"/>
+<text x="1196.67" y="273.11" text-anchor="middle" font-family="Segoe UI,Arial" font-size="10.5" font-weight="700" fill="#334c40">NEIGHBOR 4</text>
+<text x="1196.67" y="285.11" text-anchor="middle" font-family="Segoe UI,Arial" font-size="9.5" fill="#58655e">10.6 × 8.5 m</text>
+<path d="M 1196.91 301.96 L 1197.94 415.8" stroke="#31594b" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="1090.53" y="342.42" width="33.6" height="79.52" rx="2" fill="#c2c0b6" stroke="#77786e" stroke-width="1"  />
+<rect x="1189.75" y="301.95" width="15.4" height="119.17" rx="2" fill="#ebe5d5" stroke="#858176" stroke-width="1"  />
+<circle cx="1279.62" cy="391.26" r="5" fill="#6f5640" stroke="#fff" stroke-width="1.5"/>
+<rect x="1244.39" y="184.37" width="88" height="30" rx="4" fill="#fffdf7" fill-opacity="0.94" stroke="#d0cec4" stroke-width="0.8"/>
+<text x="1288.39" y="197.37" text-anchor="middle" font-family="Segoe UI,Arial" font-size="10.5" font-weight="700" fill="#334c40">PLOT 4</text>
+<text x="1288.39" y="209.37" text-anchor="middle" font-family="Segoe UI,Arial" font-size="9.5" fill="#58655e">15 × 15 m</text>
 <rect x="628.2" y="561.01" width="117.6" height="44.8" rx="2" fill="#e8eee1" stroke="#3e7660" stroke-width="3" stroke-dasharray="8 4" />
 <rect x="643" y="568.41" width="88" height="30" rx="4" fill="#fffdf7" fill-opacity="0.94" stroke="#d0cec4" stroke-width="0.8"/>
 <text x="687" y="581.41" text-anchor="middle" font-family="Segoe UI,Arial" font-size="10.5" font-weight="700" fill="#334c40">ENTRANCE</text>
@@ -91,15 +91,15 @@
 <rect x="900.5" y="951.1" width="189" height="49" rx="6" fill="#fffdf7" stroke="#c8c7bd"/>
 <text x="995" y="972.6" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" font-weight="700" fill="#23372f">PUBLIC PROMENADE</text>
 <text x="995" y="990.6" text-anchor="middle" font-family="Segoe UI,Arial" font-size="11.5" fill="#58655e">connects park to landmark</text>
-<line x1="374.1" y1="625.6" x2="407" y2="625.6" stroke="#ad513e" stroke-width="2.5" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+<line x1="374.1" y1="625.6" x2="407.51" y2="625.6" stroke="#ad513e" stroke-width="2.5" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
 <rect x="92" y="1073" width="1288" height="98" rx="8" fill="#fffdf7" stroke="#d2d0c5"/>
 <text x="110" y="1099" font-family="Segoe UI,Arial" font-size="14" font-weight="700" fill="#253d35">MEASURED CLEARANCES · property-edge to property-edge (m)</text>
-<text x="1362" y="1099" text-anchor="end" font-family="Segoe UI,Arial" font-size="14" font-weight="700" fill="#31594b">MINIMUM: 2.35 m</text>
-<text x="112" y="1125" font-family="Segoe UI,Arial" font-size="12.5" fill="#394b42">Chapter 1 ↔ Neighbor 1: 2.35 m</text>
-<text x="528" y="1125" font-family="Segoe UI,Arial" font-size="12.5" fill="#394b42">Neighbor 1 ↔ Neighbor 2: 7.89 m</text>
-<text x="944" y="1125" font-family="Segoe UI,Arial" font-size="12.5" fill="#394b42">Neighbor 2 ↔ Neighbor 3: 9.12 m</text>
-<text x="112" y="1143" font-family="Segoe UI,Arial" font-size="12.5" fill="#394b42">Neighbor 3 ↔ Neighbor 4: 11.06 m</text>
-<text x="528" y="1143" font-family="Segoe UI,Arial" font-size="12.5" fill="#394b42">Neighbor 2 ↔ Neighbor 4: 18.25 m</text>
-<text x="110" y="1167" font-family="Segoe UI,Arial" font-size="11.5" fill="#5a655f">Only driveways/front walks cross lot frontage to meet the shared sidewalk (0.74 m). All house footprints remain inside their properties.</text>
+<text x="1362" y="1099" text-anchor="end" font-family="Segoe UI,Arial" font-size="14" font-weight="700" fill="#31594b">MINIMUM: 2.39 m</text>
+<text x="112" y="1125" font-family="Segoe UI,Arial" font-size="12.5" fill="#394b42">Chapter 1 ↔ Neighbor 1: 2.39 m</text>
+<text x="528" y="1125" font-family="Segoe UI,Arial" font-size="12.5" fill="#394b42">Neighbor 1 ↔ Neighbor 2: 9.97 m</text>
+<text x="944" y="1125" font-family="Segoe UI,Arial" font-size="12.5" fill="#394b42">Neighbor 2 ↔ Neighbor 3: 10.76 m</text>
+<text x="112" y="1143" font-family="Segoe UI,Arial" font-size="12.5" fill="#394b42">Neighbor 3 ↔ Neighbor 4: 12.48 m</text>
+<text x="528" y="1143" font-family="Segoe UI,Arial" font-size="12.5" fill="#394b42">Neighbor 2 ↔ Neighbor 4: 16.63 m</text>
+<text x="110" y="1167" font-family="Segoe UI,Arial" font-size="11.5" fill="#5a655f">Homes stay behind the curved sidewalk. Driveways and front walks cross the 0.84 m verge to reach it.</text>
 <text x="1380" y="1196" text-anchor="end" font-family="Segoe UI,Arial" font-size="10.5" fill="#7a7d74">NORTH ↑ · World X horizontal · world +Z upward · plot scale 14 px/m</text>
 </svg>

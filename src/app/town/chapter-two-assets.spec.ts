@@ -7,6 +7,7 @@ import {
   buildChapterTwoRoad,
   CHAPTER_TWO_LOTS,
 } from './chapter-two-assets';
+import { CHAPTER_TWO_HOUSE_BLUEPRINTS } from './chapter-two-blueprints';
 import { buildWorld } from './world';
 
 it('builds a continuous road and reserves four distinct, empty residential lots', () => {
@@ -34,12 +35,35 @@ it('builds every neighborhood house lot in each of the three architectural style
       const assets = new AssetLibrary();
       const result = buildChapterTwoProject(assets, new T.Group(), project.id, style);
       expect(result.root.name).toBe(`project-asset:${project.id}`);
-      expect(result.pieces.has('house')).toBe(true);
+      expect(result.renderObjects?.has('house')).toBe(true);
+      expect(result.pieces.has('house-foundation')).toBe(true);
+      expect(result.pieces.has('house-main-roof')).toBe(true);
       expect(result.pieces.has('driveway-and-walk')).toBe(true);
       expect(result.pieces.has('front-garden')).toBe(true);
+      expect([...result.pieces.keys()]).toEqual(result.recipe.pieces.map((piece) => piece.id));
       expect(result.focus.zoom).toBeGreaterThan(0);
       assets.dispose();
     }
+  }
+});
+
+it('schedules production house pieces only after their blueprint prerequisites complete', () => {
+  const assets = new AssetLibrary();
+  const house = buildChapterTwoProject(assets, new T.Group(), 'ch2-neighbor-2', 'craftsman');
+  const recipe = new Map(house.recipe.pieces.map((piece) => [piece.id, piece]));
+  const blueprint = CHAPTER_TWO_HOUSE_BLUEPRINTS['l-shaped'];
+  try {
+    for (const step of blueprint.assembly) {
+      const scheduled = recipe.get(`house-${step.id}`)!;
+      for (const dependency of step.dependsOn ?? []) {
+        const predecessor = recipe.get(`house-${dependency}`)!;
+        expect(scheduled.delayMs).toBeGreaterThanOrEqual(
+          (predecessor.delayMs ?? 0) + (predecessor.durationMs ?? 0),
+        );
+      }
+    }
+  } finally {
+    assets.dispose();
   }
 });
 
@@ -77,7 +101,7 @@ it('integrates Chapter 2 into the same world and removes a reserved lot as its h
     expect(world.projectAssets.size).toBe(10);
     expect(world.projectAssets.has('ch2-neighborhood')).toBe(true);
     expect(world.projectAssets.get('ch2-neighborhood')?.pieces.has('reserved-lot-1')).toBe(false);
-    expect(world.projectAssets.get('ch2-neighbor-1')?.pieces.has('house')).toBe(true);
+    expect(world.projectAssets.get('ch2-neighbor-1')?.renderObjects?.has('house')).toBe(true);
     expect(
       world.projectAssets.get('ch2-community-park')?.pieces.has('community-gathering-place'),
     ).toBe(true);
@@ -87,11 +111,9 @@ it('integrates Chapter 2 into the same world and removes a reserved lot as its h
       expect(driveway?.userData['connectsToRoad']).toBe(true);
       expect(Number.isFinite(driveway?.userData['roadEdgeWorldZ'])).toBe(true);
     }
-    const firstNeighborBounds = new T.Box3().setFromObject(
-      world.projectAssets.get('ch2-neighbor-1')!.root,
-    );
-    expect(firstNeighborBounds.getCenter(new T.Vector3()).x).toBeCloseTo(CHAPTER_TWO_LOTS[0].x, 0);
-    expect(firstNeighborBounds.getCenter(new T.Vector3()).z).toBeCloseTo(CHAPTER_TWO_LOTS[0].z, 0);
+    const firstNeighborRoot = world.projectAssets.get('ch2-neighbor-1')!.root;
+    expect(firstNeighborRoot.position.x).toBeCloseTo(CHAPTER_TWO_LOTS[0].x, 6);
+    expect(firstNeighborRoot.position.z).toBeCloseTo(CHAPTER_TWO_LOTS[0].z, 6);
     const names: string[] = [];
     world.group.traverse((object) => names.push(object.name));
     expect(names.some((name) => /car|vehicle/i.test(name))).toBe(false);

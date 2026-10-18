@@ -200,14 +200,14 @@ selected.forEach((row,i)=>{
   const y=tableTop+26+Math.floor(i/3)*18;
   add(`<text x="${round(x)}" y="${round(y)}" font-family="Segoe UI,Arial" font-size="12.5" fill="#394b42">${esc(`${row.a} ↔ ${row.b}: ${row.gap.toFixed(2)} m`)}</text>`);
 });
-add(`<text x="${margin.left+18}" y="${tableTop+68}" font-family="Segoe UI,Arial" font-size="11.5" fill="#5a655f">Only driveways/front walks cross lot frontage to meet the shared sidewalk (0.74 m). All house footprints remain inside their properties.</text>`);
+add(`<text x="${margin.left+18}" y="${tableTop+68}" font-family="Segoe UI,Arial" font-size="11.5" fill="#5a655f">Homes stay behind the curved sidewalk. Driveways and front walks cross the 0.84 m verge to reach it.</text>`);
 add(`<text x="${width-margin.right}" y="${height-18}" text-anchor="end" font-family="Segoe UI,Arial" font-size="10.5" fill="#7a7d74">NORTH ↑ · World X horizontal · world +Z upward · plot scale ${scale} px/m</text>`);
 add('</svg>');
 
 const svg=parts.join('\n');
 fs.writeFileSync(destination,svg);
 const report={
-  output:destination,
+  output:path.relative(process.cwd(),destination).replace(/\\/g,'/'),
   district:plan.district.dimensions,
   roadWidth:plan.street.roadWidth,
   sidewalkWidth:plan.street.sidewalkWidth,
@@ -259,7 +259,7 @@ const markdown=[
   '|---|---:|---:|',
   ...publicRows,
   '',
-  'Driveways and front walks remain owned by their residential lot and intentionally cross only the front boundary to reach the public sidewalk (0.74 m beyond the property frontage). The entrance connects the north sidewalk to the park approach; the park and landmark share a public promenade. The original Chapter 1 property and home coordinates remain unchanged. No vehicle assets are included.',
+  'Driveways and front walks remain owned by their residential lot and cross the front boundary, the 0.84 m planted verge, and the sidewalk apron to meet the public route. House footprints remain behind the curved sidewalk. The entrance connects the north sidewalk to the park approach; the park and landmark share a public promenade. The original Chapter 1 property and home coordinates remain unchanged. No vehicle assets are included.',
   '',
   'The SVG and JSON data can be regenerated together with `node scripts/render-chapter-two-site-plan.cjs`.',
   '',

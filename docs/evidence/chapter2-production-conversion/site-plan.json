@@ -1,5 +1,5 @@
 {
-  "output": "C:\\Users\\mayha\\GameDev\\foundations-chapter2-production-conversion\\docs\\evidence\\chapter2-production-conversion\\site-plan.svg",
+  "output": "docs/evidence/chapter2-production-conversion/site-plan.svg",
   "district": {
     "width": 132,
     "depth": 90,
@@ -7,109 +7,109 @@
   },
   "roadWidth": 6.3,
   "sidewalkWidth": 1.48,
-  "minimumPropertyGapMeters": 2.35,
+  "minimumPropertyGapMeters": 2.39,
   "propertyGaps": [
     {
       "a": "Chapter 1",
       "b": "Neighbor 1",
-      "gap": 2.35
+      "gap": 2.39
     },
     {
       "a": "Neighbor 1",
       "b": "Neighbor 2",
-      "gap": 7.89
+      "gap": 9.97
     },
     {
       "a": "Neighbor 2",
       "b": "Neighbor 3",
-      "gap": 9.12
+      "gap": 10.76
     },
     {
       "a": "Neighbor 3",
       "b": "Neighbor 4",
-      "gap": 11.06
+      "gap": 12.48
     },
     {
       "a": "Neighbor 2",
       "b": "Neighbor 4",
-      "gap": 18.25
+      "gap": 16.63
     },
     {
       "a": "Chapter 1",
       "b": "Neighbor 2",
-      "gap": 19.61
+      "gap": 21.3
     },
     {
       "a": "Neighbor 1",
       "b": "Neighbor 3",
-      "gap": 20.75
-    },
-    {
-      "a": "Chapter 1",
-      "b": "Neighbor 3",
-      "gap": 36.1
+      "gap": 23.38
     },
     {
       "a": "Neighbor 1",
       "b": "Neighbor 4",
-      "gap": 37.27
+      "gap": 37.62
+    },
+    {
+      "a": "Chapter 1",
+      "b": "Neighbor 3",
+      "gap": 38.76
     },
     {
       "a": "Chapter 1",
       "b": "Neighbor 4",
-      "gap": 52.07
+      "gap": 52.14
     }
   ],
   "houseClearances": [
     {
       "a": "Chapter 1 home",
       "b": "Neighbor 1",
-      "gap": 5.7
+      "gap": 5.91
     },
     {
       "a": "Neighbor 1",
       "b": "Neighbor 2",
-      "gap": 17.83
+      "gap": 19.41
     },
     {
       "a": "Neighbor 2",
       "b": "Neighbor 3",
-      "gap": 19.68
+      "gap": 21.69
     },
     {
       "a": "Neighbor 3",
       "b": "Neighbor 4",
-      "gap": 21.51
+      "gap": 21.89
     },
     {
       "a": "Neighbor 2",
       "b": "Neighbor 4",
-      "gap": 22.35
+      "gap": 21.9
     },
     {
       "a": "Chapter 1 home",
       "b": "Neighbor 2",
-      "gap": 24.83
+      "gap": 26.13
     },
     {
       "a": "Neighbor 1",
       "b": "Neighbor 3",
-      "gap": 26.05
+      "gap": 29.76
     },
     {
       "a": "Chapter 1 home",
       "b": "Neighbor 3",
-      "gap": 39.15
+      "gap": 42.67
     },
     {
       "a": "Neighbor 1",
       "b": "Neighbor 4",
-      "gap": 44.72
+      "gap": 45.48
     },
     {
       "a": "Chapter 1 home",
       "b": "Neighbor 4",
-      "gap": 55.8
+      "gap": 56.17
     }
   ],
   "publicClearances": [
@@ -118,30 +118,30 @@
       "width": 8.4,
       "depth": 3.2,
       "nearestPrivate": "Neighbor 1",
-      "clearance": 2.8
+      "clearance": 2.76
     },
     {
       "site": "ch2-community-park",
       "width": 20,
       "depth": 16,
       "nearestPrivate": "Neighbor 3",
-      "clearance": 2.9
+      "clearance": 3.71
     },
     {
       "site": "ch2-landmark",
       "width": 12,
       "depth": 10,
       "nearestPrivate": "Neighbor 3",
-      "clearance": 6.02
+      "clearance": 5.3
     }
   ],
   "lotFrontages": [
     {
       "id": "ch2-neighbor-1",
       "side": "north",
-      "rotation": 0,
-      "x": 10,
-      "z": -5.69,
+      "rotation": 0.02,
+      "x": 10.036673955476,
+      "z": -6.53,
       "width": 13,
       "depth": 12,
       "roadZ": 5.07
@@ -149,32 +149,32 @@
     {
       "id": "ch2-neighbor-2",
       "side": "south",
-      "rotation": 3.14,
-      "x": 27,
-      "z": 14.75,
+      "rotation": 3.26,
+      "x": 28.533535621707014,
+      "z": 15.49,
       "width": 14.5,
       "depth": 14.5,
-      "roadZ": 2.74
+      "roadZ": 2.56
     },
     {
       "id": "ch2-neighbor-3",
       "side": "north",
-      "rotation": 0,
-      "x": 45,
-      "z": -9.11,
+      "rotation": -0.19,
+      "x": 47.66409818629271,
+      "z": -9.7,
       "width": 15.5,
       "depth": 16,
-      "roadZ": 3.65
+      "roadZ": 4.15
     },
     {
       "id": "ch2-neighbor-4",
       "side": "south",
-      "rotation": 3.14,
-      "x": 60,
-      "z": 17.45,
+      "rotation": 3.13,
+      "x": 59.916992861026216,
+      "z": 18.29,
       "width": 15,
       "depth": 15,
-      "roadZ": 5.19
+      "roadZ": 5.18
     }
   ]
 }

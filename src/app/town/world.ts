@@ -296,7 +296,7 @@ export function buildWorld(
     ]) {
       const asset = projectAssets.get(projectId);
       put(`${projectId}-lot`, asset?.root);
-      put(`${projectId}-house`, asset?.pieces.get('house'));
+      put(`${projectId}-house`, asset?.renderObjects?.get('house') ?? asset?.pieces.get('house'));
       put(`${projectId}-yard`, asset?.pieces.get('front-garden'));
       put(`${projectId}-driveway`, asset?.pieces.get('driveway-and-walk'));
       put(`${projectId}-walkway`, asset?.pieces.get('driveway-and-walk'));

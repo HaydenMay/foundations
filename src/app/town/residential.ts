@@ -393,3 +393,5 @@ export function buildStartingHouse(
   a.lantern(details, -1.0, 2.0, -2.6, false);
   return { root: g, assemblies };
 }
+
+export { door as addResidentialDoor, window as addResidentialWindow };
