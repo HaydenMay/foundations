@@ -32,13 +32,19 @@ Create identity-local wrappers for the foundation, main structure, entry/porch, 
 
 ### 3. Integrate with the one scene animation loop
 
+**Status: complete.** The current home's explicit recipe now runs from `TownScene`'s existing elapsed-time animation loop. Skip completes once, cancellation and replacement restore without success, reduced motion and missing bindings complete safely, and the existing Home-camera easing is preserved.
+
 Bind an animator to the current home's object instance and recipe. Feed normalized elapsed time from the existing scene rAF callback; keep the established Home-camera interpolation and cached-shadow policy. Skip completes/restores baselines once. Cancel restores without reporting success. Replacing designs cancels old playback before disposing assets; scene disposal cancels and disposes without later mutation. Missing optional entries warn and continue; required/unsafe bindings render the already complete house and end the request safely. Test scene callback count, skip, reduced motion, replacement, disposal, save-before-animation and no historical replay.
 
 ### 4. Extend the isolated Developer Preview
 
+**Status: complete.** Preview construction uses the same house recipe and animator; transient 0.5×/1×/2× speed and force-reduced-motion controls never enter persistent state or JSON backups.
+
 Add speed choices and a force-reduced-motion checkbox as ephemeral panel state. The existing house selector supplies the recipe, `Show first house` selects empty/completed presentation, and its existing preview construction action enters the same `TownScene` animator path. Keep the accessible global Skip action. Verify no settings reach store preferences, localStorage, real JSON exports or cross-tab state.
 
 ### 5. Compare, validate and publish
+
+**Status: in progress.** Matched final captures and three frozen intermediate recipe frames are recorded; validation and review evidence are complete. Commit, push and Pages verification remain.
 
 Capture baseline and final completed homes at the same camera and lighting; capture genuine intermediate assembly frames for all three recipes. Check final frame transform restoration and style appearance in portrait, landscape and desktop. Run unit tests, full browser suite, production build and hosted browser verification after publishing through the existing Pages workflow. Report physical-device/Safari testing as skipped if unavailable. Commit the inspected plan/baseline checkpoint, implementation increments, then final evidence; merge/push to the configured deployment branch only after tests and screenshot review.
 

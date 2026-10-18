@@ -3,7 +3,9 @@ import { CameraState, Lighting } from '../domain/models';
 import { TownCamera } from './camera';
 import { lightAt } from './lighting';
 import { buildWorld, TownWorld } from './world';
-import { constructionFrame, homeTransition } from './construction';
+import { AssemblyAnimator } from './assembly';
+import type { AssemblyConfigOverride } from './assembly';
+import { homeTransition } from './construction';
 
 export class TownScene {
   readonly renderer: T.WebGLRenderer;
@@ -23,7 +25,8 @@ export class TownScene {
     started: number;
     last: number;
     from: CameraState;
-    baseY: number;
+    animator: AssemblyAnimator;
+    visibility: boolean[];
     done: () => void;
   };
   private readonly visibility = () => {
@@ -89,7 +92,7 @@ export class TownScene {
     document.addEventListener('visibilitychange', this.visibility);
   }
   setDesigns(designs: Record<string, string>) {
-    this.finishConstruction();
+    this.cancelConstruction();
     if (this.world) {
       this.scene.remove(this.world.group);
       this.world.assets.dispose();
@@ -99,11 +102,31 @@ export class TownScene {
     this.scene.add(this.world.group);
     this.updateLight();
   }
-  celebrate(done: () => void) {
-    this.finishConstruction();
-    const home = this.world?.home;
-    if (!home || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  celebrate(done: () => void, override: AssemblyConfigOverride = {}) {
+    this.cancelConstruction();
+    const home = this.world?.home,
+      assemblies = this.world?.homeAssemblies,
+      recipe = this.world?.homeRecipe;
+    if (!home || !assemblies || !recipe) {
       this.camera.home();
+      this.render();
+      done();
+      return;
+    }
+    let animator: AssemblyAnimator;
+    try {
+      animator = new AssemblyAnimator(home, assemblies, recipe, {
+        ...override,
+        reducedMotion:
+          override.reducedMotion ??
+          (typeof matchMedia !== 'undefined' &&
+            matchMedia('(prefers-reduced-motion: reduce)').matches),
+      });
+    } catch (error) {
+      console.warn('Home assembly could not start; showing the completed house:', error);
+      this.camera.home();
+      this.renderer.shadowMap.needsUpdate = true;
+      this.render();
       done();
       return;
     }
@@ -112,56 +135,83 @@ export class TownScene {
       started: performance.now(),
       last: -100,
       from: this.camera.state(),
-      baseY: home.position.y,
+      animator,
+      visibility: animator.pieces.map((piece) => piece.object.visible),
       done,
     };
     this.construction = animation;
     this.camera.controls.enabled = false;
+    if (!animator.play(() => this.completeConstruction(animation))) {
+      this.construction = undefined;
+      animator.dispose();
+      this.camera.controls.enabled = true;
+      this.camera.home();
+      this.renderer.shadowMap.needsUpdate = true;
+      this.render();
+      done();
+      return;
+    }
+    if (this.construction !== animation) return;
     const frame = (now: number) => {
       if (this.construction !== animation) return;
-      const phase = constructionFrame(now - animation.started);
-      if (phase.done) {
-        this.finishConstruction();
-        return;
+      const elapsed = Math.max(0, now - animation.started),
+        progress =
+          animation.animator.durationMs === 0 ? 1 : elapsed / animation.animator.durationMs;
+      animation.animator.update(progress);
+      if (this.construction !== animation) return;
+      let visibilityChanged = false;
+      for (let i = 0; i < animation.animator.pieces.length; i++) {
+        const visible = animation.animator.pieces[i].object.visible;
+        if (animation.visibility[i] !== visible) {
+          animation.visibility[i] = visible;
+          visibilityChanged = true;
+        }
       }
-      animation.request = requestAnimationFrame(frame);
-      if (now - animation.last < 1000 / 30) return;
-      animation.last = now;
-      // Cache shadows during the small reveal; refresh only at visibility changes and settlement.
-      const visibilityChanged = home.visible !== phase.visible;
-      if (
-        !visibilityChanged &&
-        home.scale.x === phase.scale &&
-        home.position.y === animation.baseY + phase.rise &&
-        phase.homeT === 1
-      )
-        return;
-      home.visible = phase.visible;
-      home.scale.setScalar(phase.scale);
-      home.position.y = animation.baseY + phase.rise;
+      const settled = animation.animator.lifecycle === 'completed';
       if (visibilityChanged) this.renderer.shadowMap.needsUpdate = true;
-      this.camera.set(homeTransition(animation.from, phase.homeT));
+      if (visibilityChanged || settled || now - animation.last >= 1000 / 30) {
+        animation.last = now;
+        // Shadow maps stay cached; redraw only when a piece is revealed and when the home settles.
+        this.camera.set(homeTransition(animation.from, Math.min(1, elapsed / 750)));
+        this.render();
+      }
+      if (settled) return;
+      animation.request = requestAnimationFrame(frame);
     };
     animation.request = requestAnimationFrame(frame);
   }
   finishConstruction() {
+    const animation = this.construction;
+    if (!animation) return;
+    if (!animation.animator.skip()) this.cancelConstruction();
+  }
+  cancelConstruction() {
     this.stopConstruction(true, true);
   }
-  private stopConstruction(notify: boolean, resetCamera: boolean) {
+  private completeConstruction(animation: NonNullable<TownScene['construction']>) {
+    if (this.construction !== animation) return;
+    cancelAnimationFrame(animation.request);
+    this.construction = undefined;
+    animation.animator.dispose();
+    this.camera.controls.enabled = true;
+    this.renderer.shadowMap.needsUpdate = true;
+    this.camera.home();
+    this.render();
+    animation.done();
+  }
+  private stopConstruction(resetCamera: boolean, refresh: boolean) {
     const animation = this.construction;
     if (!animation) return;
     cancelAnimationFrame(animation.request);
     this.construction = undefined;
-    const home = this.world?.home;
-    if (home) {
-      home.visible = true;
-      home.scale.setScalar(1);
-      home.position.y = animation.baseY;
-    }
+    animation.animator.cancel();
+    animation.animator.dispose();
     this.camera.controls.enabled = true;
-    this.renderer.shadowMap.needsUpdate = true;
-    if (resetCamera) this.camera.home();
-    if (notify) animation.done();
+    if (resetCamera) this.camera.set(animation.from);
+    if (refresh) {
+      this.renderer.shadowMap.needsUpdate = true;
+      this.render();
+    }
   }
   setLighting(value: Lighting) {
     if (this.lighting === value) return;

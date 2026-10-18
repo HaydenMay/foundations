@@ -84,6 +84,22 @@ test('reload discards preview and another tab stays genuine while real updates s
   expect(JSON.parse((await raw(page))!).completions).toHaveLength(2);
   await other.close();
 });
+test('assembly preview settings drive the first-home sequence without touching real storage', async ({
+  page,
+}) => {
+  await seed(page);
+  const before = await raw(page);
+  await enter(page);
+  await page.getByLabel('Assembly speed').selectOption('2');
+  await page.getByLabel('Force reduced motion').check();
+  await page.getByRole('button', { name: 'Preview construction', exact: true }).click();
+  await expect(page.getByText('Construction preview complete.', { exact: true })).toBeVisible();
+  await expect(page.locator('app-town')).toHaveAttribute('data-construction', 'idle');
+  expect(await raw(page)).toBe(before);
+  await page.getByRole('button', { name: 'Exit Developer Preview', exact: true }).click();
+  expect(await raw(page)).toBe(before);
+});
+
 test('all five preview scenarios render, controls collapse and layout stays usable', async ({
   page,
 }, info) => {

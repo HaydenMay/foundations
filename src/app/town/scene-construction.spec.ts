@@ -21,48 +21,73 @@ it('does not repaint identical lighting preferences while other preferences sync
   expect(updateLight).toHaveBeenCalledTimes(2);
 });
 
-it('limits construction shadow refreshes and stops submitting unchanged settled frames', () => {
-  let frame: FrameRequestCallback = () => {},
+it('refreshes cached shadows only as assembly pieces appear and when the home settles', () => {
+  let frame: FrameRequestCallback | undefined,
     requests = 0,
-    refreshes = 0;
+    refreshes = 0,
+    renders = 0;
   vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
     frame = callback;
     return ++requests;
   });
-  vi.stubGlobal('cancelAnimationFrame', vi.fn());
+  vi.stubGlobal('cancelAnimationFrame', () => {
+    frame = undefined;
+  });
   vi.stubGlobal('matchMedia', () => ({ matches: false }));
   vi.spyOn(performance, 'now').mockReturnValue(0);
-  const home = new Group();
-  home.position.y = 0.13;
+  const home = new Group(),
+    walls = new Group(),
+    roof = new Group();
+  walls.position.y = 0.13;
+  roof.position.y = 0.13;
+  home.add(walls, roof);
   const shadowMap = { needsUpdate: false };
-  const set = vi.fn(() => {
+  const set = vi.fn();
+  const done = vi.fn();
+  const render = () => {
+    renders++;
     if (shadowMap.needsUpdate) refreshes++;
     shadowMap.needsUpdate = false;
-  });
-  const settled = vi.fn();
+  };
   // Exercise the real sequence without requiring a WebGL driver in unit tests.
   const scene: TownScene = Object.create(TownScene.prototype);
   Object.assign(scene, {
-    world: { home },
+    world: {
+      home,
+      homeAssemblies: new Map([
+        ['walls', walls],
+        ['roof', roof],
+      ]),
+      homeRecipe: {
+        pieces: [
+          { id: 'walls', order: 1 },
+          { id: 'roof', order: 2 },
+        ],
+        config: { durationMs: 1000, dropHeight: 2, staggerMs: 200, concurrency: 1 },
+      },
+    },
     renderer: { shadowMap },
     camera: {
       state: () => ({ x: 4, z: 2, zoom: 0.8, angle: 0 }),
       controls: { enabled: true },
       set,
-      home: settled,
+      home: vi.fn(),
     },
+    active: true,
+    render,
   });
-  const done = vi.fn();
   scene.celebrate(done);
-  for (let t = 0; t <= 1800; t += 50) frame(t);
+  for (let t = 0; t <= 1200; t += 50) {
+    const current = frame;
+    frame = undefined;
+    current?.(t);
+  }
   expect(refreshes).toBeLessThanOrEqual(3);
-  const rendered = set.mock.calls.length;
-  for (let t = 1850; t <= 2700; t += 50) frame(t);
-  expect(set.mock.calls.length).toBe(rendered);
-  scene.finishConstruction();
-  expect(home.visible).toBe(true);
-  expect(home.scale.x).toBe(1);
-  expect(home.position.y).toBe(0.13);
   expect(done).toHaveBeenCalledOnce();
-  expect(settled).toHaveBeenCalledOnce();
+  expect(walls.position.y).toBe(0.13);
+  expect(roof.position.y).toBe(0.13);
+  expect(frame).toBeUndefined();
+  const finishedRenders = renders;
+  expect(renders).toBeGreaterThan(3);
+  expect(finishedRenders).toBe(renders);
 });

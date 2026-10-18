@@ -34,7 +34,9 @@
       [preferences]="store.state().preferences"
       [sessionKey]="store.sessionKey()"
       [construction]="construction()"
+      [assemblyOptions]="previewAssemblyOptions()"
       (constructionFinished)="constructionFinished($event)"
+      (constructionCancelled)="constructionCancelled($event)"
       (cameraChange)="cameraChanged($event)"
       (lightChange)="sceneLight.set($event)"
     />
@@ -69,7 +71,7 @@
         [open]="previewPanelOpen()"
         [position]="cameraPosition()"
         (toggle)="previewPanelOpen.set(!previewPanelOpen())"
-        (construct)="previewConstruction()"
+        (construct)="previewConstruction($event)"
         (home)="town()?.command('home')"
       />
     }

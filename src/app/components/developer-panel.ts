@@ -4,6 +4,7 @@ import { FoundationsStore } from '../state.service';
 import { PROJECTS } from '../domain/progression';
 import { Lighting } from '../domain/models';
 import { PreviewScenario } from '../domain/preview';
+import type { AssemblyConfigOverride } from '../town/assembly';
 @Component({
   selector: 'app-developer-panel',
   imports: [DecimalPipe],
@@ -85,7 +86,24 @@ import { PreviewScenario } from '../domain/preview';
               [checked]="!!store.state().designs['home']"
               (change)="visible('home', $event)"
             />Show first house</label
-          ><button class="wide" (click)="construct.emit()">Preview construction</button>
+          ><label for="assembly-speed">Assembly speed</label
+          ><select
+            id="assembly-speed"
+            [value]="assemblySpeed()"
+            (change)="setAssemblySpeed($event)"
+          >
+            <option value="0.5">Slow · ½×</option>
+            <option value="1">Natural · 1×</option>
+            <option value="2">Quick · 2×</option>
+          </select>
+          <label class="check"
+            ><input
+              id="force-reduced-motion"
+              type="checkbox"
+              [checked]="forceReducedMotion()"
+              (change)="setForceReducedMotion($event)"
+            />Force reduced motion</label
+          ><button class="wide" (click)="previewConstruction()">Preview construction</button>
         </section>
         <section>
           <h3>Backyard</h3>
@@ -149,10 +167,12 @@ export class DeveloperPanel {
   readonly open = input(true);
   readonly position = input<{ x: number; y: number; z: number } | null>(null);
   readonly toggle = output<void>();
-  readonly construct = output<void>();
+  readonly construct = output<AssemblyConfigOverride>();
   readonly home = output<void>();
   readonly error = signal('');
   readonly scenario = signal('');
+  readonly assemblySpeed = signal(1);
+  readonly forceReducedMotion = signal(false);
   private run(action: () => void) {
     try {
       this.error.set('');
@@ -199,5 +219,17 @@ export class DeveloperPanel {
     this.store
       .preferences({ lighting: this.value(e) as Lighting })
       .catch((e) => this.error.set(e.message));
+  }
+  setAssemblySpeed(e: Event) {
+    const speed = Number(this.value(e));
+    if ([0.5, 1, 2].includes(speed)) this.assemblySpeed.set(speed);
+  }
+  setForceReducedMotion(e: Event) {
+    this.forceReducedMotion.set((e.target as HTMLInputElement).checked);
+  }
+  previewConstruction() {
+    const override: AssemblyConfigOverride = { speed: this.assemblySpeed() };
+    if (this.forceReducedMotion()) override.reducedMotion = true;
+    this.construct.emit(override);
   }
 }

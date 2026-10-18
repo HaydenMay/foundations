@@ -23,3 +23,21 @@ RED: the new residential contract test failed because no recipe module existed; 
 Wrapped existing meshes in seven identity-transform groups (`foundation`, `walls`, `openings`, `entry`, `roofline`, `garage`, `details`). Cottage, Craftsman and Brick each have an explicit recipe order; Craftsman and Brick place the entry/openings or finishing details in their own authored stages. Each assembly is batched locally and marked as a boundary before world batching, preserving the home anchor and resource ownership. No models, materials, geometry dimensions or world extents were redesigned.
 
 Focused residential and visual-asset tests: **12/12 PASS**. Full Angular unit suite: **99/99 PASS**,14 files. Exact tested home bounds remain within0.001m of the pre-refactor captures; all three completed worlds remain below145 meshes and220,000 triangles. Actual draw calls and screenshot review are recorded after scene integration.
+
+## Task 3 — scene-loop integration
+
+RED: the new scene contract first failed because `TownScene.celebrate` accepted no animation override and had no cancellation API. Integrated `AssemblyAnimator` with the existing requestAnimationFrame loop, elapsed-time normalization, 30 FPS paint limit, visibility-triggered cached-shadow refreshes, camera easing and settlement. Skip invokes completion once; cancel, design replacement, session change and disposal stop without reporting success. Missing required bindings fall back to the already-complete house and finish safely; reduced motion completes synchronously. Replaced the now-unused whole-home pop helper and its obsolete tests.
+
+Focused scene and camera tests: **7/7 PASS**. Preview-lifecycle regressions cover stale-session requests, cancelling active playback on asset replacement, and passing transient settings only for a new request.
+
+## Task 4 — Developer Preview controls
+
+RED: focused panel and app tests failed because the speed/reduced-motion controls and app option signal were absent. Added touch-sized speed choices (0.5×/1×/2×), a force-reduced-motion checkbox, and one-shot options passed to `TownScene`; omitting the checkbox override leaves the OS preference in control. Options live in the app/panel only, reset on preview entry/exit, and are absent from the store and JSON backup. The same production recipes animate in onboarding and Developer Preview. App cancellation handling clears only the matching construction notice.
+
+Focused unit suite after integration: **107/107 PASS**,16 files. Production build: **PASS**. New portrait browser check for assembly options and unchanged genuine storage: **1/1 PASS**. Existing browser suite against the integrated build: **86 PASS, 1 SKIPPED**,87 total; skipped case is the desktop-only variant of a touch-pinch test. Hosted Pages verification remains after push.
+
+## Task 5 — evidence and review
+
+Final screenshots use the exact baseline camera position and afternoon light in portrait390×844, landscape844×390 and desktop1440×1000. All three intermediate frames are frozen from actual running recipes at 0.5× in the portrait capture; their assembly IDs, poses and visibility are recorded in `docs/evidence/phase-3/final-metrics.json`. Chromium reported no console/page errors, no horizontal overflow, and only the local application host. Captures show96 WebGL draw calls and186,792 triangles for the cottage completed scene. See `docs/phase-3-results.md` for comparisons, evidence and validation matrix.
+
+Execution note: the installed plan helper set does not include `task-start` or `task-done`, and its `task-brief` extractor expects `Task N` headings while this plan uses numbered sections. Work continued with the numbered plan and this tracked ledger as the durable task record.

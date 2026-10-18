@@ -13,6 +13,7 @@ import {
 import { CameraState, Preferences } from '../domain/models';
 import { Icon } from '../components/icon';
 import type { TownScene } from './scene';
+import type { AssemblyConfigOverride } from './assembly';
 
 @Component({
   selector: 'app-town',
@@ -223,7 +224,9 @@ export class TownComponent implements OnDestroy {
   readonly preferences = input.required<Preferences>();
   readonly sessionKey = input(0);
   readonly construction = input(0);
+  readonly assemblyOptions = input<AssemblyConfigOverride>({});
   readonly constructionFinished = output<{ id: number; sessionKey: number }>();
+  readonly constructionCancelled = output<{ id: number; sessionKey: number }>();
   readonly cameraChange = output<{
     camera: CameraState;
     sessionKey: number;
@@ -280,7 +283,13 @@ export class TownComponent implements OnDestroy {
           );
           this.lastDesigns = JSON.stringify(this.designs());
           this.scene.setLighting(this.preferences().lighting);
-          this.sync(this.designs(), this.preferences(), this.sessionKey(), this.construction());
+          this.sync(
+            this.designs(),
+            this.preferences(),
+            this.sessionKey(),
+            this.construction(),
+            this.assemblyOptions(),
+          );
         } catch (e) {
           console.warn('Town renderer unavailable:', e);
           this.zone.run(() => this.failed.set(true));
@@ -289,8 +298,9 @@ export class TownComponent implements OnDestroy {
     );
     effect(() => {
       const designs = this.designs(),
-        preferences = this.preferences();
-      this.sync(designs, preferences, this.sessionKey(), this.construction());
+        preferences = this.preferences(),
+        assemblyOptions = this.assemblyOptions();
+      this.sync(designs, preferences, this.sessionKey(), this.construction(), assemblyOptions);
     });
   }
   private sync(
@@ -298,11 +308,12 @@ export class TownComponent implements OnDestroy {
     preferences: Preferences,
     sessionKey: number,
     construction: number,
+    assemblyOptions: AssemblyConfigOverride,
   ) {
     if (!this.scene) return;
     if (sessionKey !== this.lastSession) {
       clearTimeout(this.timer);
-      this.scene.finishConstruction();
+      this.scene.cancelConstruction();
       this.building.set(false);
       this.lastSession = sessionKey;
       this.incomingCamera = '';
@@ -312,6 +323,11 @@ export class TownComponent implements OnDestroy {
     }
     const key = JSON.stringify(designs);
     if (this.lastDesigns !== key) {
+      if (this.building()) {
+        this.scene.cancelConstruction();
+        this.building.set(false);
+        this.constructionCancelled.emit({ id: this.lastConstruction, sessionKey });
+      }
       this.lastDesigns = key;
       this.scene.setDesigns(designs);
     }
@@ -328,13 +344,15 @@ export class TownComponent implements OnDestroy {
     if (construction && construction !== this.lastConstruction) {
       this.lastConstruction = construction;
       this.building.set(true);
-      this.scene.celebrate(() =>
-        this.zone.run(() => {
-          if (this.sessionKey() === sessionKey && this.construction() === construction) {
-            this.building.set(false);
-            this.constructionFinished.emit({ id: construction, sessionKey });
-          }
-        }),
+      this.scene.celebrate(
+        () =>
+          this.zone.run(() => {
+            if (this.sessionKey() === sessionKey && this.construction() === construction) {
+              this.building.set(false);
+              this.constructionFinished.emit({ id: construction, sessionKey });
+            }
+          }),
+        assemblyOptions,
       );
     }
   }

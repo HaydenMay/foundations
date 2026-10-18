@@ -1,4 +1,4 @@
-// Captures comparable starting-house baselines from the existing renderer before Phase 3 edits.
+// Captures comparable completed-house baselines or final assembly playback evidence.
 import { chromium, expect } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
@@ -6,6 +6,8 @@ import assert from 'node:assert/strict';
 
 const url = process.env.BASE_URL || 'http://127.0.0.1:4200/foundations/';
 const directory = process.env.CAPTURE_DIR || 'docs/evidence/phase-3';
+const mode = process.env.CAPTURE_MODE || 'baseline';
+assert.ok(['baseline', 'final'].includes(mode), 'CAPTURE_MODE must be baseline or final');
 const layouts = [
   ['portrait', { width: 390, height: 844 }, true],
   ['landscape', { width: 844, height: 390 }, true],
@@ -15,6 +17,7 @@ const selectedLayouts = process.env.CAPTURE_LAYOUTS?.split(',');
 await mkdir(directory, { recursive: true });
 const browser = await chromium.launch({ headless: true });
 const captures = [];
+const intermediateFrames = [];
 const repositoryCommit = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 const applicationSourceCommit = process.env.APP_SOURCE_COMMIT || repositoryCommit;
 try {
@@ -40,6 +43,18 @@ try {
     await page.addInitScript(() => {
       window.__THREE_DEVTOOLS__ = new EventTarget();
       window.__visual = { renderer: null, scene: null, camera: null, renders: 0 };
+      window.__assemblyFrameControl = { freezeAt: null, frozen: false, timestamp: 0 };
+      const requestFrame = window.requestAnimationFrame.bind(window);
+      window.requestAnimationFrame = (callback) =>
+        requestFrame((timestamp) => {
+          const control = window.__assemblyFrameControl;
+          if (control.freezeAt !== null && timestamp >= control.freezeAt) {
+            control.freezeAt = null;
+            control.frozen = true;
+            control.timestamp = timestamp;
+          }
+          callback(control.frozen ? control.timestamp : timestamp);
+        });
       window.__THREE_DEVTOOLS__.addEventListener('observe', (event) => {
         const renderer = event.detail;
         if (!renderer.isWebGLRenderer) return;
@@ -58,6 +73,8 @@ try {
 
     await page.goto(url);
     await expect(page.locator('canvas[data-rendered="true"]')).toBeVisible();
+    if (mode === 'final')
+      await page.addStyleTag({ content: '.toast { display: none !important; }' });
     await page.getByRole('button', { name: 'Settings', exact: true }).click();
     await page.getByRole('button', { name: 'Developer Preview', exact: true }).click();
     await page.getByRole('button', { name: 'Enter Developer Preview' }).click();
@@ -84,6 +101,13 @@ try {
       const frame = await page.evaluate(() => {
         const canvas = document.querySelector('app-town canvas');
         const camera = window.__visual?.camera;
+        const scene = window.__visual?.scene;
+        const assemblies = [];
+        scene?.traverse((object) => {
+          const assemblyId = object.userData?.assemblyId;
+          if (assemblyId)
+            assemblies.push({ id: assemblyId, y: object.position.y, visible: object.visible });
+        });
         return {
           width: canvas?.width,
           height: canvas?.height,
@@ -92,6 +116,9 @@ try {
           homeVisible: document.querySelector('app-town')?.getAttribute('data-home-visible'),
           lighting: document.querySelector('app-town')?.getAttribute('data-lighting'),
           overflow: document.documentElement.scrollWidth > innerWidth,
+          assemblies,
+          drawCalls: window.__visual?.renderer?.info?.render?.calls,
+          triangles: window.__visual?.renderer?.info?.render?.triangles,
         };
       });
       assert.deepEqual(frame.homeVisible, 'true');
@@ -102,19 +129,65 @@ try {
         assert.deepEqual(frame.position, referenceCamera.position, 'Camera position changed');
         assert.equal(frame.zoom, referenceCamera.zoom, 'Camera zoom changed');
       } else referenceCamera = frame;
-      const path = `${directory}/baseline-${layout}-${style}.png`;
+      const path = `${directory}/${mode}-${layout}-${style}.png`;
       await page.locator('app-town').screenshot({ path });
       captures.push({ layout, style, ...frame, file: path });
+      if (mode === 'final' && layout === 'portrait') {
+        await page.getByTestId('preview-badge').click();
+        await page.getByLabel('Assembly speed').selectOption('0.5');
+        await page.evaluate(() => {
+          window.__assemblyFrameControl.freezeAt = performance.now() + 1000;
+        });
+        await page.getByRole('button', { name: 'Preview construction', exact: true }).click();
+        await expect(page.locator('app-town')).toHaveAttribute('data-construction', 'active');
+        await expect
+          .poll(() => page.evaluate(() => window.__assemblyFrameControl.frozen))
+          .toBe(true);
+        const during = await page.evaluate(() => {
+          const scene = window.__visual?.scene;
+          const state = [];
+          scene?.traverse((object) => {
+            const assemblyId = object.userData?.assemblyId;
+            if (assemblyId)
+              state.push({ id: assemblyId, y: object.position.y, visible: object.visible });
+          });
+          return state;
+        });
+        const baseline = new Map(frame.assemblies.map((part) => [part.id, part.y]));
+        assert.ok(
+          during.some((part) => !part.visible || Math.abs(part.y - baseline.get(part.id)) > 0.02),
+          `${style} did not expose an intermediate assembly pose`,
+        );
+        const intermediatePath = `${directory}/assembly-portrait-${style}.png`;
+        await page.locator('app-town').screenshot({ path: intermediatePath });
+        intermediateFrames.push({
+          layout,
+          style,
+          speed: 0.5,
+          file: intermediatePath,
+          assemblies: during,
+        });
+        await page.evaluate(() =>
+          document.querySelector('[aria-label="Skip construction"]')?.click(),
+        );
+        await page.evaluate(() => {
+          window.__assemblyFrameControl.frozen = false;
+          window.__assemblyFrameControl.freezeAt = null;
+        });
+        await expect(page.locator('app-town')).toHaveAttribute('data-construction', 'idle');
+      }
     }
     assert.deepEqual(errors, [], `${layout} had browser errors`);
     assert.deepEqual([...requestHosts].sort(), [new URL(url).hostname]);
     await context.close();
   }
   await writeFile(
-    `${directory}/baseline-metrics.json`,
-    `${JSON.stringify({ repositoryCommit, applicationSourceCommit, url, lighting: 'day', captures }, null, 2)}\n`,
+    `${directory}/${mode}-metrics.json`,
+    `${JSON.stringify({ repositoryCommit, applicationSourceCommit, url, lighting: 'day', captures, intermediateFrames }, null, 2)}\n`,
   );
-  console.log(`Captured ${captures.length} comparable baseline house views from ${applicationSourceCommit}.`);
+  console.log(
+    `Captured ${captures.length} comparable ${mode} house views and ${intermediateFrames.length} intermediate frames from ${applicationSourceCommit}.`,
+  );
 } finally {
   await browser.close();
 }

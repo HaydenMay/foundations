@@ -19,6 +19,7 @@ import { PROJECTS, isProjectUnlocked } from './domain/progression';
 import { importState } from './domain/state';
 import { HomeSelection } from './components/home-selection';
 import { DeveloperPanel } from './components/developer-panel';
+import type { AssemblyConfigOverride } from './town/assembly';
 
 @Component({
   selector: 'app-root',
@@ -34,6 +35,7 @@ export class App {
   readonly draftHome = signal('sage');
   readonly previewPanelOpen = signal(true);
   readonly construction = signal(0);
+  readonly previewAssemblyOptions = signal<AssemblyConfigOverride>({});
   readonly cameraPosition = signal<{ x: number; y: number; z: number } | null>(null);
   readonly renderDesigns = computed(() =>
     this.choosingHome()
@@ -198,6 +200,10 @@ export class App {
         : 'A home, built by your first healthy step.',
     );
   }
+  constructionCancelled(event: { id: number; sessionKey: number }) {
+    if (event.id === this.construction() && event.sessionKey === this.store.sessionKey())
+      this.construction.set(0);
+  }
   skipConstruction() {
     this.town()?.skipConstruction();
     this.construction.set(0);
@@ -206,6 +212,7 @@ export class App {
     this.close();
     this.cancelHome();
     this.construction.set(0);
+    this.previewAssemblyOptions.set({});
     this.store.enterPreview();
     this.previewPanelOpen.set(true);
   }
@@ -213,10 +220,12 @@ export class App {
     this.close();
     this.cancelHome();
     this.construction.set(0);
+    this.previewAssemblyOptions.set({});
     this.store.exitPreview();
   }
-  previewConstruction() {
+  previewConstruction(options: AssemblyConfigOverride = {}) {
     if (!this.store.preview()) return;
+    this.previewAssemblyOptions.set(options);
     this.cancelHome();
     this.store.previewVisible('home', true);
     this.construction.set(++this.constructionId);
