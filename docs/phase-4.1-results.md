@@ -30,7 +30,7 @@ Captures were made from the production build in headless Chromium with a fresh s
 - Production-bundle visual capture: **PASS — 25 scene captures plus 2 responsive controls**. Page and console errors: **0**; WebGL errors: **0**; context loss: **0**. Emulated portrait at 390×844 and landscape at 844×390 have matching document dimensions, with no overflow.
 - Renderer observations at 1280×900: up to **102 draw calls** and **171,330 triangles** in the captured scenes. These are Chromium renderer counters, not frame-time or physical-device performance measurements.
 - Physical iPhone/Android, Safari, and real mobile GPU testing: **SKIPPED**. Browser screenshots used headless desktop Chromium with emulated viewports.
-- GitHub Pages deployment: **PENDING** at the time this report was drafted; this section will be updated after the push and hosted verification.
+- GitHub Pages deployment: **PASS** — [Actions run 39108701577](https://github.com/HaydenMay/foundations/actions/runs/39108701577) passed the unit/build and deploy jobs for app source commit `b09e006`. The hosted app returned HTTP 200 with title `Foundations` and base href `/foundations/`; the deployed CSS, shared scene chunk and new main bundle each returned HTTP 200. The report/evidence commit `ab0afbe` contains no app code changes. The workflow runs unit tests, production build and Pages deploy; it does not run browser end-to-end tests.
 
 ## Known visual compromises
 
