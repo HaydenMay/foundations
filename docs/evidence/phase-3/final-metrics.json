@@ -1,0 +1,634 @@
+{
+  "repositoryCommit": "9f6a57832497df96827bead0e93b656f08f1d95f",
+  "applicationSourceCommit": "9f6a57832497df96827bead0e93b656f08f1d95f",
+  "url": "http://127.0.0.1:4200/foundations/",
+  "lighting": "day",
+  "captures": [
+    {
+      "layout": "portrait",
+      "style": "cottage",
+      "width": 780,
+      "height": 1428,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "homeVisible": "true",
+      "lighting": "day",
+      "overflow": false,
+      "assemblies": [
+        {
+          "id": "foundation",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "walls",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "openings",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "entry",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "roofline",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "garage",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "details",
+          "y": 0,
+          "visible": true
+        }
+      ],
+      "drawCalls": 96,
+      "triangles": 186792,
+      "file": "docs/evidence/phase-3/final-portrait-cottage.png"
+    },
+    {
+      "layout": "portrait",
+      "style": "craftsman",
+      "width": 780,
+      "height": 1428,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "homeVisible": "true",
+      "lighting": "day",
+      "overflow": false,
+      "assemblies": [
+        {
+          "id": "foundation",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "walls",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "openings",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "entry",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "roofline",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "garage",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "details",
+          "y": 0,
+          "visible": true
+        }
+      ],
+      "drawCalls": 97,
+      "triangles": 185132,
+      "file": "docs/evidence/phase-3/final-portrait-craftsman.png"
+    },
+    {
+      "layout": "portrait",
+      "style": "brick",
+      "width": 780,
+      "height": 1428,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "homeVisible": "true",
+      "lighting": "day",
+      "overflow": false,
+      "assemblies": [
+        {
+          "id": "foundation",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "walls",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "openings",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "entry",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "roofline",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "garage",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "details",
+          "y": 0,
+          "visible": true
+        }
+      ],
+      "drawCalls": 96,
+      "triangles": 185136,
+      "file": "docs/evidence/phase-3/final-portrait-brick.png"
+    },
+    {
+      "layout": "landscape",
+      "style": "cottage",
+      "width": 1688,
+      "height": 662,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "homeVisible": "true",
+      "lighting": "day",
+      "overflow": false,
+      "assemblies": [
+        {
+          "id": "foundation",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "walls",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "openings",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "entry",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "roofline",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "garage",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "details",
+          "y": 0,
+          "visible": true
+        }
+      ],
+      "drawCalls": 96,
+      "triangles": 186792,
+      "file": "docs/evidence/phase-3/final-landscape-cottage.png"
+    },
+    {
+      "layout": "landscape",
+      "style": "craftsman",
+      "width": 1688,
+      "height": 662,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "homeVisible": "true",
+      "lighting": "day",
+      "overflow": false,
+      "assemblies": [
+        {
+          "id": "foundation",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "walls",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "openings",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "entry",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "roofline",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "garage",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "details",
+          "y": 0,
+          "visible": true
+        }
+      ],
+      "drawCalls": 97,
+      "triangles": 185132,
+      "file": "docs/evidence/phase-3/final-landscape-craftsman.png"
+    },
+    {
+      "layout": "landscape",
+      "style": "brick",
+      "width": 1688,
+      "height": 662,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "homeVisible": "true",
+      "lighting": "day",
+      "overflow": false,
+      "assemblies": [
+        {
+          "id": "foundation",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "walls",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "openings",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "entry",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "roofline",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "garage",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "details",
+          "y": 0,
+          "visible": true
+        }
+      ],
+      "drawCalls": 96,
+      "triangles": 185136,
+      "file": "docs/evidence/phase-3/final-landscape-brick.png"
+    },
+    {
+      "layout": "desktop",
+      "style": "cottage",
+      "width": 1440,
+      "height": 908,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "homeVisible": "true",
+      "lighting": "day",
+      "overflow": false,
+      "assemblies": [
+        {
+          "id": "foundation",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "walls",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "openings",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "entry",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "roofline",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "garage",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "details",
+          "y": 0,
+          "visible": true
+        }
+      ],
+      "drawCalls": 96,
+      "triangles": 186792,
+      "file": "docs/evidence/phase-3/final-desktop-cottage.png"
+    },
+    {
+      "layout": "desktop",
+      "style": "craftsman",
+      "width": 1440,
+      "height": 908,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "homeVisible": "true",
+      "lighting": "day",
+      "overflow": false,
+      "assemblies": [
+        {
+          "id": "foundation",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "walls",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "openings",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "entry",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "roofline",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "garage",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "details",
+          "y": 0,
+          "visible": true
+        }
+      ],
+      "drawCalls": 97,
+      "triangles": 185132,
+      "file": "docs/evidence/phase-3/final-desktop-craftsman.png"
+    },
+    {
+      "layout": "desktop",
+      "style": "brick",
+      "width": 1440,
+      "height": 908,
+      "position": [
+        19.041630560342615,
+        29.8,
+        19.441630560342617
+      ],
+      "zoom": 1,
+      "homeVisible": "true",
+      "lighting": "day",
+      "overflow": false,
+      "assemblies": [
+        {
+          "id": "foundation",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "walls",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "openings",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "entry",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "roofline",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "garage",
+          "y": 0,
+          "visible": true
+        },
+        {
+          "id": "details",
+          "y": 0,
+          "visible": true
+        }
+      ],
+      "drawCalls": 96,
+      "triangles": 185136,
+      "file": "docs/evidence/phase-3/final-desktop-brick.png"
+    }
+  ],
+  "intermediateFrames": [
+    {
+      "layout": "portrait",
+      "style": "cottage",
+      "speed": 0.5,
+      "file": "docs/evidence/phase-3/assembly-portrait-cottage.png",
+      "assemblies": [
+        {
+          "id": "foundation",
+          "y": 1.9944306789496742,
+          "visible": true
+        },
+        {
+          "id": "walls",
+          "y": 1.9944306789496742,
+          "visible": true
+        },
+        {
+          "id": "openings",
+          "y": 2.468777934599537,
+          "visible": true
+        },
+        {
+          "id": "entry",
+          "y": 2.468777934599537,
+          "visible": true
+        },
+        {
+          "id": "roofline",
+          "y": 3.0129373353111286,
+          "visible": true
+        },
+        {
+          "id": "garage",
+          "y": 3.0129373353111286,
+          "visible": true
+        },
+        {
+          "id": "details",
+          "y": 0,
+          "visible": false
+        }
+      ]
+    },
+    {
+      "layout": "portrait",
+      "style": "craftsman",
+      "speed": 0.5,
+      "file": "docs/evidence/phase-3/assembly-portrait-craftsman.png",
+      "assemblies": [
+        {
+          "id": "foundation",
+          "y": 1.9436472712223758,
+          "visible": true
+        },
+        {
+          "id": "walls",
+          "y": 1.9436472712223758,
+          "visible": true
+        },
+        {
+          "id": "openings",
+          "y": 2.4101974224288765,
+          "visible": true
+        },
+        {
+          "id": "entry",
+          "y": 2.4101974224288765,
+          "visible": true
+        },
+        {
+          "id": "roofline",
+          "y": 2.9460031124726953,
+          "visible": true
+        },
+        {
+          "id": "garage",
+          "y": 0,
+          "visible": false
+        },
+        {
+          "id": "details",
+          "y": 2.9460031124726953,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "layout": "portrait",
+      "style": "brick",
+      "speed": 0.5,
+      "file": "docs/evidence/phase-3/assembly-portrait-brick.png",
+      "assemblies": [
+        {
+          "id": "foundation",
+          "y": 1.959949636804688,
+          "visible": true
+        },
+        {
+          "id": "walls",
+          "y": 1.959949636804688,
+          "visible": true
+        },
+        {
+          "id": "openings",
+          "y": 2.4290103775432854,
+          "visible": true
+        },
+        {
+          "id": "entry",
+          "y": 2.4290103775432854,
+          "visible": true
+        },
+        {
+          "id": "roofline",
+          "y": 2.9675063831995785,
+          "visible": true
+        },
+        {
+          "id": "garage",
+          "y": 0,
+          "visible": false
+        },
+        {
+          "id": "details",
+          "y": 2.9675063831995785,
+          "visible": true
+        }
+      ]
+    }
+  ]
+}
