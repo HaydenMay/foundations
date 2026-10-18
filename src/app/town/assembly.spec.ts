@@ -22,11 +22,22 @@ describe('asset-agnostic assembly playback', () => {
       secondAlpha = object(secondRoot, 2, 1, 0),
       secondZeta = object(secondRoot, -1, 3, 0);
     const recipe: AssemblyRecipe = {
-      pieces: [{ id: 'zeta', dropHeight: 3 }, { id: 'alpha', dropHeight: 1 }],
+      pieces: [
+        { id: 'zeta', dropHeight: 3 },
+        { id: 'alpha', dropHeight: 1 },
+      ],
       config: { durationMs: 1000, staggerMs: 250, concurrency: 1 },
     };
-    const first = new AssemblyAnimator(firstRoot, bindings({ alpha: firstAlpha, zeta: firstZeta }), recipe),
-      second = new AssemblyAnimator(secondRoot, bindings({ alpha: secondAlpha, zeta: secondZeta }), recipe);
+    const first = new AssemblyAnimator(
+        firstRoot,
+        bindings({ alpha: firstAlpha, zeta: firstZeta }),
+        recipe,
+      ),
+      second = new AssemblyAnimator(
+        secondRoot,
+        bindings({ alpha: secondAlpha, zeta: secondZeta }),
+        recipe,
+      );
 
     first.evaluate(0);
     expect(firstAlpha.visible).toBe(true);
@@ -91,11 +102,12 @@ describe('asset-agnostic assembly playback', () => {
       scale: hidden.scale.clone(),
       visibility: hidden.visible,
     };
-    const animator = new AssemblyAnimator(
-      root,
-      bindings({ visible, hidden }),
-      { pieces: [{ id: 'visible', order: 1 }, { id: 'hidden', order: 2 }] },
-    );
+    const animator = new AssemblyAnimator(root, bindings({ visible, hidden }), {
+      pieces: [
+        { id: 'visible', order: 1 },
+        { id: 'hidden', order: 2 },
+      ],
+    });
 
     for (let replay = 0; replay < 20; replay++) {
       if (replay === 0) animator.play();
@@ -176,23 +188,18 @@ describe('asset-agnostic assembly playback', () => {
       child = object(parent, 0, 1, 0);
     expect(
       () =>
-        new AssemblyAnimator(
-          root,
-          bindings({ parent, child }),
-          { pieces: [{ id: 'parent' }, { id: 'child' }] },
-        ),
+        new AssemblyAnimator(root, bindings({ parent, child }), {
+          pieces: [{ id: 'parent' }, { id: 'child' }],
+        }),
     ).toThrow(/overlap/i);
     expect(
       () =>
-        new AssemblyAnimator(
-          root,
-          bindings({ part: parent }),
-          { pieces: [{ id: 'part' }, { id: 'part' }] },
-        ),
+        new AssemblyAnimator(root, bindings({ part: parent }), {
+          pieces: [{ id: 'part' }, { id: 'part' }],
+        }),
     ).toThrow(/duplicate/i);
     expect(
-      () =>
-        new AssemblyAnimator(root, bindings({}), { pieces: [{ id: 'required' }] }),
+      () => new AssemblyAnimator(root, bindings({}), { pieces: [{ id: 'required' }] }),
     ).toThrow(/required/i);
     expect(parent.position.toArray()).toEqual([0, 1, 0]);
     expect(child.position.toArray()).toEqual([0, 1, 0]);
@@ -241,21 +248,17 @@ describe('asset-agnostic assembly playback', () => {
       invalid = object(root, 0, 2, 0);
     expect(
       () =>
-        new AssemblyAnimator(
-          root,
-          bindings({ left: first, alias: first }),
-          { pieces: [{ id: 'left' }, { id: 'alias' }] },
-        ),
+        new AssemblyAnimator(root, bindings({ left: first, alias: first }), {
+          pieces: [{ id: 'left' }, { id: 'alias' }],
+        }),
     ).toThrow(/ambiguous/i);
 
     invalid.position.x = Number.NaN;
     expect(
       () =>
-        new AssemblyAnimator(
-          root,
-          bindings({ first, invalid }),
-          { pieces: [{ id: 'first' }, { id: 'invalid' }] },
-        ),
+        new AssemblyAnimator(root, bindings({ first, invalid }), {
+          pieces: [{ id: 'first' }, { id: 'invalid' }],
+        }),
     ).toThrow(/unsafe completed transform/i);
     expect(first.position.toArray()).toEqual([0, 1, 0]);
     expect(invalid.position.x).toBeNaN();
@@ -263,15 +266,21 @@ describe('asset-agnostic assembly playback', () => {
 
   it('prevents overlapping controllers but allows independent object instances', () => {
     const firstRoot = new T.Group(),
-      secondRoot = new T.Group();
+      secondRoot = new T.Group(),
+      outerRoot = new T.Group();
+    outerRoot.add(firstRoot);
     const shared = object(firstRoot, 0, 0, 0),
       independent = object(secondRoot, 0, 0, 0);
     const recipe: AssemblyRecipe = { pieces: [{ id: 'part' }] };
     const first = new AssemblyAnimator(firstRoot, bindings({ part: shared }), recipe),
-      conflicting = new AssemblyAnimator(firstRoot, bindings({ part: shared }), recipe),
+      conflicting = new AssemblyAnimator(outerRoot, bindings({ part: shared }), recipe),
       separate = new AssemblyAnimator(secondRoot, bindings({ part: independent }), recipe);
     expect(first.play()).toBe(true);
+    first.update(0.25);
+    const animatedPose = shared.position.clone();
     expect(conflicting.play()).toBe(false);
+    conflicting.evaluate(0);
+    expect(shared.position.toArray()).toEqual(animatedPose.toArray());
     expect(separate.play()).toBe(true);
     separate.skip();
     expect(separate.lifecycle).toBe('completed');
@@ -280,6 +289,57 @@ describe('asset-agnostic assembly playback', () => {
     first.dispose();
     conflicting.dispose();
     separate.dispose();
+  });
+
+  it('rejects a controller created during playback instead of capturing a temporary pose', () => {
+    const root = new T.Group(),
+      piece = object(root, 0, 1, 0),
+      recipe: AssemblyRecipe = { pieces: [{ id: 'part' }] };
+    const active = new AssemblyAnimator(root, bindings({ part: piece }), recipe);
+
+    expect(active.play()).toBe(true);
+    active.update(0.25);
+    const animatedPose = piece.position.clone();
+    expect(animatedPose.y).not.toBe(1);
+    expect(() => new AssemblyAnimator(root, bindings({ part: piece }), recipe)).toThrow(
+      /active assembly playback/i,
+    );
+    expect(piece.position.toArray()).toEqual(animatedPose.toArray());
+
+    active.cancel();
+    const next = new AssemblyAnimator(root, bindings({ part: piece }), recipe);
+    expect(next.play()).toBe(true);
+    expect(next.skip()).toBe(true);
+    expect(piece.position.toArray()).toEqual([0, 1, 0]);
+    active.dispose();
+    next.dispose();
+  });
+
+  it('blocks direct evaluation and concurrent playback for another controller on the same instance', () => {
+    const root = new T.Group(),
+      firstPiece = object(root, -1, 1, 0),
+      secondPiece = object(root, 1, 1, 0);
+    const first = new AssemblyAnimator(root, bindings({ firstPiece }), {
+        pieces: [{ id: 'firstPiece' }],
+      }),
+      second = new AssemblyAnimator(root, bindings({ secondPiece }), {
+        pieces: [{ id: 'secondPiece' }],
+      });
+
+    expect(first.play()).toBe(true);
+    first.update(0.25);
+    const firstPose = firstPiece.position.clone(),
+      secondPose = secondPiece.position.clone();
+    expect(second.play()).toBe(false);
+    second.evaluate(0);
+    expect(firstPiece.position.toArray()).toEqual(firstPose.toArray());
+    expect(secondPiece.position.toArray()).toEqual(secondPose.toArray());
+
+    first.cancel();
+    expect(second.play()).toBe(true);
+    expect(second.skip()).toBe(true);
+    first.dispose();
+    second.dispose();
   });
 
   it('stops and restores the bound instance when its root is replaced', () => {

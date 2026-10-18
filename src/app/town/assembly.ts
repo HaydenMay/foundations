@@ -70,6 +70,7 @@ interface Baseline {
 }
 
 const objectOwners = new WeakMap<T.Object3D, AssemblyAnimator>();
+const instanceOwners = new WeakMap<T.Object3D, AssemblyAnimator>();
 
 function isBelow(root: T.Object3D, object: T.Object3D): boolean {
   for (let current: T.Object3D | null = object; current; current = current.parent)
@@ -149,8 +150,6 @@ export class AssemblyAnimator {
     warn: (message: string) => void = (message) => console.warn(message),
   ) {
     this.config = Object.freeze(resolveConfig(recipe, override));
-    this.boundParent = root.parent;
-    root.updateWorldMatrix(true, true);
 
     const ids = new Set<string>();
     const resolved: { entry: AssemblyPieceRecipe; object: T.Object3D }[] = [];
@@ -176,7 +175,9 @@ export class AssemblyAnimator {
         throw new Error('Required assembly piece "' + entry.id + '" is missing.');
       }
       if (!isBelow(root, object))
-        throw new Error('Assembly piece "' + entry.id + '" does not belong to this asset instance.');
+        throw new Error(
+          'Assembly piece "' + entry.id + '" does not belong to this asset instance.',
+        );
       resolved.push({ entry, object });
     }
 
@@ -196,6 +197,16 @@ export class AssemblyAnimator {
         if (overlaps(current.object, resolved[j].object))
           throw new Error('Assembly pieces overlap by ancestor/descendant ownership.');
     }
+
+    const ownedObjects = selectedObjects(
+      root,
+      resolved.map(({ object }) => object),
+    );
+    if (instanceOwners.has(root) || ownedObjects.some((object) => objectOwners.has(object)))
+      throw new Error('The asset instance already has active assembly playback.');
+
+    this.boundParent = root.parent;
+    root.updateWorldMatrix(true, true);
 
     const baselines: Baseline[] = [];
     resolved.forEach(({ entry, object }, index) => {
@@ -240,7 +251,7 @@ export class AssemblyAnimator {
       (duration, piece) => Math.max(duration, piece.startMs + piece.durationMs),
       0,
     );
-    this.ownedObjects = Object.freeze(selectedObjects(root, baselines.map((piece) => piece.object)));
+    this.ownedObjects = Object.freeze(ownedObjects);
   }
 
   /** Begin from the immutable completed-state snapshot. Repeated play calls never stack. */
@@ -269,6 +280,7 @@ export class AssemblyAnimator {
       this.cancel();
       return;
     }
+    if (this.hasForeignOwner()) return;
     const normalized = Number.isFinite(progress) ? T.MathUtils.clamp(progress, 0, 1) : 0;
     const elapsed = normalized * this.durationMs;
     for (const piece of this.pieces) {
@@ -362,13 +374,28 @@ export class AssemblyAnimator {
   }
 
   private acquire(): boolean {
-    if (this.ownedObjects.some((object) => objectOwners.has(object))) return false;
+    if (
+      instanceOwners.has(this.root) ||
+      this.ownedObjects.some((object) => objectOwners.has(object))
+    )
+      return false;
+    instanceOwners.set(this.root, this);
     for (const object of this.ownedObjects) objectOwners.set(object, this);
     return true;
   }
 
   private release(): void {
+    if (instanceOwners.get(this.root) === this) instanceOwners.delete(this.root);
     for (const object of this.ownedObjects)
       if (objectOwners.get(object) === this) objectOwners.delete(object);
+  }
+
+  private hasForeignOwner(): boolean {
+    return (
+      (instanceOwners.has(this.root) && instanceOwners.get(this.root) !== this) ||
+      this.ownedObjects.some(
+        (object) => objectOwners.has(object) && objectOwners.get(object) !== this,
+      )
+    );
   }
 }

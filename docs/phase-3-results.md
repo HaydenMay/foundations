@@ -6,6 +6,8 @@ The first-home reveal now animates the existing house as authored pieces instead
 
 `TownScene` drives normalized elapsed progress through its existing requestAnimationFrame loop. It keeps camera easing and cached shadow maps, limits useful redraws to about 30 per second, restores exact transforms on completion/Skip/cancel, and disposes playback before replacing or releasing house assets. Reduced-motion, empty recipes and missing required bindings settle safely. Scenario/session changes and house replacement cancel without showing a success message.
 
+The controller now claims both the asset root and selected piece trees during playback. A competing controller cannot snapshot an in-progress pose, run alongside another playback on the same instance, or mutate an owned piece through direct evaluation. Constructor conflicts are rejected before transform baselines are captured.
+
 Developer Preview exposes 0.5×, 1× and 2× assembly speeds and an optional force-reduced-motion toggle. A deliberate construction request passes those transient values through the same `TownScene` recipe path used by onboarding. Omitting the toggle preserves the device's reduced-motion preference. The controls are in-memory app/panel state; they do not enter `FoundationsStore`, local storage, backup exports or cross-tab messages.
 
 ## Visual evidence
@@ -24,14 +26,14 @@ See [all layouts and the baseline comparison](evidence/phase-3/README.md). The c
 
 | Check                                                   | Result                                                                                                                      |
 | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Unit tests (Angular/Vitest)                             | **PASS** — 107 tests across 16 files                                                                                        |
-| Existing browser suite                                  | **PASS** — 86 passed; **SKIPPED** — 1 desktop touch-only pinch case; 87 total                                               |
+| Unit tests (Angular/Vitest)                             | **PASS** — 109 tests across 16 files                                                                                        |
+| Browser suite (Chromium portrait, landscape, desktop)   | **PASS** — 89 passed; **SKIPPED** — 1 expected desktop touch-only pinch case; 90 total                                      |
 | New assembly-preview browser check                      | **PASS** — 1 portrait test; settings complete through preview and genuine storage stays byte-for-byte unchanged             |
 | Production Angular build with `/foundations/` base href | **PASS** — output in `dist/foundations/browser`                                                                             |
 | Final capture and assertions                            | **PASS** — 9 completed views, 3 intermediate frames, consistent camera/light, no console/page errors or horizontal overflow |
 | Physical iPhone/iPad or Safari                          | **SKIPPED** — no physical device or Safari session was available                                                            |
 
-Chromium's completed Cottage scene measured 96 WebGL draw calls and 186,792 triangles. The application's initial bundles were 303.60 kB raw (80.89 kB estimated transfer) and the lazy scene chunk was 640.64 kB raw (138.80 kB estimated transfer). These are renderer and bundle observations, not a physical-device frame-rate measurement.
+Chromium's completed Cottage scene measured 96 WebGL draw calls and 186,792 triangles. The application's initial bundles were 303.60 kB raw (80.75 kB estimated transfer) and the lazy scene chunk was 641.02 kB raw (138.91 kB estimated transfer). These are renderer and bundle observations, not a physical-device frame-rate measurement.
 
 ## Save safety and deployment
 
