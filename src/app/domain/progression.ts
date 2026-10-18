@@ -10,6 +10,8 @@ const choice = (
 ): Choice => ({ id, name, description, color, set });
 
 export const CHAPTER_COMPLETE_THRESHOLD = 100;
+export const CHAPTER_TWO_START_THRESHOLD = 100;
+export const CHAPTER_TWO_COMPLETE_THRESHOLD = 200;
 
 export function chapterLotVisible(
   stars: number,
@@ -326,6 +328,305 @@ export const PROJECTS: Project[] = [
   },
 ];
 
+/** Selectable Chapter 2 projects. The 100- and 200-star events are automatic, not purchases. */
+export const CHAPTER_TWO_PROJECTS: Project[] = [
+  {
+    id: 'ch2-neighbor-1',
+    name: 'First Neighbor',
+    threshold: 110,
+    icon: 'home',
+    zone: 'ch2-lot-1',
+    chapter: 2,
+    lot: 'compact',
+    description: 'Welcome a compact single-story cottage, craftsman, or brick home to the street.',
+    choices: [
+      choice(
+        'cottage',
+        'Classic Cottage',
+        'Cream siding, a dark roof, and a welcoming porch.',
+        '#d7d0ba',
+        'A',
+      ),
+      choice(
+        'craftsman',
+        'Modern Craftsman',
+        'Warm wood, layered gables, and stone accents.',
+        '#ae8b62',
+        'B',
+      ),
+      choice(
+        'brick',
+        'Traditional Brick',
+        'Warm brick, charcoal shingles, and white trim.',
+        '#a66f55',
+        'C',
+      ),
+    ],
+  },
+  {
+    id: 'ch2-street-trees',
+    name: 'Street Trees',
+    threshold: 120,
+    icon: 'tree',
+    zone: 'ch2-street-trees',
+    chapter: 2,
+    description: 'Bring a gentle rhythm of seasonal color and shade to the neighborhood road.',
+    choices: [
+      choice(
+        'flowering-trees',
+        'Flowering Trees',
+        'Soft spring blooms among green leaves.',
+        '#b995a7',
+        'A',
+      ),
+      choice(
+        'autumn-maples',
+        'Autumn Maples',
+        'Warm amber and russet leaves for the street.',
+        '#c3834f',
+        'B',
+      ),
+      choice(
+        'evergreens',
+        'Evergreens',
+        'Quiet evergreen forms through every season.',
+        '#6f806a',
+        'C',
+      ),
+    ],
+  },
+  {
+    id: 'ch2-neighbor-2',
+    name: 'Second Neighbor',
+    threshold: 130,
+    icon: 'home',
+    zone: 'ch2-lot-2',
+    chapter: 2,
+    lot: 'l-shaped',
+    description: 'Add a medium L-shaped family home with a connected driveway.',
+    choices: [
+      choice(
+        'cottage',
+        'Classic Cottage',
+        'Cream siding, a dark roof, and a welcoming porch.',
+        '#d7d0ba',
+        'A',
+      ),
+      choice(
+        'craftsman',
+        'Modern Craftsman',
+        'Warm wood, layered gables, and stone accents.',
+        '#ae8b62',
+        'B',
+      ),
+      choice(
+        'brick',
+        'Traditional Brick',
+        'Warm brick, charcoal shingles, and white trim.',
+        '#a66f55',
+        'C',
+      ),
+    ],
+  },
+  {
+    id: 'ch2-gardens',
+    name: 'Streetside Gardens',
+    threshold: 140,
+    icon: 'leaf',
+    zone: 'ch2-gardens',
+    chapter: 2,
+    description: 'Layer flowers, shrubs, or grasses along the sidewalks and planted verges.',
+    choices: [
+      choice(
+        'flowering-borders',
+        'Flowering Borders',
+        'Low beds with a calm mix of seasonal flowers.',
+        '#c58d81',
+        'A',
+      ),
+      choice(
+        'decorative-shrubs',
+        'Decorative Shrubs',
+        'Rounded shrubs with restrained accent blooms.',
+        '#87967b',
+        'B',
+      ),
+      choice(
+        'ornamental-grasses',
+        'Ornamental Grasses',
+        'Soft grasses and small blue flower accents.',
+        '#a9a075',
+        'C',
+      ),
+    ],
+  },
+  {
+    id: 'ch2-neighbor-3',
+    name: 'Third Neighbor',
+    threshold: 150,
+    icon: 'home',
+    zone: 'ch2-lot-3',
+    chapter: 2,
+    lot: 'two-story',
+    description: 'Add a larger two-story home with a broad porch and a distinct roofline.',
+    choices: [
+      choice(
+        'cottage',
+        'Classic Cottage',
+        'Cream siding, a dark roof, and a welcoming porch.',
+        '#d7d0ba',
+        'A',
+      ),
+      choice(
+        'craftsman',
+        'Modern Craftsman',
+        'Warm wood, layered gables, and stone accents.',
+        '#ae8b62',
+        'B',
+      ),
+      choice(
+        'brick',
+        'Traditional Brick',
+        'Warm brick, charcoal shingles, and white trim.',
+        '#a66f55',
+        'C',
+      ),
+    ],
+  },
+  {
+    id: 'ch2-entrance',
+    name: 'Neighborhood Entrance',
+    threshold: 160,
+    icon: 'home',
+    zone: 'ch2-entrance',
+    chapter: 2,
+    description: 'Give the western entry a warm welcome for the neighborhood.',
+    choices: [
+      choice(
+        'stone-pillars',
+        'Stone Pillars',
+        'Paired stone posts frame the entry walk.',
+        '#aaa395',
+        'A',
+      ),
+      choice(
+        'flowering-entrance',
+        'Flowering Entrance',
+        'A planted entry with flowering borders.',
+        '#c58d81',
+        'B',
+      ),
+      choice(
+        'timber-sign',
+        'Timber Welcome Sign',
+        'A simple timber sign with soft landscaping.',
+        '#ad9273',
+        'C',
+      ),
+    ],
+  },
+  {
+    id: 'ch2-neighbor-4',
+    name: 'Fourth Neighbor',
+    threshold: 170,
+    icon: 'home',
+    zone: 'ch2-lot-4',
+    chapter: 2,
+    lot: 'wide-gable',
+    description: 'Complete the residential street with a wide-gable family home.',
+    choices: [
+      choice(
+        'cottage',
+        'Classic Cottage',
+        'Cream siding, a dark roof, and a welcoming porch.',
+        '#d7d0ba',
+        'A',
+      ),
+      choice(
+        'craftsman',
+        'Modern Craftsman',
+        'Warm wood, layered gables, and stone accents.',
+        '#ae8b62',
+        'B',
+      ),
+      choice(
+        'brick',
+        'Traditional Brick',
+        'Warm brick, charcoal shingles, and white trim.',
+        '#a66f55',
+        'C',
+      ),
+    ],
+  },
+  {
+    id: 'ch2-community-park',
+    name: 'Community Park',
+    threshold: 180,
+    icon: 'tree',
+    zone: 'ch2-community-park',
+    chapter: 2,
+    description: 'Create a shared place to pause, play, and enjoy the neighborhood.',
+    choices: [
+      choice(
+        'flower-garden',
+        'Flower Garden',
+        'A garden walk with a quiet place to sit.',
+        '#c58d81',
+        'A',
+      ),
+      choice(
+        'playground',
+        'Woodland Playground',
+        'A small timber play structure among trees.',
+        '#ad9273',
+        'B',
+      ),
+      choice(
+        'picnic-grove',
+        'Picnic Grove',
+        'A shaded grove with picnic tables and paths.',
+        '#87967b',
+        'C',
+      ),
+    ],
+  },
+  {
+    id: 'ch2-landmark',
+    name: 'Neighborhood Landmark',
+    threshold: 190,
+    icon: 'tree',
+    zone: 'ch2-landmark',
+    chapter: 2,
+    description: 'Finish the street with a small landmark in its own landscaped square.',
+    choices: [
+      choice(
+        'fountain-plaza',
+        'Fountain Plaza',
+        'A modest stone fountain in a planted plaza.',
+        '#9eb8b5',
+        'A',
+      ),
+      choice(
+        'neighborhood-gazebo',
+        'Neighborhood Gazebo',
+        'A cozy timber gazebo with garden seating.',
+        '#ad9273',
+        'B',
+      ),
+      choice(
+        'natural-stone',
+        'Natural Stone Monument',
+        'A few substantial stones among grasses and low lights.',
+        '#aaa395',
+        'C',
+      ),
+    ],
+  },
+];
+
+/** Complete selectable catalog for unlock, selection, rendering and preview lookups. */
+export const ALL_PROJECTS: Project[] = [...PROJECTS, ...CHAPTER_TWO_PROJECTS];
+
 /** Previous catalog retained solely for players who had already earned it. */
 export const LEGACY_PROJECTS: Project[] = [
   {
@@ -478,13 +779,15 @@ export function isProjectUnlocked(
 }
 
 export function unlockedProjects(state: AppState, stars = lifetimeStars(state)): Project[] {
-  return [...PROJECTS, ...LEGACY_PROJECTS].filter((project) =>
+  return [...ALL_PROJECTS, ...LEGACY_PROJECTS].filter((project) =>
     isProjectUnlocked(state, project, stars),
   );
 }
 
 export function selectDesign(state: AppState, projectId: string, choiceId: string): AppState {
-  const project = [...PROJECTS, ...LEGACY_PROJECTS].find((candidate) => candidate.id === projectId);
+  const project = [...ALL_PROJECTS, ...LEGACY_PROJECTS].find(
+    (candidate) => candidate.id === projectId,
+  );
   if (
     !project ||
     !isProjectUnlocked(state, project) ||

@@ -8,6 +8,8 @@ import { batchStatic } from './batching';
 import type { AssemblyRecipe } from './assembly';
 import { STARTING_HOME_ASSEMBLY_RECIPES } from './residential-assembly';
 import { buildMilestoneProject, FEATURE_ZONES, MilestoneAsset } from './milestone-assets';
+import { buildChapterTwoProject, buildChapterTwoRoad } from './chapter-two-assets';
+import { CHAPTER_TWO_PROJECTS } from '../domain/progression';
 
 export interface TownWorld {
   group: T.Group;
@@ -146,26 +148,40 @@ const PROJECT_ASSETS: Record<string, ProjectFactory> = {
 export function buildWorld(designs: Record<string, string>): TownWorld {
   const group = new T.Group(),
     a = new AssetLibrary();
+  const chapterTwo = designs['ch2-neighborhood'] === 'reveal';
   // A shallow rounded terrain slice keeps the whole environment miniature and replaceable.
-  const base = a.geometry(new RoundedBoxGeometry(36, 0.8, 29, 2, 0.35));
-  a.mesh(group, base, '#b9b79a', 0, -0.52, -1.5);
-  const turf = a.geometry(new RoundedBoxGeometry(35.8, 0.22, 28.8, 2, 0.28));
-  a.mesh(group, turf, surface(a, 'grass', '#829456'), 0, -0.04, -1.5);
+  const worldWidth = chapterTwo ? 90 : 36,
+    worldDepth = chapterTwo ? 62 : 29,
+    worldCenterX = chapterTwo ? 18 : 0,
+    base = a.geometry(new RoundedBoxGeometry(worldWidth, 0.8, worldDepth, 2, 0.35));
+  a.mesh(group, base, '#b9b79a', worldCenterX, -0.52, -1.5);
+  const turf = a.geometry(
+    new RoundedBoxGeometry(worldWidth - 0.2, 0.22, worldDepth - 0.2, 2, 0.28),
+  );
+  a.mesh(group, turf, surface(a, 'grass', '#829456'), worldCenterX, -0.04, -1.5);
   a.box(group, surface(a, 'grass', '#819852'), -6, 0.085, -5.4, 13.8, 0.08, 13.4);
-  // Road, kerb, two continuous sidewalks, and quiet material seams.
-  a.box(group, '#bdbfac', 0, 0.13, 5, 35.8, 0.18, 6.6);
-  a.box(group, '#858d83', 0, 0.24, 5, 35.8, 0.08, 4.8);
-  for (const z of [1.7, 8.3]) {
-    a.box(group, '#d5d3bc', 0, 0.25, z, 35.8, 0.13, 1.25);
-    for (let x = -17; x < 18; x += 1.55) a.box(group, '#bfc3ad', x, 0.32, z, 0.025, 0.012, 1.22);
+  // Chapter 2 replaces the straight starter street with one connected residential road.
+  if (!chapterTwo) {
+    a.box(group, '#bdbfac', 0, 0.13, 5, 35.8, 0.18, 6.6);
+    a.box(group, '#858d83', 0, 0.24, 5, 35.8, 0.08, 4.8);
+    for (const z of [1.7, 8.3]) {
+      a.box(group, '#d5d3bc', 0, 0.25, z, 35.8, 0.13, 1.25);
+      for (let x = -17; x < 18; x += 1.55) a.box(group, '#bfc3ad', x, 0.32, z, 0.025, 0.012, 1.22);
+    }
+    for (let x = -16; x < 18; x += 4) a.box(group, '#d1cdb2', x, 0.29, 5, 1.75, 0.012, 0.07);
+    for (const z of [2.73, 7.27]) a.box(group, '#bbc0a9', 0, 0.29, z, 35.8, 0.012, 0.045);
   }
-  for (let x = -16; x < 18; x += 4) a.box(group, '#d1cdb2', x, 0.29, 5, 1.75, 0.012, 0.07);
-  for (const z of [2.73, 7.27]) a.box(group, '#bbc0a9', 0, 0.29, z, 35.8, 0.012, 0.045);
   let home: T.Group | undefined,
     homeAssemblies: ReadonlyMap<string, T.Group> | undefined,
     homeRecipe: AssemblyRecipe | undefined;
   const projectAssets = new Map<string, MilestoneAsset>(),
     legacyAssets = new Map<string, T.Group>();
+  if (chapterTwo) {
+    const occupied = CHAPTER_TWO_PROJECTS.filter(
+      (project) => project.lot && designs[project.id],
+    ).map((project) => project.id);
+    projectAssets.set('ch2-neighborhood', buildChapterTwoRoad(a, group, occupied));
+  }
   if (designs['home']) {
     a.box(group, '#c8c7b5', -0.8, 0.19, -1.6, 2.6, 0.14, 7.8);
     for (let z = -4; z < 2; z += 1.55) a.box(group, '#b9bda7', -0.8, 0.27, z, 2.58, 0.008, 0.025);
@@ -211,11 +227,11 @@ export function buildWorld(designs: Record<string, string>): TownWorld {
   }
   if (home) startingLandscape(a, group);
   for (const [id, choice] of Object.entries(designs)) {
-    if (FEATURE_ZONES[id])
-      projectAssets.set(
-        id,
-        buildMilestoneProject(a, group, id, choice, designs['home'] || 'sage'),
-      );
+    if (id === 'ch2-neighborhood') continue;
+    if (CHAPTER_TWO_PROJECTS.some((project) => project.id === id))
+      projectAssets.set(id, buildChapterTwoProject(a, group, id, choice));
+    else if (FEATURE_ZONES[id])
+      projectAssets.set(id, buildMilestoneProject(a, group, id, choice, designs['home'] || 'sage'));
     else if (PROJECT_ASSETS[id]) {
       const legacy = a.group(group);
       legacy.name = `legacy-project:${id}`;

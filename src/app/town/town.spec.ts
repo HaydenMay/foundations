@@ -19,10 +19,10 @@ describe('time and camera', () => {
   });
   it('bounds camera movement and zoom and normalizes rotation', () => {
     const c = clampCamera({ x: 100, z: -100, zoom: 8, angle: Math.PI * 10 });
-    expect(c.x).toBe(18);
-    expect(c.z).toBe(-18);
+    expect(c.x).toBe(60);
+    expect(c.z).toBe(-40);
     expect(c.zoom).toBe(2.5);
     expect(c.angle).toBeCloseTo(0);
-    expect(clampCamera({ x: 0, z: 0, zoom: 0.01, angle: -Math.PI / 2 }).zoom).toBe(0.5);
+    expect(clampCamera({ x: 0, z: 0, zoom: 0.01, angle: -Math.PI / 2 }).zoom).toBe(0.3);
   });
 });

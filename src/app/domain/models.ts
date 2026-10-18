@@ -30,14 +30,24 @@ export interface CameraState {
   zoom: number;
   angle: number;
 }
+/** Offsets from the original home camera, sized to keep the Chapter 2 neighborhood reachable. */
+export const CAMERA_X_LIMIT = 60;
+export const CAMERA_Z_LIMIT = 40;
+export const CAMERA_MIN_ZOOM = 0.3;
+export const CAMERA_MAX_ZOOM = 2.5;
 export interface Preferences {
   panelOpen: boolean;
   lighting: Lighting;
   camera: CameraState;
 }
+export interface ChapterNotices {
+  neighborhoodSeen: boolean;
+  completeSeen: boolean;
+}
 export interface AppState {
-  version: 3;
+  version: 4;
   onboarding: { firstHomeUnlocked: boolean };
+  chapterNotices: ChapterNotices;
   habits: Habit[];
   completions: Completion[];
   designs: Record<string, string>;
@@ -67,6 +77,10 @@ export interface Project {
   choices: Choice[];
   /** Stable lot region used by the renderer and camera focus. */
   zone?: string;
+  /** Chapter metadata used for progression and preview grouping. Older projects default to Chapter 1. */
+  chapter?: 1 | 2;
+  /** Distinct base footprint for Chapter 2 neighbor homes. */
+  lot?: 'compact' | 'l-shaped' | 'two-story' | 'wide-gable';
   /** Legacy projects remain available to migrated profiles only. */
   legacy?: boolean;
 }

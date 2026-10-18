@@ -29,3 +29,13 @@ export function projectTransition(
     angle: (((from.angle + delta * t) % turn) + turn) % turn,
   };
 }
+
+/** Settle chapter reveals at their new district while ordinary projects return to the original home. */
+export function settleConstructionCamera(
+  from: CameraState,
+  focus: { x: number; z: number; zoom: number } | undefined,
+  remainAtFocus: boolean,
+): CameraState {
+  if (remainAtFocus && focus) return projectTransition(from, focus, 1);
+  return homeTransition(from, 1);
+}

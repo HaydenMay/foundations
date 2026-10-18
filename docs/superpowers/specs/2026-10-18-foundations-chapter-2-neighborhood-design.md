@@ -1,7 +1,7 @@
 # Foundations Chapter 2: Welcome to the Neighborhood
 
-**Status:** Written design for product-owner review
-**Scope:** Extend the existing Chapter 1 world through 200 lifetime stars. Do not begin Chapter 2 implementation until this spec is approved.
+**Status:** Approved for implementation by the product owner on 2026-10-18
+**Scope:** Extend the existing Chapter 1 world through 200 lifetime stars, following the approved implementation plan.
 
 ## Goal
 
@@ -38,7 +38,7 @@ Keep the original home, its complete lot, and its current Home framing intact. U
                                                                      [Community Park]
                                                                      [Landmark Square]
                                SOUTH (+Z)                              separate from entry
- ```
+```
 
 Neighbor 1 and Neighbor 3 sit on one side of the street; Neighbor 2 and Neighbor 4 sit opposite. Every driveway reaches the road, while pedestrian paths remain continuous along both sidewalks and connect to the park and landmark. The entrance treatment is at the western neighborhood entry. The landmark occupies its own small shared square near the far end and does not duplicate the entrance. The park is nearby but spatially distinct. A visible road continuation remains beyond these features; it is a reserved connection, not Chapter 3 content.
 
@@ -48,19 +48,19 @@ At the 100-star milestone, reveal the extended road, sidewalks, reserved lots, a
 
 All thresholds use permanent lifetime stars. A choice is immediately available at unlock, free, persistent, and reversible. A milestone's basic access pieces are part of its project and do not require separate rewards.
 
-| Stars | Project | Choices / automatic result |
-|---:|---|---|
-| 100 | Neighborhood Begins | Automatically reveal road and sidewalk extension, reserved lots, and Chapter 2 welcome |
-| 110 | First Neighbor | Cottage / Craftsman / Brick for Neighbor 1 |
-| 120 | Street Trees | Flowering Trees / Autumn Maples / Evergreens |
-| 130 | Second Neighbor | Cottage / Craftsman / Brick for Neighbor 2 |
-| 140 | Streetside Gardens | Flowering Borders / Decorative Shrubs / Ornamental Grasses |
-| 150 | Third Neighbor | Cottage / Craftsman / Brick for Neighbor 3 |
-| 160 | Neighborhood Entrance | Stone Pillars / Flowering Entrance / Timber Welcome Sign |
-| 170 | Fourth Neighbor | Cottage / Craftsman / Brick for Neighbor 4 |
-| 180 | Community Park | Flower Garden / Playground / Picnic Grove |
-| 190 | Neighborhood Landmark | Fountain Plaza / Neighborhood Gazebo / Natural Stone Monument |
-| 200 | Chapter Complete | One-time celebration and a future-expansion teaser; no additional city content |
+| Stars | Project               | Choices / automatic result                                                             |
+| ----: | --------------------- | -------------------------------------------------------------------------------------- |
+|   100 | Neighborhood Begins   | Automatically reveal road and sidewalk extension, reserved lots, and Chapter 2 welcome |
+|   110 | First Neighbor        | Cottage / Craftsman / Brick for Neighbor 1                                             |
+|   120 | Street Trees          | Flowering Trees / Autumn Maples / Evergreens                                           |
+|   130 | Second Neighbor       | Cottage / Craftsman / Brick for Neighbor 2                                             |
+|   140 | Streetside Gardens    | Flowering Borders / Decorative Shrubs / Ornamental Grasses                             |
+|   150 | Third Neighbor        | Cottage / Craftsman / Brick for Neighbor 3                                             |
+|   160 | Neighborhood Entrance | Stone Pillars / Flowering Entrance / Timber Welcome Sign                               |
+|   170 | Fourth Neighbor       | Cottage / Craftsman / Brick for Neighbor 4                                             |
+|   180 | Community Park        | Flower Garden / Playground / Picnic Grove                                              |
+|   190 | Neighborhood Landmark | Fountain Plaza / Neighborhood Gazebo / Natural Stone Monument                          |
+|   200 | Chapter Complete      | One-time celebration and a future-expansion teaser; no additional city content         |
 
 If several milestones unlock before the player returns to construction, every unlocked project remains available in the Chapter 2 project list. Do not assign a default design or skip a choice automatically.
 

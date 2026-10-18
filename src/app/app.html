@@ -53,7 +53,9 @@
           ? 'Our little cul-de-sac'
           : store.state().designs['neighbor']
             ? 'A growing neighborhood'
-            : 'A place to begin'
+            : store.stars() >= 100
+              ? 'Welcome to the neighborhood'
+              : 'A place to begin'
       }}</span
       ><span class="place-number">01</span>
     </div>
@@ -109,10 +111,35 @@
           ? 'A home, built by you.'
           : constructionProject() === 'chapter'
             ? 'Your next little lot is ready.'
-            : 'A little more of your home, built by you.'
+            : constructionProject() === 'ch2-neighborhood'
+              ? 'Your neighborhood is unfolding.'
+              : 'A little more of your home, built by you.'
       }}</span
       ><button aria-label="Skip construction" (click)="skipConstruction()">Skip</button>
     </div>
+  }
+  @if (store.chapterNotice(); as notice) {
+    <section class="chapter-transition" aria-live="polite" aria-label="Chapter progress">
+      <span class="eyebrow">{{
+        notice === 'neighborhood' ? 'A NEW CHAPTER' : 'A CHAPTER COMPLETE'
+      }}</span>
+      <h2>
+        {{ notice === 'neighborhood' ? 'Welcome to the Neighborhood' : 'Chapter 2 complete' }}
+      </h2>
+      <p>
+        {{
+          notice === 'neighborhood'
+            ? 'Your steady steps have made room for a connected street, new neighbors, and a place to grow together.'
+            : 'You have built a welcoming neighborhood, one healthy step at a time. More room to grow will be here when you are ready.'
+        }}
+      </p>
+      <div class="chapter-transition-actions">
+        <button class="secondary" (click)="dismissChapterNotice()">Continue</button>
+        @if (notice === 'neighborhood') {
+          <button class="primary" (click)="skipChapterNotice()">Skip reveal</button>
+        }
+      </div>
+    </section>
   }
   @if (!store.preview() && !choosingHome()) {
     <aside
@@ -500,6 +527,11 @@
         @if (store.migrationBackupAvailable(2)) {
           <button class="text-button" (click)="exportUpgradeBackup(2)">
             Export original v2 backup
+          </button>
+        }
+        @if (store.migrationBackupAvailable(3)) {
+          <button class="text-button" (click)="exportUpgradeBackup(3)">
+            Export original v3 backup
           </button>
         }
         <hr />

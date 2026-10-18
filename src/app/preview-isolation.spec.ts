@@ -17,6 +17,7 @@ type PreviewStore = FoundationsStore & {
   previewJump(project: string): void;
   previewDesign(project: string, choice: string): void;
   previewVisible(project: string, visible: boolean): void;
+  acknowledgeChapterNotice(notice: 'neighborhood' | 'complete'): Promise<void>;
   backupJSON(): string;
 };
 describe('disposable Developer Preview boundary', () => {
@@ -88,7 +89,7 @@ describe('disposable Developer Preview boundary', () => {
     const real = structuredClone(s.state());
     s.enterPreview();
     s.previewScenario('all');
-    expect(s.stars()).toBe(100);
+    expect(s.stars()).toBe(200);
     const reopened = make();
     expect(reopened.preview()).toBeNull();
     expect(reopened.state()).toEqual(real);
@@ -117,18 +118,32 @@ describe('disposable Developer Preview boundary', () => {
     expect(localStorage.getItem(STORAGE_KEY)).toBe(saved);
     expect(s.backupJSON()).toBe(backup);
   });
-  it('can hide and restore the 100-star teaser without changing genuine data', () => {
+  it('can hide and restore the continuous neighborhood road without changing genuine data', () => {
     const s = make(),
       real = structuredClone(s.realState()),
       raw = localStorage.getItem(STORAGE_KEY);
     s.enterPreview();
     s.previewStars(100);
-    s.previewVisible('chapter', false);
-    expect(s.preview()?.hiddenDesigns['chapter']).toBe('__hidden__');
-    s.previewVisible('chapter', true);
-    expect(s.preview()?.hiddenDesigns['chapter']).toBeUndefined();
+    s.previewVisible('ch2-neighborhood', false);
+    expect(s.preview()?.hiddenDesigns['ch2-neighborhood']).toBe('__hidden__');
+    expect(s.state().designs['ch2-neighborhood']).toBeUndefined();
+    s.previewVisible('ch2-neighborhood', true);
+    expect(s.preview()?.hiddenDesigns['ch2-neighborhood']).toBeUndefined();
+    expect(s.state().designs['ch2-neighborhood']).toBe('reveal');
     expect(s.realState()).toEqual(real);
     expect(localStorage.getItem(STORAGE_KEY)).toBe(raw);
+  });
+  it('keeps chapter notice acknowledgments inside the preview copy', async () => {
+    const s = make(),
+      real = structuredClone(s.realState()),
+      raw = localStorage.getItem(STORAGE_KEY);
+    s.enterPreview();
+    s.previewStars(100);
+    await s.acknowledgeChapterNotice('neighborhood');
+    expect(s.preview()?.state.chapterNotices.neighborhoodSeen).toBe(true);
+    expect(s.realState()).toEqual(real);
+    expect(localStorage.getItem(STORAGE_KEY)).toBe(raw);
+    expect(JSON.parse(s.backupJSON())).toEqual(real);
   });
   it('accepts genuine updates from another tab behind the isolated view and exports only real data', async () => {
     const s = make(),
@@ -139,7 +154,7 @@ describe('disposable Developer Preview boundary', () => {
       raw = exportState(other);
     localStorage.setItem(STORAGE_KEY, raw);
     window.dispatchEvent(new StorageEvent('storage', { key: STORAGE_KEY, newValue: raw }));
-    expect(s.stars()).toBe(100);
+    expect(s.stars()).toBe(200);
     expect(JSON.parse(s.backupJSON())).toEqual(other);
     s.exitPreview();
     expect(s.state()).toEqual(other);

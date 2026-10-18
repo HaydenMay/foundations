@@ -2,7 +2,12 @@ import { computed, Injectable, OnDestroy, signal } from '@angular/core';
 import { localDate } from './domain/dates';
 import { completeHabit, createHabit, dailyStars, editHabit, lifetimeStars } from './domain/habits';
 import { AppState, HabitInput, Preferences } from './domain/models';
-import { PROJECTS, selectDesign, unlockedProjects } from './domain/progression';
+import { PROJECTS, ALL_PROJECTS, selectDesign, unlockedProjects } from './domain/progression';
+import {
+  acknowledgeChapterNotice,
+  ChapterNotice,
+  pendingChapterNotice,
+} from './domain/chapter-notices';
 import {
   exportState,
   importState,
@@ -10,11 +15,13 @@ import {
   STORAGE_KEY,
   MIGRATION_BACKUP_KEY,
   MIGRATION_BACKUP_V3_KEY,
+  MIGRATION_BACKUP_V4_KEY,
 } from './domain/state';
 import {
   copyPreview,
   jumpPreview,
   previewDesign,
+  previewNotice,
   previewStars,
   previewVisible,
   PreviewScenario,
@@ -37,10 +44,11 @@ export class FoundationsStore implements OnDestroy {
   readonly daily = computed(() => dailyStars(this.state(), this.today()));
   readonly unlocked = computed(() => unlockedProjects(this.state(), this.stars()));
   readonly pending = computed(() => this.unlocked().filter((p) => !this.state().designs[p.id]));
+  readonly chapterNotice = computed(() => pendingChapterNotice(this.state(), this.stars()));
   readonly next = computed(() =>
     !this.state().onboarding.firstHomeUnlocked
       ? PROJECTS[0]
-      : PROJECTS.find((p) => p.threshold > this.stars()),
+      : ALL_PROJECTS.find((p) => p.threshold > this.stars()),
   );
   private unsaved = false;
   private corrupt = false;
@@ -79,7 +87,7 @@ export class FoundationsStore implements OnDestroy {
     try {
       if (saved) {
         this.real.set(importState(saved));
-        if (JSON.parse(saved).version < 3) this.initializeStorage();
+        if (JSON.parse(saved).version < 4) this.initializeStorage();
       } else if (!this.storageBlocked) this.initializeStorage();
     } catch {
       this.corrupt = true;
@@ -130,7 +138,9 @@ export class FoundationsStore implements OnDestroy {
             ? MIGRATION_BACKUP_KEY
             : previousVersion === 2
               ? MIGRATION_BACKUP_V3_KEY
-              : undefined;
+              : previousVersion === 3
+                ? MIGRATION_BACKUP_V4_KEY
+                : undefined;
         if (backupKey && !localStorage.getItem(backupKey)) {
           localStorage.setItem(backupKey, this.persistedBaseline);
         }
@@ -230,6 +240,9 @@ export class FoundationsStore implements OnDestroy {
     });
     return gained;
   }
+  acknowledgeChapterNotice(notice: ChapterNotice): Promise<void> {
+    return this.commit((state) => acknowledgeChapterNotice(state, notice));
+  }
   saveHabit(input: HabitInput, id?: string): Promise<void> {
     return this.commit((s) => ({
       ...s,
@@ -280,16 +293,26 @@ export class FoundationsStore implements OnDestroy {
     }
     return text;
   }
-  exportMigrationBackup(version: 1 | 2 = 1): void {
+  exportMigrationBackup(version: 1 | 2 | 3 = 1): void {
     const text = localStorage.getItem(
-      version === 1 ? MIGRATION_BACKUP_KEY : MIGRATION_BACKUP_V3_KEY,
+      version === 1
+        ? MIGRATION_BACKUP_KEY
+        : version === 2
+          ? MIGRATION_BACKUP_V3_KEY
+          : MIGRATION_BACKUP_V4_KEY,
     );
     if (!text) throw new Error('No pre-upgrade backup is stored in this browser.');
     this.download(text, `pre-v${version}-`);
   }
-  migrationBackupAvailable(version: 1 | 2 = 1): boolean {
+  migrationBackupAvailable(version: 1 | 2 | 3 = 1): boolean {
     try {
-      return !!localStorage.getItem(version === 1 ? MIGRATION_BACKUP_KEY : MIGRATION_BACKUP_V3_KEY);
+      return !!localStorage.getItem(
+        version === 1
+          ? MIGRATION_BACKUP_KEY
+          : version === 2
+            ? MIGRATION_BACKUP_V3_KEY
+            : MIGRATION_BACKUP_V4_KEY,
+      );
     } catch {
       return false;
     }
@@ -326,6 +349,9 @@ export class FoundationsStore implements OnDestroy {
   }
   previewStars(stars: number): void {
     this.changePreview((s) => previewStars(s, stars));
+  }
+  previewChapterNotice(notice: ChapterNotice): void {
+    this.changePreview((s) => previewNotice(s, notice));
   }
   previewJump(project: string): void {
     this.changePreview((s) => jumpPreview(s, project), true);
