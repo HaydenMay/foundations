@@ -1,7 +1,13 @@
 import { Component, inject, input, output, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { FoundationsStore } from '../state.service';
-import { ALL_PROJECTS, CHAPTER_TWO_PROJECTS, PROJECTS } from '../domain/progression';
+import {
+  ALL_PROJECTS,
+  CHAPTER_FOUR_PROJECTS,
+  CHAPTER_THREE_PROJECTS,
+  CHAPTER_TWO_PROJECTS,
+  PROJECTS,
+} from '../domain/progression';
 import { Lighting } from '../domain/models';
 import { PreviewScenario } from '../domain/preview';
 import type { AssemblyConfigOverride } from '../town/assembly';
@@ -11,7 +17,7 @@ export interface ConstructionPreviewRequest {
   override: AssemblyConfigOverride;
 }
 
-type PreviewTab = 'chapter1' | 'chapter2' | 'shared';
+type PreviewTab = 'chapter1' | 'chapter2' | 'chapter3' | 'chapter4' | 'shared';
 
 @Component({
   selector: 'app-developer-panel',
@@ -47,6 +53,20 @@ type PreviewTab = 'chapter1' | 'chapter2' | 'shared';
             (click)="selectTab('chapter2')"
           >
             Chapter 2
+          </button>
+          <button
+            [class.active]="tab() === 'chapter3'"
+            [attr.aria-pressed]="tab() === 'chapter3'"
+            (click)="selectTab('chapter3')"
+          >
+            Chapter 3
+          </button>
+          <button
+            [class.active]="tab() === 'chapter4'"
+            [attr.aria-pressed]="tab() === 'chapter4'"
+            (click)="selectTab('chapter4')"
+          >
+            Chapter 4
           </button>
           <button
             [class.active]="tab() === 'shared'"
@@ -204,7 +224,7 @@ type PreviewTab = 'chapter1' | 'chapter2' | 'shared';
               }
               <option value="ch2-complete">Chapter 2 · Complete</option>
             </select>
-            <button class="wide" (click)="unlockAll()">Unlock all current milestones</button>
+            <button class="wide" (click)="unlockAll()">Unlock all Chapter 2 projects</button>
             <div class="two">
               <button (click)="replayNotice('neighborhood')">Replay Chapter 2 welcome</button>
               <button (click)="replayNotice('complete')">Replay Chapter 2 completion</button>
@@ -299,6 +319,169 @@ type PreviewTab = 'chapter1' | 'chapter2' | 'shared';
             }
           </section>
         }
+        @if (tab() === 'chapter3') {
+          <section>
+            <h3>Chapter 3 · Town Center</h3>
+            <label for="city-scenario">Test scenario</label
+            ><select id="city-scenario" [value]="scenario()" (change)="setScenario($event)">
+              <option value="">Choose a Town Center state</option>
+              <option value="city-start">210 stars · Town Center opens</option>
+              <option value="town-center">300 stars · Town Center complete</option>
+            </select>
+            <label for="city-stars">Simulated lifetime stars</label>
+            <div class="row">
+              <input
+                #cityStars
+                id="city-stars"
+                type="number"
+                min="0"
+                max="100000"
+                step="1"
+                [value]="store.stars()"
+              />
+              <button (click)="setStars(cityStars.value)" aria-label="Apply simulated city stars">
+                Apply
+              </button>
+            </div>
+            <label for="city-jump">Jump to Town Center milestone</label
+            ><select id="city-jump" (change)="jump($event)">
+              <option value="">Choose a milestone</option>
+              @for (p of chapterThreeProjects; track p.id) {
+                <option [value]="p.id">{{ p.name }} · {{ p.threshold }} stars</option>
+              }
+              <option value="city-complete">Chapter 3 · Complete</option>
+            </select>
+            <button class="wide" (click)="setScenarioValue('town-center')">
+              Unlock Town Center projects
+            </button>
+            <div class="two">
+              <button (click)="replayNotice('city-center')">Replay Chapter 3 welcome</button>
+              <button (click)="replayNotice('city-complete')">Replay Chapter 3 completion</button>
+            </div>
+            <p class="hint">
+              The connected street and sidewalks appear with Town Center construction. Every
+              project stays on the same continuous world.
+            </p>
+          </section>
+          <section>
+            <h3>Town Center projects</h3>
+            @for (p of chapterThreeProjects; track p.id) {
+              <details class="project-preview">
+                <summary>{{ p.name }} <span>{{ p.threshold }} ★</span></summary>
+                <label [attr.for]="'preview-' + p.id">Preview {{ p.name }}</label>
+                <select
+                  [id]="'preview-' + p.id"
+                  [attr.data-preview-project]="p.id"
+                  [value]="
+                    store.state().designs[p.id] ||
+                    store.preview()?.hiddenDesigns?.[p.id] ||
+                    p.choices[0].id
+                  "
+                  (change)="design(p.id, $event)"
+                >
+                  @for (c of p.choices; track c.id) {
+                    <option [value]="c.id">{{ c.name }}</option>
+                  }
+                </select>
+                <label class="check"
+                  ><input
+                    type="checkbox"
+                    [attr.data-preview-visible]="p.id"
+                    [checked]="!!store.state().designs[p.id]"
+                    (change)="visible(p.id, $event)"
+                  />Show {{ p.name }}</label
+                >
+                <button
+                  class="wide build-preview"
+                  [attr.data-build-preview]="p.id"
+                  [attr.aria-label]="'Build preview: ' + p.name"
+                  (click)="buildPreview(p.id)"
+                >
+                  ▶ Build Preview
+                </button>
+              </details>
+            }
+          </section>
+        }
+        @if (tab() === 'chapter4') {
+          <section>
+            <h3>Chapter 4 · Elevated Monorail</h3>
+            <label for="rail-scenario">Test scenario</label
+            ><select id="rail-scenario" [value]="scenario()" (change)="setScenario($event)">
+              <option value="">Choose a transit state</option>
+              <option value="monorail-city">400 stars · Complete city and monorail</option>
+            </select>
+            <label for="rail-stars">Simulated lifetime stars</label>
+            <div class="row">
+              <input
+                #railStars
+                id="rail-stars"
+                type="number"
+                min="0"
+                max="100000"
+                step="1"
+                [value]="store.stars()"
+              />
+              <button (click)="setStars(railStars.value)" aria-label="Apply simulated rail stars">
+                Apply
+              </button>
+            </div>
+            <label for="rail-jump">Jump to transport milestone</label
+            ><select id="rail-jump" (change)="jump($event)">
+              <option value="">Choose a milestone</option>
+              @for (p of chapterFourProjects; track p.id) {
+                <option [value]="p.id">{{ p.name }} · {{ p.threshold }} stars</option>
+              }
+            </select>
+            <button class="wide" (click)="setScenarioValue('monorail-city')">
+              Unlock the complete city preview
+            </button>
+            <button class="wide" (click)="replayNotice('monorail')">Replay Chapter 4 welcome</button>
+            <p class="hint">
+              The elevated loop and two stations extend the same city. Ambient trains are visual
+              only; there are no passengers or transport management.
+            </p>
+          </section>
+          <section>
+            <h3>Monorail appearance</h3>
+            @for (p of chapterFourProjects; track p.id) {
+              <details class="project-preview">
+                <summary>{{ p.name }} <span>{{ p.threshold }} ★</span></summary>
+                <label [attr.for]="'preview-' + p.id">Preview {{ p.name }}</label>
+                <select
+                  [id]="'preview-' + p.id"
+                  [attr.data-preview-project]="p.id"
+                  [value]="
+                    store.state().designs[p.id] ||
+                    store.preview()?.hiddenDesigns?.[p.id] ||
+                    p.choices[0].id
+                  "
+                  (change)="design(p.id, $event)"
+                >
+                  @for (c of p.choices; track c.id) {
+                    <option [value]="c.id">{{ c.name }}</option>
+                  }
+                </select>
+                <label class="check"
+                  ><input
+                    type="checkbox"
+                    [attr.data-preview-visible]="p.id"
+                    [checked]="!!store.state().designs[p.id]"
+                    (change)="visible(p.id, $event)"
+                  />Show {{ p.name }}</label
+                >
+                <button
+                  class="wide build-preview"
+                  [attr.data-build-preview]="p.id"
+                  [attr.aria-label]="'Build preview: ' + p.name"
+                  (click)="buildPreview(p.id)"
+                >
+                  ▶ Build Preview
+                </button>
+              </details>
+            }
+          </section>
+        }
         @if (tab() === 'shared') {
           <section>
             <h3>Lighting</h3>
@@ -357,6 +540,8 @@ export class DeveloperPanel {
   readonly store = inject(FoundationsStore);
   readonly projects = ALL_PROJECTS;
   readonly chapterTwoProjects = CHAPTER_TWO_PROJECTS;
+  readonly chapterThreeProjects = CHAPTER_THREE_PROJECTS;
+  readonly chapterFourProjects = CHAPTER_FOUR_PROJECTS;
   readonly homeProject = PROJECTS.find((project) => project.id === 'home')!;
   readonly backyardProject = PROJECTS.find((project) => project.id === 'backyard')!;
   readonly otherProjects = PROJECTS.filter(
@@ -404,8 +589,19 @@ export class DeveloperPanel {
       this.scenario.set(value);
     });
   }
-  replayNotice(notice: 'neighborhood' | 'complete') {
-    const scenario: PreviewScenario = notice === 'neighborhood' ? 'neighborhood' : 'complete';
+  replayNotice(
+    notice: 'neighborhood' | 'complete' | 'city-center' | 'city-complete' | 'monorail',
+  ) {
+    const scenario: PreviewScenario =
+      notice === 'city-center'
+        ? 'city-start'
+        : notice === 'city-complete'
+          ? 'town-center'
+          : notice === 'monorail'
+            ? 'monorail-city'
+            : notice === 'neighborhood'
+              ? 'neighborhood'
+              : 'complete';
     this.run(() => {
       this.store.previewScenario(scenario);
       this.store.previewChapterNotice(notice);

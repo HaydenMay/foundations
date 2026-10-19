@@ -1,21 +1,31 @@
 import {
   CAMERA_MAX_ZOOM,
   CAMERA_MIN_ZOOM,
-  CAMERA_X_LIMIT,
-  CAMERA_Z_LIMIT,
   CameraState,
 } from '../domain/models';
 import { MOUSE, OrthographicCamera, TOUCH, Vector3 } from 'three';
 import { MapControls } from 'three/addons/controls/MapControls.js';
 const HOME = new Vector3(-5, 1.8, -4.6);
+export interface CameraBounds {
+  minX: number;
+  maxX: number;
+  minZ: number;
+  maxZ: number;
+}
+export const HOME_CAMERA_BOUNDS: CameraBounds = { minX: -60, maxX: 60, minZ: -40, maxZ: 40 };
+/** City camera state is an offset from HOME and covers the authored continuous terrain. */
+export const CITY_CAMERA_BOUNDS: CameraBounds = { minX: -50, maxX: 170, minZ: -65, maxZ: 75 };
 export function homeViewHeight(width: number, height: number): number {
   return Math.max(19, (20.5 * height) / Math.max(1, width));
 }
-export function clampCamera(state: CameraState): CameraState {
+export function clampCamera(
+  state: CameraState,
+  bounds: CameraBounds = HOME_CAMERA_BOUNDS,
+): CameraState {
   const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
   return {
-    x: clamp(state.x, -CAMERA_X_LIMIT, CAMERA_X_LIMIT),
-    z: clamp(state.z, -CAMERA_Z_LIMIT, CAMERA_Z_LIMIT),
+    x: clamp(state.x, bounds.minX, bounds.maxX),
+    z: clamp(state.z, bounds.minZ, bounds.maxZ),
     zoom: clamp(state.zoom, CAMERA_MIN_ZOOM, CAMERA_MAX_ZOOM),
     angle: ((state.angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2),
   };
@@ -25,6 +35,7 @@ export class TownCamera {
   readonly controls: MapControls;
   private angle = Math.PI / 4;
   private applying = false;
+  private bounds: CameraBounds;
   private readonly keyHandler = (event: KeyboardEvent) => {
     const moves: Record<string, [number, number]> = {
       ArrowLeft: [-1, 0],
@@ -47,7 +58,9 @@ export class TownCamera {
     initial: CameraState,
     private readonly changed: (s: CameraState) => void,
     private readonly render: () => void,
+    bounds: CameraBounds = HOME_CAMERA_BOUNDS,
   ) {
+    this.bounds = bounds;
     this.controls = new MapControls(this.camera, canvas);
     this.controls.enableRotate = false;
     this.controls.enableDamping = false;
@@ -59,7 +72,7 @@ export class TownCamera {
     this.controls.addEventListener('change', () => {
       if (this.applying) return;
       const s = this.state(),
-        bounded = clampCamera(s);
+        bounded = clampCamera(s, this.bounds);
       const correction = new Vector3(bounded.x - s.x, 0, bounded.z - s.z);
       this.controls.target.add(correction);
       this.camera.position.add(correction);
@@ -78,7 +91,7 @@ export class TownCamera {
     };
   }
   set(state: CameraState) {
-    const s = clampCamera(state);
+    const s = clampCamera(state, this.bounds);
     this.applying = true;
     this.angle = s.angle;
     this.controls.target.copy(HOME).add(new Vector3(s.x, 0, s.z));
@@ -92,6 +105,12 @@ export class TownCamera {
     this.applying = false;
     this.render();
     this.changed(s);
+  }
+  setBounds(bounds: CameraBounds) {
+    this.bounds = bounds;
+    const state = this.state();
+    const bounded = clampCamera(state, bounds);
+    if (state.x !== bounded.x || state.z !== bounded.z) this.set(bounded);
   }
   resize(width: number, height: number) {
     const aspect = width / height;

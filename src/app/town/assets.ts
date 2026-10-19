@@ -18,6 +18,9 @@ export class AssetLibrary {
   readonly windows: T.MeshStandardMaterial[] = [];
   readonly lamps: T.PointLight[] = [];
   readonly torchFlames: T.MeshStandardMaterial[] = [];
+  /** Shared shader uniforms and selected water surfaces updated by TownScene's one render loop. */
+  readonly foliageTimeUniforms: { value: number }[] = [];
+  readonly animatedWater: T.Mesh[] = [];
   private readonly materials = new Map<string, T.MeshStandardMaterial>();
   private readonly geometries = new Set<T.BufferGeometry>();
   private readonly geometryCache = new Map<string, T.BufferGeometry>();
@@ -62,6 +65,30 @@ export class AssetLibrary {
         new T.MeshStandardMaterial({ color, roughness: 0.92, metalness: 0 }),
       );
     return this.materials.get(color)!;
+  }
+  foliageMaterial(color: string) {
+    return this.namedMaterial(`ambient-foliage:${color}`, () => {
+      const time = { value: 0 };
+      this.foliageTimeUniforms.push(time);
+      const material = new T.MeshStandardMaterial({ color, roughness: 0.94 });
+      material.onBeforeCompile = (shader) => {
+        shader.uniforms['foundationsFoliageTime'] = time;
+        shader.vertexShader = shader.vertexShader.replace(
+          '#include <common>',
+          '#include <common>\nuniform float foundationsFoliageTime;',
+        );
+        shader.vertexShader = shader.vertexShader.replace(
+          '#include <begin_vertex>',
+          `#include <begin_vertex>
+          float foundationsCrownHeight = max(position.y - 1.35, 0.0);
+          float foundationsBreezePhase = foundationsFoliageTime * 0.62 + dot(position.xz, vec2(0.071, 0.113));
+          transformed.x += sin(foundationsBreezePhase) * foundationsCrownHeight * 0.015;
+          transformed.z += cos(foundationsBreezePhase * 0.73) * foundationsCrownHeight * 0.009;`,
+        );
+      };
+      material.customProgramCacheKey = () => 'foundations-soft-foliage-sway-v1';
+      return material;
+    });
   }
   geometry<G extends T.BufferGeometry>(geometry: G): G {
     this.geometries.add(geometry);
@@ -119,7 +146,14 @@ export class AssetLibrary {
     parent.add(group);
     return group;
   }
-  roof(parent: T.Object3D, width: number, depth: number, height: number, y: number, color: string) {
+  roof(
+    parent: T.Object3D,
+    width: number,
+    depth: number,
+    height: number,
+    y: number,
+    color: string | T.Material,
+  ) {
     const shape = new T.Shape();
     shape.moveTo(-width / 2, 0);
     shape.lineTo(0, height);
@@ -273,6 +307,8 @@ export class AssetLibrary {
     this.windows.length = 0;
     this.lamps.length = 0;
     this.torchFlames.length = 0;
+    this.foliageTimeUniforms.length = 0;
+    this.animatedWater.length = 0;
     this.materials.clear();
     this.geometries.clear();
     this.geometryCache.clear();

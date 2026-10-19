@@ -42,7 +42,7 @@ export interface MilestoneAsset {
   /** Stable geometry groups that are not animated assembly pieces (for plot ownership bindings). */
   renderObjects?: ReadonlyMap<string, T.Group>;
   recipe: AssemblyRecipe;
-  focus: { x: number; z: number; zoom: number };
+  focus: { x: number; z: number; zoom: number; angle?: number };
 }
 
 const COLOR = {

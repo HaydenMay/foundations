@@ -18,7 +18,7 @@ describe('time and camera', () => {
     expect(Math.abs(after.sunPower - before.sunPower)).toBeLessThan(0.03);
   });
   it('bounds camera movement and zoom and normalizes rotation', () => {
-    const c = clampCamera({ x: 100, z: -100, zoom: 8, angle: Math.PI * 10 });
+    const c = clampCamera({ x: 300, z: -100, zoom: 8, angle: Math.PI * 10 });
     expect(c.x).toBe(60);
     expect(c.z).toBe(-40);
     expect(c.zoom).toBe(2.5);

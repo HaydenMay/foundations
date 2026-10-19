@@ -3,6 +3,9 @@ import { completeHabit, lifetimeStars } from './habits';
 import { initialState } from './state';
 import {
   CHAPTER_COMPLETE_THRESHOLD,
+  CHAPTER_FOUR_START_THRESHOLD,
+  CHAPTER_THREE_COMPLETE_THRESHOLD,
+  CHAPTER_THREE_START_THRESHOLD,
   CHAPTER_TWO_COMPLETE_THRESHOLD,
   CHAPTER_TWO_START_THRESHOLD,
   ALL_PROJECTS,
@@ -15,7 +18,17 @@ import { Project } from './models';
 import type { ChapterNotice } from './chapter-notices';
 
 export type PreviewScenario =
-  'new' | 'ready' | 'home' | 'several' | 'neighborhood' | 'chapter-two' | 'complete' | 'all';
+  | 'new'
+  | 'ready'
+  | 'home'
+  | 'several'
+  | 'neighborhood'
+  | 'chapter-two'
+  | 'complete'
+  | 'city-start'
+  | 'town-center'
+  | 'monorail-city'
+  | 'all';
 export interface PreviewSession {
   state: AppState;
   stars: number;
@@ -34,13 +47,20 @@ export function previewStars(session: PreviewSession, stars: number): PreviewSes
   return { ...session, stars };
 }
 export function previewNotice(session: PreviewSession, notice: ChapterNotice): PreviewSession {
+  const flag = {
+    neighborhood: 'neighborhoodSeen',
+    complete: 'completeSeen',
+    'city-center': 'cityCenterSeen',
+    'city-complete': 'cityCompleteSeen',
+    monorail: 'monorailSeen',
+  }[notice] as keyof AppState['chapterNotices'];
   return {
     ...session,
     state: {
       ...session.state,
       chapterNotices: {
         ...session.state.chapterNotices,
-        [notice === 'neighborhood' ? 'neighborhoodSeen' : 'completeSeen']: false,
+        [flag]: false,
       },
     },
   };
@@ -136,6 +156,33 @@ export function jumpPreview(session: PreviewSession, projectId: string): Preview
               icon: 'tree',
               choices: [],
             }
+          : projectId === 'city-center'
+            ? {
+                id: 'city-center',
+                name: 'Chapter 3 · Town Center',
+          threshold: CHAPTER_THREE_START_THRESHOLD,
+                description: 'Open the connected town center beyond the neighborhood.',
+                icon: 'home',
+                choices: [],
+              }
+            : projectId === 'city-complete'
+              ? {
+                  id: 'city-complete',
+                  name: 'Chapter 3 · Complete',
+              threshold: CHAPTER_THREE_COMPLETE_THRESHOLD,
+                  description: 'Unlock every current Town Center project.',
+                  icon: 'tree',
+                  choices: [],
+                }
+              : projectId === 'monorail-city'
+                ? {
+                    id: 'monorail-city',
+                    name: 'Chapter 4 · Elevated Monorail',
+                    threshold: CHAPTER_FOUR_START_THRESHOLD,
+                    description: 'Unlock the complete connected city and monorail loop.',
+                    icon: 'road',
+                    choices: [],
+                  }
           : [...ALL_PROJECTS, ...LEGACY_PROJECTS].find((p) => p.id === projectId);
   if (!target) throw new Error('Choose an existing milestone.');
   const threshold = target.threshold;
@@ -160,18 +207,39 @@ export function jumpPreview(session: PreviewSession, projectId: string): Preview
     session.hiddenDesigns['ch2-neighborhood'] !== '__hidden__'
   )
     designs['ch2-neighborhood'] = 'reveal';
+  if (
+    threshold >= CHAPTER_THREE_START_THRESHOLD &&
+    session.hiddenDesigns['city-main-street'] !== '__hidden__'
+  )
+    designs['city-main-street'] ||= 'bakery-row';
   if (projectId === 'chapter') designs['chapter'] = 'reveal';
   const neighborhoodSeen =
       threshold >= CHAPTER_TWO_START_THRESHOLD || session.state.chapterNotices.neighborhoodSeen,
     completeSeen =
-      threshold >= CHAPTER_TWO_COMPLETE_THRESHOLD || session.state.chapterNotices.completeSeen;
+      threshold >= CHAPTER_TWO_COMPLETE_THRESHOLD || session.state.chapterNotices.completeSeen,
+    cityCenterSeen = threshold >= CHAPTER_THREE_START_THRESHOLD
+      ? true
+      : session.state.chapterNotices.cityCenterSeen,
+    cityCompleteSeen = threshold >= CHAPTER_THREE_COMPLETE_THRESHOLD
+      ? true
+      : session.state.chapterNotices.cityCompleteSeen,
+    monorailSeen = threshold >= CHAPTER_FOUR_START_THRESHOLD
+      ? true
+      : session.state.chapterNotices.monorailSeen;
   return {
     ...session,
     stars: threshold,
     state: {
       ...session.state,
       onboarding: { ...session.state.onboarding, firstHomeUnlocked: true },
-      chapterNotices: { neighborhoodSeen, completeSeen },
+      chapterNotices: {
+        ...session.state.chapterNotices,
+        neighborhoodSeen,
+        completeSeen,
+        ...(cityCenterSeen === undefined ? {} : { cityCenterSeen }),
+        ...(cityCompleteSeen === undefined ? {} : { cityCompleteSeen }),
+        ...(monorailSeen === undefined ? {} : { monorailSeen }),
+      },
       designs,
       legacyUnlocks,
       preferences: {
@@ -198,5 +266,8 @@ export function scenarioPreview(kind: PreviewScenario, date: string): PreviewSes
   if (kind === 'neighborhood') return jumpPreview(session, 'ch2-neighborhood');
   if (kind === 'chapter-two') return jumpPreview(session, 'ch2-neighbor-3');
   if (kind === 'complete' || kind === 'all') return jumpPreview(session, 'ch2-complete');
+  if (kind === 'city-start') return jumpPreview(session, 'city-center');
+  if (kind === 'town-center') return jumpPreview(session, 'city-complete');
+  if (kind === 'monorail-city') return jumpPreview(session, 'monorail-city');
   return session;
 }

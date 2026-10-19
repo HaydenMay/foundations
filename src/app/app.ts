@@ -22,6 +22,7 @@ import {
   isProjectUnlocked,
 } from './domain/progression';
 import { importState } from './domain/state';
+import type { ChapterNotice } from './domain/chapter-notices';
 import { HomeSelection } from './components/home-selection';
 import { ConstructionPreviewRequest, DeveloperPanel } from './components/developer-panel';
 import type { AssemblyConfigOverride } from './town/assembly';
@@ -308,6 +309,40 @@ export class App {
     }
     this.act(() => this.store.acknowledgeChapterNotice(notice));
   }
+  chapterTransition(notice: ChapterNotice) {
+    switch (notice) {
+      case 'neighborhood':
+        return {
+          eyebrow: 'A NEW CHAPTER',
+          title: 'Welcome to the Neighborhood',
+          copy: 'Your steady steps have made room for a connected street, new neighbors, and a place to grow together.',
+        };
+      case 'complete':
+        return {
+          eyebrow: 'A CHAPTER COMPLETE',
+          title: 'Chapter 2 complete',
+          copy: 'You have built a welcoming neighborhood, one healthy step at a time. More room to grow will be here when you are ready.',
+        };
+      case 'city-center':
+        return {
+          eyebrow: 'A NEW CHAPTER',
+          title: 'Welcome to Town Center',
+          copy: 'Your neighborhood now has room for local shops, a library, and peaceful places to gather. Build at your own pace.',
+        };
+      case 'city-complete':
+        return {
+          eyebrow: 'A CHAPTER COMPLETE',
+          title: 'Town Center is taking shape',
+          copy: 'You have connected new places for the town to grow. Every project is yours to arrange and revisit.',
+        };
+      case 'monorail':
+        return {
+          eyebrow: 'A NEW CHAPTER',
+          title: 'A new way across town',
+          copy: 'An elevated monorail can connect the neighborhood and Town Center. It is here to enjoy, with no schedules or upkeep.',
+        };
+    }
+  }
   enterPreview() {
     this.close();
     this.cancelHome();
@@ -360,6 +395,11 @@ export class App {
       this.store.previewVisible('ch2-neighborhood', true);
       this.store.previewVisible(request.projectId, true);
     } else {
+      const project = ALL_PROJECTS.find((candidate) => candidate.id === request.projectId);
+      if (project?.chapter && project.chapter >= 3) {
+        this.store.previewStars(Math.max(project.threshold, this.store.stars()));
+        this.store.previewVisible('ch2-neighborhood', true);
+      }
       this.store.previewVisible(request.projectId, true);
     }
     this.constructionProject.set(request.projectId);
