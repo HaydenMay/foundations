@@ -44,8 +44,9 @@ function rect(x, z, w, d, fill, stroke, rotation = 0, dash = '') {
     `<rect x="${X(x - w / 2)}" y="${Y(z - d / 2)}" width="${w * scale}" height="${d * scale}" fill="${fill}" stroke="${stroke}" stroke-width="1.2" transform="rotate(${(-rotation * 180) / Math.PI} ${X(x)} ${Y(z)})" ${dash ? `stroke-dasharray="${dash}"` : ''}/>`,
   );
 }
+const labels = [];
 function text(x, z, label, size = 12) {
-  add(
+  labels.push(
     `<text x="${X(x)}" y="${Y(z)}" text-anchor="middle" font-size="${size}" paint-order="stroke" stroke="#faf7ed" stroke-width="4" fill="#294736">${escape(label)}</text>`,
   );
 }
@@ -176,6 +177,7 @@ for (const station of rail.stations) {
 text(35, 5, 'Established residential street', 11);
 text(83, 5.2, 'Main Street', 11);
 text(17, 33, 'Quiet residential edge / future outward growth', 12);
+parts.push(...labels);
 add(
   `<text x="50" y="942" font-size="16" fill="#294736">One continuous world: home → residential street → walkable Main Street → civic square / greenway</text><text x="50" y="972" font-size="13" fill="#536855">Dashed outline: complete Chapter 3 terrain · outer outline: Chapter 4 terrain · dots: offset cantilever piers</text><text x="50" y="997" font-size="13" fill="#536855">The diagnostic uses authored footprints and walking centerlines; it is not arbitrary mesh collision or NPC navigation.</text></svg>`,
 );
