@@ -6,7 +6,7 @@ import { buildWorld, TownWorld } from './world';
 import { AssemblyAnimator } from './assembly';
 import type { AssemblyConfigOverride } from './assembly';
 import { homeTransition, projectTransition, settleConstructionCamera } from './construction';
-import { CITY_MONORAIL_PLAN, monorailPoseAt } from './city-site-plan';
+import { CITY_MONORAIL_PLAN } from './city-site-plan';
 import { CHAPTER_FOUR_PROJECTS, CHAPTER_THREE_PROJECTS } from '../domain/progression';
 
 export class TownScene {
@@ -461,12 +461,7 @@ export class TownScene {
       }
       if (world.movingMonorail) {
         const progress = 0.11 + seconds / CITY_MONORAIL_PLAN.trainLapSeconds;
-        const pose = monorailPoseAt(progress);
-        world.movingMonorail.root.position.copy(pose.position);
-        world.movingMonorail.root.quaternion.setFromUnitVectors(
-          new T.Vector3(0, 0, 1),
-          pose.tangent,
-        );
+        world.movingMonorail.update(progress);
       }
       shouldRender = true;
     }

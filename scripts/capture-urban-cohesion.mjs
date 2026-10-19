@@ -295,8 +295,13 @@ async function assemblyInspection(page) {
     .getByRole('button', { name: 'Skip construction' })
     .isVisible();
   await capture(page, 'assembly-mid', 'Main Street at slow assembly speed before skip.');
-  if (observations.skipAvailable)
-    await page.getByRole('button', { name: 'Skip construction' }).click();
+  // A software-rendered screenshot can outlast the animation. Replay before testing Skip.
+  await play('0.25');
+  observations.skipClicked = await page.evaluate(() => {
+    const button = document.querySelector('button[aria-label="Skip construction"]');
+    button?.click();
+    return !!button;
+  });
   await capture(page, 'assembly-skipped', 'Completed Main Street after Skip.');
   await play('1');
   await page

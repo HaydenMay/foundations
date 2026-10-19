@@ -107,6 +107,55 @@ describe('walkable urban composition', () => {
     }
   });
 
+  it('keeps both coach envelopes clear of piers throughout a lap', () => {
+    const world = buildWorld({ home: 'sage', monorail: 'timber-brass' });
+    const moving = world.movingMonorail!;
+    for (let sample = 0; sample < 480; sample++) {
+      const progress = sample / 480;
+      moving.update(progress);
+      moving.root.updateWorldMatrix(true, true);
+      for (const coach of moving.root.children) {
+        if (!(coach instanceof T.Group)) continue;
+        for (let index = 0; index < CITY_MONORAIL_PLAN.supportCount; index++) {
+          const pier = City.monorailSupportPoint(index).add(
+            new T.Vector3(...CITY_MONORAIL_PLAN.origin),
+          );
+          const local = coach.worldToLocal(pier);
+          expect(
+            Math.abs(local.x) > 1.65 || Math.abs(local.z) > 3.7,
+            `coach / pier ${index} at ${progress}`,
+          ).toBe(true);
+        }
+      }
+    }
+    world.assets.dispose();
+  });
+
+  it('places station boarding surfaces at the hanging coach floor height', () => {
+    const world = buildWorld({ home: 'sage', monorail: 'timber-brass' });
+    const stations = world.projectAssets.get('monorail')!.pieces.get('stations')!;
+    stations.updateWorldMatrix(true, true);
+    for (const station of CITY_MONORAIL_PLAN.stations) {
+      const point = new T.Vector3(-3, 12.7, -1)
+        .applyAxisAngle(new T.Vector3(0, 1, 0), station.rotation)
+        .add(new T.Vector3(...station.position))
+        .add(new T.Vector3(...CITY_MONORAIL_PLAN.origin));
+      const hits = new T.Raycaster(point, new T.Vector3(0, -1, 0), 0, 4).intersectObject(
+        stations,
+        true,
+      );
+      expect(hits[0]?.point.y).toBeCloseTo(10.525, 2);
+      const headroom = new T.Vector3(2.7, 2.5, 1.4)
+        .applyAxisAngle(new T.Vector3(0, 1, 0), station.rotation)
+        .add(new T.Vector3(...station.position))
+        .add(new T.Vector3(...CITY_MONORAIL_PLAN.origin));
+      expect(
+        new T.Raycaster(headroom, new T.Vector3(0, 1, 0), 0, 2).intersectObject(stations, true),
+      ).toHaveLength(0);
+    }
+    world.assets.dispose();
+  });
+
   it('renders station approach segments at their authored coordinates, without doubling the district origin', () => {
     const world = buildWorld({
       home: 'sage',

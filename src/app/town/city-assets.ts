@@ -679,6 +679,7 @@ export function buildCityInfrastructure(a: AssetLibrary, parent: T.Group): T.Gro
 export interface MovingMonorail {
   root: T.Group;
   readonly trainCount: 2;
+  update(progress: number): void;
 }
 
 function station(set: PieceSet, parent: T.Group, stationId: string, choice: string) {
@@ -692,36 +693,46 @@ function station(set: PieceSet, parent: T.Group, stationId: string, choice: stri
     choice === 'timber-brass' ? '#ad8958' : choice === 'sage-stone' ? '#777f74' : '#b37c5c';
   // The platform is paired so the single central guide beam remains clearly visible.
   for (const side of [-1, 1]) {
-    a.box(group, surface(a, 'stone', '#bcb5a3'), side * 3, 12.0, 0, 2.4, 0.5, 17);
-    a.box(group, wall, side * 3, 12.32, 0, 2.55, 0.1, 17.2);
+    a.box(group, surface(a, 'stone', '#bcb5a3'), side * 3, 10.2, 0, 2.4, 0.5, 17);
+    a.box(group, wall, side * 3, 10.475, 0, 2.55, 0.1, 17.2);
     for (const z of [-6.4, -2.2, 2.2, 6.4])
-      a.box(group, timber, side * 3.45, 13.55, z, 0.14, 3.1, 0.14);
+      a.box(group, timber, side * 3.45, 12.8, z, 0.14, 4.6, 0.14);
     a.box(group, metal, side * 3.45, 15.1, 0, 0.34, 0.13, 14.2);
     a.box(group, wall, side * 3, 15.45, 0, 3.6, 0.42, 15.4);
     a.box(group, wall, side * 3, 15.68, 0, 3.3, 0.08, 14.8);
     for (const z of [-4.6, 0, 4.6]) a.lantern(group, side * 3.0, 14.3, z, false, false);
   }
   // Lift core plus switchback stairs form a readable ground entrance without passenger simulation.
-  a.box(group, wall, -3, 6.1, 8.25, 2.5, 12.2, 2.5);
-  a.box(group, '#78918c', -3, 6.0, 9.53, 1.4, 10.8, 0.08);
-  a.box(group, metal, -3, 12.25, 8.25, 3.1, 0.23, 3.1);
-  // Four connected flights stack beside the right platform, away from the train channel.
+  a.box(group, wall, -3, 5.25, 8.25, 2.5, 10.5, 2.5);
+  a.box(group, '#78918c', -3, 5.3, 9.53, 1.4, 9.3, 0.08);
+  a.box(group, metal, -3, 10.55, 8.25, 3.1, 0.23, 3.1);
+  // Alternating lanes give successive flights headroom, with full-width turning landings.
+  const flightRise = 2.625;
   for (let flight = 0; flight < 4; flight++) {
     const reverse = flight % 2 === 1;
     for (let step = 0; step < 12; step++) {
       const z = reverse ? 0.4 + step * 0.5 : 6.4 - step * 0.5;
-      a.box(group, '#b8aa91', 3, flight * 3 + (step + 0.5) * 0.25, z, 1.4, 0.12, 0.5);
+      a.box(
+        group,
+        '#b8aa91',
+        reverse ? 4.25 : 2.7,
+        flight * flightRise + ((step + 0.5) * flightRise) / 12,
+        z,
+        1.2,
+        0.12,
+        0.5,
+      );
     }
-    a.box(group, wall, 3, (flight + 1) * 3, reverse ? 6.4 : 0.4, 1.7, 0.2, 1.4);
+    a.box(group, wall, 3.475, (flight + 1) * flightRise, reverse ? 6.9 : 0.4, 2.95, 0.2, 1);
   }
   a.box(group, surface(a, 'paving', '#bdb7a4'), 0, 0.2, 10, 8.5, 0.15, 2);
   a.box(group, surface(a, 'paving', '#bdb7a4'), 3, 0.2, 8, 1.8, 0.15, 3.2);
   for (const z of [-5.5, 5.5]) {
-    for (const x of [-4.5, 4.5]) a.box(group, wall, x, 6.79, z, 0.45, 13.58, 0.45);
-    a.box(group, wall, 0, 13.58, z, 10.2, 0.55, 1.15);
+    for (const x of [-5.5, 5.5]) a.box(group, wall, x, 6.79, z, 0.45, 13.58, 0.45);
+    a.box(group, wall, 0, 13.58, z, 12.2, 0.55, 1.15);
   }
   for (const z of [-6.4, 6.4]) a.box(group, timber, 0, 15.15, z, 9.6, 0.18, 0.22);
-  for (const side of [-1, 1]) a.box(group, metal, side * 4.15, 13.0, 0, 0.08, 0.08, 16);
+  for (const side of [-1, 1]) a.box(group, metal, side * 4.15, 11.25, 0, 0.08, 0.08, 16);
 }
 
 function trainCoach(a: AssetLibrary, parent: T.Group, body: string, trim: string) {
@@ -824,17 +835,29 @@ export function buildMonorailProject(
   train.traverse((object) => {
     if (object instanceof T.Mesh) object.castShadow = false;
   });
-  const initialPose = monorailPoseAt(0.11);
-  train.position.copy(initialPose.position);
-  train.quaternion.setFromUnitVectors(new T.Vector3(0, 0, 1), initialPose.tangent);
-  train.userData['trainProgress'] = 0.11;
+  const forward = new T.Vector3(0, 0, 1);
+  const inverseHeading = new T.Quaternion();
+  // Each coach follows the guideway independently; a rigid tail sweeps into piers on bends.
+  const coachSpacing = 7.8;
+  const routeLength = curve.getLength();
+  const update = (progress: number) => {
+    const lead = monorailPoseAt(progress);
+    const tail = monorailPoseAt(progress - coachSpacing / routeLength);
+    train.position.copy(lead.position);
+    train.quaternion.setFromUnitVectors(forward, lead.tangent);
+    inverseHeading.copy(train.quaternion).invert();
+    coachTwo.position.copy(tail.position).sub(lead.position).applyQuaternion(inverseHeading);
+    coachTwo.quaternion.setFromUnitVectors(forward, tail.tangent).premultiply(inverseHeading);
+    train.userData['trainProgress'] = progress;
+  };
+  update(0.11);
   const focus = {
     x: CITY_MONORAIL_PLAN.origin[0] - -5,
     z: CITY_MONORAIL_PLAN.origin[2] - -4.6,
     zoom: 0.32,
   };
   const result = finish(set, focus, 4800, ['train']);
-  return { ...result, movingMonorail: { root: train, trainCount: 2 } };
+  return { ...result, movingMonorail: { root: train, trainCount: 2, update } };
 }
 
 export function buildCityProjectForWorld(

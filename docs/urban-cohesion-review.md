@@ -28,3 +28,7 @@ The rail inspection also exposed centerline piers intersecting the suspended coa
 2. Validate hierarchical plots, street/structure separation, pedestrian graph continuity, rail closure/tangents/support spacing, and station access. All existing saves, rewards, project IDs/choices, preview, assembly and lifecycle tests remain in the full suite.
 3. Build and inspect the same fixed-camera before/after production views, plus day/night, both stations, Chapter 3/4, mobile, and assembly/reduced motion. Repair visible failures. Produce a labeled plan and record comparable renderer counters with software-renderer caveats.
 4. Commit/push `agent/codex/urban-cohesion`, open a draft PR, and stop without merging or deploying.
+
+## Review repairs
+
+Read-only code review identified a rigid trailing coach sweeping into an offset pier on curves and overlapping staircase flights. Both were reproduced before fixing. Each coach now follows its own arc-length-spaced guideway pose through the existing shared animation loop. A 480-sample full-lap test checks both actual coach envelopes against every free pier. Station stairs alternate lanes with connected turning landings and clear support columns; a raycast checks lower-flight headroom. Boarding surfaces were also lowered from 12.37 m to 10.525 m to meet the suspended coach floor, with matching lifts and stair rise. No animation loop, progression, save format or original-home camera changes were added.
