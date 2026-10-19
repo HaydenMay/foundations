@@ -217,15 +217,31 @@ describe('continuous city site plan', () => {
       home: 'sage',
       'ch2-neighborhood': 'reveal',
       'city-main-street': 'bakery-row',
+      'city-library': 'garden-library',
+      'city-plaza': 'square-fountain',
+      'city-greenway': 'pollinator-walk',
+    });
+    const cityTerrain = world.group.children.find((object) => object instanceof T.Mesh);
+    expect(cityTerrain).toBeDefined();
+    cityTerrain!.geometry.computeBoundingBox();
+    const cityDimensions = cityTerrain!.geometry.boundingBox!.getSize(new T.Vector3());
+    expect(cityDimensions.x).toBeLessThanOrEqual(175);
+    expect(cityDimensions.z).toBeLessThanOrEqual(105);
+    world.assets.dispose();
+
+    const expandedWorld = buildWorld({
+      home: 'sage',
+      'ch2-neighborhood': 'reveal',
+      'city-main-street': 'bakery-row',
       monorail: 'sage-stone',
     });
-    const terrain = world.group.children.find((object) => object instanceof T.Mesh);
+    const terrain = expandedWorld.group.children.find((object) => object instanceof T.Mesh);
     expect(terrain).toBeDefined();
     terrain!.geometry.computeBoundingBox();
     const dimensions = terrain!.geometry.boundingBox!.getSize(new T.Vector3());
     expect(dimensions.x).toBeLessThanOrEqual(205);
     expect(dimensions.z).toBeLessThanOrEqual(125);
-    world.assets.dispose();
+    expandedWorld.assets.dispose();
   });
 
   it('bounds the camera far enough to reach the outer monorail sites', () => {

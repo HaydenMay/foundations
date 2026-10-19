@@ -229,7 +229,7 @@ try {
   );
   await setScenario(page, 'Chapter 3', '#city-scenario', 'town-center');
   await panel(page, false);
-  await setCamera(page, 46, -1, 0.21, Math.PI / 4, 54);
+  await setCamera(page, 47, 5, 0.16, Math.PI / 4, 54);
   await panel(page, false);
   await capture(
     page,

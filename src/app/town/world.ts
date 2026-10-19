@@ -180,24 +180,19 @@ export function buildWorld(
     (project) => project.id,
   );
   const cityExpanded = cityProjectIds.some((id) => !!designs[id]);
+  const monorailExpanded = !!designs['monorail'];
   const chapterTwo = designs['ch2-neighborhood'] === 'reveal' || cityExpanded;
   // A shallow rounded terrain slice keeps the whole environment miniature and replaceable.
-  const worldWidth = cityExpanded ? 200 : chapterTwo ? 120 : 36,
-    worldDepth = cityExpanded ? 120 : chapterTwo ? 88 : 29,
+  const worldWidth = monorailExpanded ? 200 : cityExpanded ? 170 : chapterTwo ? 120 : 36,
+    worldDepth = monorailExpanded ? 120 : cityExpanded ? 100 : chapterTwo ? 88 : 29,
     worldCenterX = cityExpanded ? 46 : chapterTwo ? 25 : 0,
+    worldCenterZ = monorailExpanded ? -1 : cityExpanded ? 4 : chapterTwo ? -4 : -1.5,
     base = a.geometry(new RoundedBoxGeometry(worldWidth, 0.8, worldDepth, 2, 0.35));
-  a.mesh(group, base, '#b9b79a', worldCenterX, -0.52, cityExpanded ? -1 : chapterTwo ? -4 : -1.5);
+  a.mesh(group, base, '#b9b79a', worldCenterX, -0.52, worldCenterZ);
   const turf = a.geometry(
     new RoundedBoxGeometry(worldWidth - 0.2, 0.22, worldDepth - 0.2, 2, 0.28),
   );
-  a.mesh(
-    group,
-    turf,
-    surface(a, 'grass', '#829456'),
-    worldCenterX,
-    -0.04,
-    cityExpanded ? -1 : chapterTwo ? -4 : -1.5,
-  );
+  a.mesh(group, turf, surface(a, 'grass', '#829456'), worldCenterX, -0.04, worldCenterZ);
   a.box(group, surface(a, 'grass', '#819852'), -6, 0.085, -5.4, 13.8, 0.08, 13.4);
   // Chapter 2 replaces the straight starter street with one connected residential road.
   if (!chapterTwo) {
