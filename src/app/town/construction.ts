@@ -15,11 +15,11 @@ export function homeTransition(from: CameraState, progress: number): CameraState
 
 export function projectTransition(
   from: CameraState,
-  focus: { x: number; z: number; zoom: number },
+  focus: { x: number; z: number; zoom: number; angle?: number },
   progress: number,
 ): CameraState {
   const t = clamp(progress),
-    targetAngle = Math.PI / 4,
+    targetAngle = focus.angle ?? Math.PI / 4,
     turn = Math.PI * 2,
     delta = ((targetAngle - from.angle + Math.PI * 3) % turn) - Math.PI;
   return {
@@ -33,7 +33,7 @@ export function projectTransition(
 /** Settle chapter reveals at their new district while ordinary projects return to the original home. */
 export function settleConstructionCamera(
   from: CameraState,
-  focus: { x: number; z: number; zoom: number } | undefined,
+  focus: { x: number; z: number; zoom: number; angle?: number } | undefined,
   remainAtFocus: boolean,
 ): CameraState {
   if (remainAtFocus && focus) return projectTransition(from, focus, 1);

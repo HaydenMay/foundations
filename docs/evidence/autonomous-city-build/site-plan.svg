@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" role="img" aria-labelledby="title description">
+  <title id="title">Foundations continuous city site-plan diagnostic</title>
+  <desc id="description">An overhead plan showing the original home, curved Chapter 2 residential street, four neighbor plots, shared park and landmark, connected Chapter 3 Town Center, access anchors, and the elevated Chapter 4 monorail loop.</desc>
+  <defs>
+    <pattern id="grid" width="45" height="45" patternUnits="userSpaceOnUse">
+      <path d="M45 0H0V45" fill="none" stroke="#d7d9c9" stroke-width="1" opacity=".45"/>
+    </pattern>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10Z" fill="#45584c"/>
+    </marker>
+    <style>
+      text{font-family:Inter,Arial,sans-serif;fill:#304338}.small{font-size:12px}.label{font-size:13px;font-weight:650}.sub{font-size:11px;fill:#627165}.chapter{font-size:14px;font-weight:700;letter-spacing:.06em}.lot{fill:#f4eddb;stroke:#536857;stroke-width:1.6;stroke-dasharray:5 3}.home{fill:#be8e62;stroke:#624f3b;stroke-width:1.4}.public{fill:#c7d4b2;stroke:#69806c;stroke-width:1.4}.street{fill:none;stroke:#626963;stroke-width:28;stroke-linecap:round;stroke-linejoin:round}.sidewalk{fill:none;stroke:#c9c4b1;stroke-width:39;stroke-linecap:round;stroke-linejoin:round}.streetmark{fill:none;stroke:#f0e7cd;stroke-width:1.5;stroke-dasharray:10 11}.connector{fill:none;stroke:#626963;stroke-width:28;stroke-linecap:round;stroke-linejoin:round}.pathway{fill:none;stroke:#d3ccb8;stroke-width:7;stroke-linecap:round;stroke-dasharray:5 3}.anchor{fill:#f0b960;stroke:#604d31;stroke-width:1.5}.rail{fill:none;stroke:#65776f;stroke-width:4;stroke-dasharray:7 4}.station{fill:#e6c998;stroke:#6a5743;stroke-width:1.5}
+    </style>
+  </defs>
+  <rect width="1280" height="800" fill="#f2f0e6"/>
+  <text x="40" y="42" font-family="Georgia,serif" font-size="26" fill="#263b31">Foundations · Continuous City Site Plan</text>
+  <text x="40" y="66" class="sub">Authored plot hierarchy, frontage, public paths and elevated route · coordinate map in metres</text>
+  <rect x="178" y="92" width="958" height="590" rx="22" fill="#d8dfc3" stroke="#a6b39a" stroke-width="2"/>
+  <rect x="178" y="92" width="958" height="590" rx="22" fill="url(#grid)"/>
+  <text x="190" y="112" class="small">North ↑</text>
+
+  <!-- Elevated loop. Its tested support interval is about 10 m; minimum structure clearance is 4 m. -->
+  <path class="rail" d="M206 348 Q207 257 314 145 Q415 116 507 118 Q650 114 746 122 Q905 132 940 149 Q1084 208 1106 393 Q1113 516 1003 644 Q923 675 827 668 Q679 662 598 654 Q445 630 395 590 Q249 524 255 487 Q204 431 206 348Z"/>
+  <text x="445" y="132" class="small">Chapter 4 · Elevated loop · support spacing target ≈10 m · clearance ≥4 m</text>
+
+  <!-- Existing Chapter 2 curved residential street and its shared sidewalks. -->
+  <path class="sidewalk" d="M309 370 L354 370 L404 370 L449 370 Q475 371 503 378 Q530 382 557 382 Q584 379 611 374 L669 369"/>
+  <path class="street" d="M309 370 L354 370 L404 370 L449 370 Q475 371 503 378 Q530 382 557 382 Q584 379 611 374 L669 369"/>
+  <path class="streetmark" d="M309 370 L354 370 L404 370 L449 370 Q475 371 503 378 Q530 382 557 382 Q584 379 611 374 L669 369"/>
+  <text x="371" y="405" class="small">Chapter 2 curved neighborhood road · 6.3 m · sidewalks 1.48 m</text>
+
+  <!-- Direct street connection continues east into the Town Center grid. -->
+  <path class="sidewalk" d="M669 369 Q731 365 800 406"/>
+  <path class="connector" d="M669 369 Q731 365 800 406"/>
+  <path class="street" d="M800 222V590 M800 406H994"/>
+  <path class="streetmark" d="M800 222V590 M800 406H994"/>
+  <text x="813" y="580" class="small" transform="rotate(-90 813 580)">Town Center street · 6.3 m · sidewalks 1.55 m</text>
+
+  <!-- Original home and the Chapter 2 individual residential plots. -->
+  <rect class="lot" x="337" y="378" width="78" height="72" rx="7"/>
+  <rect class="home" x="348" y="389" width="56" height="49" rx="5"/>
+  <text x="342" y="465" class="label">Your original home</text>
+  <rect class="lot" x="410" y="392" width="58" height="54" rx="6"/>
+  <rect class="home" x="418" y="399" width="42" height="39" rx="4"/>
+  <text x="414" y="459" class="small">Neighbor 1 · compact</text>
+  <rect class="lot" x="480" y="270" width="64" height="64" rx="6"/>
+  <rect class="home" x="489" y="279" width="46" height="46" rx="4"/>
+  <text x="481" y="261" class="small">Neighbor 2 · L-shaped</text>
+  <rect class="lot" x="560" y="402" width="69" height="72" rx="6"/>
+  <rect class="home" x="570" y="412" width="49" height="51" rx="4"/>
+  <text x="559" y="488" class="small">Neighbor 3 · two-story</text>
+  <rect class="lot" x="635" y="267" width="68" height="68" rx="6"/>
+  <rect class="home" x="645" y="277" width="48" height="48" rx="4"/>
+  <text x="635" y="258" class="small">Neighbor 4 · wide gable</text>
+
+  <!-- Chapter 2 shared entrance, park and natural landmark. -->
+  <rect class="public" x="475" y="383" width="52" height="26" rx="5"/>
+  <text x="476" y="423" class="small">Welcome entrance</text>
+  <rect class="public" x="462" y="490" width="92" height="72" rx="12"/>
+  <text x="468" y="531" class="label">Community park</text>
+  <rect class="public" x="637" y="493" width="56" height="45" rx="10"/>
+  <text x="628" y="558" class="small">Natural landmark</text>
+  <path class="pathway" d="M501 409V490 M554 526H637"/>
+
+  <!-- Chapter 3 connected shops, library, public square and greenway. -->
+  <rect class="lot" x="822" y="280" width="63" height="198" rx="6"/>
+  <rect class="home" x="827" y="300" width="53" height="48" rx="4"/>
+  <rect class="home" x="827" y="355" width="53" height="48" rx="4"/>
+  <rect class="home" x="827" y="410" width="53" height="48" rx="4"/>
+  <text x="890" y="311" class="label">Main Street</text>
+  <text x="890" y="328" class="small">3 shops · connected frontage</text>
+  <rect class="lot" x="666" y="266" width="81" height="81" rx="8"/>
+  <rect class="home" x="676" y="276" width="61" height="61" rx="6"/>
+  <text x="666" y="254" class="small">Community library</text>
+  <rect class="public" x="926" y="401" width="99" height="81" rx="12"/>
+  <text x="944" y="444" class="label">Town square</text>
+  <rect class="public" x="900" y="478" width="90" height="81" rx="12"/>
+  <text x="908" y="522" class="label">Greenway</text>
+
+  <!-- Ground pedestrian paths and measured access anchors. -->
+  <path class="pathway" d="M800 369H822 M800 432H822 M800 495H822 M747 307H666 M823 438H926 M880 500H900"/>
+  <circle class="anchor" cx="800" cy="369" r="5"/><circle class="anchor" cx="822" cy="369" r="5"/>
+  <circle class="anchor" cx="800" cy="432" r="5"/><circle class="anchor" cx="822" cy="432" r="5"/>
+  <circle class="anchor" cx="800" cy="495" r="5"/><circle class="anchor" cx="822" cy="495" r="5"/>
+  <circle class="anchor" cx="747" cy="307" r="5"/><circle class="anchor" cx="666" cy="307" r="5"/>
+  <circle class="anchor" cx="823" cy="438" r="5"/><circle class="anchor" cx="926" cy="438" r="5"/>
+  <circle class="anchor" cx="880" cy="500" r="5"/><circle class="anchor" cx="900" cy="500" r="5"/>
+  <text x="708" y="607" class="small">Pedestrian links tie every shop, civic site, station and shared space into the same street network.</text>
+
+  <!-- Station pads sit beside neighborhood and Town Center approaches. -->
+  <rect class="station" x="194" y="317" width="43" height="40" rx="8"/>
+  <text x="187" y="374" class="small">Neighborhood station</text>
+  <rect class="station" x="989" y="585" width="47" height="44" rx="8"/>
+  <text x="978" y="646" class="small">Town Center station</text>
+
+  <!-- North arrow and scale bar. -->
+  <path d="M1085 163V121" stroke="#45584c" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="1074" y="181" class="small">N</text>
+  <path d="M190 654H280" stroke="#45584c" stroke-width="3"/>
+  <path d="M190 648V660M280 648V660" stroke="#45584c" stroke-width="2"/>
+  <text x="205" y="674" class="small">20 m</text>
+
+  <!-- Compact legend and site-plan checks. -->
+  <g transform="translate(40 716)">
+    <rect x="0" y="0" width="20" height="13" class="lot"/><text x="28" y="12" class="small">Residential / building plot</text>
+    <rect x="224" y="0" width="20" height="13" class="public"/><text x="252" y="12" class="small">Public space</text>
+    <circle cx="402" cy="6" r="5" class="anchor"/><text x="414" y="12" class="small">Measured access anchor</text>
+    <path d="M596 6H630" class="rail"/><text x="638" y="12" class="small">Elevated monorail</text>
+    <text x="0" y="40" class="sub">No disconnected scenes · no cars or traffic · plots and access are authored in the shared coordinate system.</text>
+    <text x="0" y="58" class="sub">Plan dimensions come from the Chapter 2 and Town Center definitions; lot rectangles are diagrammed at consistent metre scale.</text>
+  </g>
+</svg>

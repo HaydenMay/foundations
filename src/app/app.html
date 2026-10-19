@@ -123,19 +123,10 @@
   }
   @if (store.chapterNotice(); as notice) {
     <section class="chapter-transition" aria-live="polite" aria-label="Chapter progress">
-      <span class="eyebrow">{{
-        notice === 'neighborhood' ? 'A NEW CHAPTER' : 'A CHAPTER COMPLETE'
-      }}</span>
-      <h2>
-        {{ notice === 'neighborhood' ? 'Welcome to the Neighborhood' : 'Chapter 2 complete' }}
-      </h2>
-      <p>
-        {{
-          notice === 'neighborhood'
-            ? 'Your steady steps have made room for a connected street, new neighbors, and a place to grow together.'
-            : 'You have built a welcoming neighborhood, one healthy step at a time. More room to grow will be here when you are ready.'
-        }}
-      </p>
+      @let transition = chapterTransition(notice);
+      <span class="eyebrow">{{ transition.eyebrow }}</span>
+      <h2>{{ transition.title }}</h2>
+      <p>{{ transition.copy }}</p>
       <div class="chapter-transition-actions">
         <button class="secondary" (click)="dismissChapterNotice()">Continue</button>
         @if (notice === 'neighborhood') {

@@ -9,7 +9,11 @@ import type { AssemblyRecipe } from './assembly';
 import { STARTING_HOME_ASSEMBLY_RECIPES } from './residential-assembly';
 import { buildMilestoneProject, FEATURE_ZONES, MilestoneAsset } from './milestone-assets';
 import { buildChapterTwoProject, buildChapterTwoRoad } from './chapter-two-assets';
-import { CHAPTER_TWO_PROJECTS } from '../domain/progression';
+import {
+  CHAPTER_FOUR_PROJECTS,
+  CHAPTER_THREE_PROJECTS,
+  CHAPTER_TWO_PROJECTS,
+} from '../domain/progression';
 import { createChapterOnePropertyPlot } from './plot-blueprints';
 import {
   buildChapterTwoFrameworkProof,
@@ -18,6 +22,12 @@ import {
 } from './plot-proof';
 import type { PlotDefinition } from './plot-framework';
 import { createChapterTwoNeighborhoodPlot } from './chapter-two-site-plan';
+import {
+  buildCityInfrastructure,
+  buildCityProjectForWorld,
+  type MovingMonorail,
+} from './city-assets';
+import { cityPlotDefinition } from './city-site-plan';
 
 export interface TownWorld {
   group: T.Group;
@@ -28,6 +38,8 @@ export interface TownWorld {
   projectAssets: Map<string, MilestoneAsset>;
   legacyAssets: Map<string, T.Group>;
   plotDefinitions: readonly PlotDefinition[];
+  movingMonorail?: MovingMonorail;
+  cityExpanded: boolean;
 }
 export interface WorldBuildOptions {
   /** Disposable visual proof; only enabled from the isolated Developer Preview UI. */
@@ -164,17 +176,23 @@ export function buildWorld(
 ): TownWorld {
   const group = new T.Group(),
     a = new AssetLibrary();
-  const chapterTwo = designs['ch2-neighborhood'] === 'reveal';
+  const cityProjectIds = [...CHAPTER_THREE_PROJECTS, ...CHAPTER_FOUR_PROJECTS].map(
+    (project) => project.id,
+  );
+  const cityExpanded = cityProjectIds.some((id) => !!designs[id]);
+  const monorailExpanded = !!designs['monorail'];
+  const chapterTwo = designs['ch2-neighborhood'] === 'reveal' || cityExpanded;
   // A shallow rounded terrain slice keeps the whole environment miniature and replaceable.
-  const worldWidth = chapterTwo ? 120 : 36,
-    worldDepth = chapterTwo ? 88 : 29,
-    worldCenterX = chapterTwo ? 25 : 0,
+  const worldWidth = monorailExpanded ? 200 : cityExpanded ? 170 : chapterTwo ? 120 : 36,
+    worldDepth = monorailExpanded ? 120 : cityExpanded ? 100 : chapterTwo ? 88 : 29,
+    worldCenterX = cityExpanded ? 46 : chapterTwo ? 25 : 0,
+    worldCenterZ = monorailExpanded ? -1 : cityExpanded ? 4 : chapterTwo ? -4 : -1.5,
     base = a.geometry(new RoundedBoxGeometry(worldWidth, 0.8, worldDepth, 2, 0.35));
-  a.mesh(group, base, '#b9b79a', worldCenterX, -0.52, chapterTwo ? -4 : -1.5);
+  a.mesh(group, base, '#b9b79a', worldCenterX, -0.52, worldCenterZ);
   const turf = a.geometry(
     new RoundedBoxGeometry(worldWidth - 0.2, 0.22, worldDepth - 0.2, 2, 0.28),
   );
-  a.mesh(group, turf, surface(a, 'grass', '#829456'), worldCenterX, -0.04, chapterTwo ? -4 : -1.5);
+  a.mesh(group, turf, surface(a, 'grass', '#829456'), worldCenterX, -0.04, worldCenterZ);
   a.box(group, surface(a, 'grass', '#819852'), -6, 0.085, -5.4, 13.8, 0.08, 13.4);
   // Chapter 2 replaces the straight starter street with one connected residential road.
   if (!chapterTwo) {
@@ -192,6 +210,7 @@ export function buildWorld(
     homeRecipe: AssemblyRecipe | undefined;
   const projectAssets = new Map<string, MilestoneAsset>(),
     legacyAssets = new Map<string, T.Group>();
+  let movingMonorail: MovingMonorail | undefined;
   let frameworkProof: ReturnType<typeof buildChapterTwoFrameworkProof> | undefined;
   if (chapterTwo) {
     const occupied = CHAPTER_TWO_PROJECTS.filter(
@@ -200,6 +219,7 @@ export function buildWorld(
     if (options.frameworkProof && !occupied.includes('ch2-neighbor-1'))
       occupied.push('ch2-neighbor-1');
     projectAssets.set('ch2-neighborhood', buildChapterTwoRoad(a, group, occupied));
+    if (cityExpanded) buildCityInfrastructure(a, group);
     if (options.frameworkProof) {
       const style = frameworkHomeStyleForNeighbor(designs['ch2-neighbor-1']);
       frameworkProof = buildChapterTwoFrameworkProof(a, group, style);
@@ -257,7 +277,22 @@ export function buildWorld(
       projectAssets.set(id, buildChapterTwoProject(a, group, id, choice));
     else if (FEATURE_ZONES[id])
       projectAssets.set(id, buildMilestoneProject(a, group, id, choice, designs['home'] || 'sage'));
-    else if (PROJECT_ASSETS[id]) {
+    else if (cityExpanded) {
+      const cityAsset = buildCityProjectForWorld(a, group, id, choice);
+      if (cityAsset) {
+        projectAssets.set(id, cityAsset);
+        if (id === 'monorail')
+          movingMonorail = (cityAsset as MilestoneAsset & { movingMonorail: MovingMonorail })
+            .movingMonorail;
+      } else if (PROJECT_ASSETS[id]) {
+        const legacy = a.group(group);
+        legacy.name = `legacy-project:${id}`;
+        PROJECT_ASSETS[id](a, legacy, choice);
+        batchStatic(legacy, (geometry) => a.geometry(geometry));
+        legacy.userData['staticBatchBoundary'] = true;
+        legacyAssets.set(id, legacy);
+      }
+    } else if (PROJECT_ASSETS[id]) {
       const legacy = a.group(group);
       legacy.name = `legacy-project:${id}`;
       PROJECT_ASSETS[id](a, legacy, choice);
@@ -277,7 +312,11 @@ export function buildWorld(
     homeStyle,
   );
   const chapterTwoPlot = chapterTwo ? createChapterTwoNeighborhoodPlot(chapterOnePlot) : undefined;
-  const plotDefinitions: PlotDefinition[] = [chapterTwoPlot ?? chapterOnePlot];
+  const combinedPlot =
+    cityExpanded && chapterTwoPlot ? cityPlotDefinition(chapterTwoPlot) : chapterTwoPlot;
+  const plotDefinitions: PlotDefinition[] = [
+    cityExpanded && chapterTwoPlot ? combinedPlot! : (chapterTwoPlot ?? chapterOnePlot),
+  ];
   if (chapterTwoPlot) {
     const bind = new Map<string, T.Object3D>();
     const put = (nodeId: string, object: T.Object3D | undefined) => {
@@ -310,9 +349,29 @@ export function buildWorld(
     const park = projectAssets.get('ch2-community-park');
     put('ch2-public-walk-to-park', park?.pieces.get('public-neighborhood-paths'));
     put('ch2-public-promenade', park?.pieces.get('public-neighborhood-paths'));
+    if (cityExpanded) {
+      put('city-road-network', group.getObjectByName('connected-road-and-sidewalk-grid'));
+      put('city-public-paths', group.getObjectByName('public-pedestrian-links'));
+      for (const projectId of CHAPTER_THREE_PROJECTS.map((project) => project.id)) {
+        const asset = projectAssets.get(projectId);
+        put(projectId, asset?.root);
+        if (projectId === 'city-main-street') {
+          put('city-shop-1', asset?.pieces.get('shop-bakery'));
+          put('city-shop-2', asset?.pieces.get('shop-bookshop'));
+          put('city-shop-3', asset?.pieces.get('shop-market'));
+        }
+        if (projectId === 'city-library') put('city-library-building', asset?.root);
+      }
+      const rail = projectAssets.get('monorail');
+      put('monorail', rail?.root);
+      put('monorail-guideway', rail?.pieces.get('guideway'));
+      put('neighborhood-station', rail?.root.getObjectByName('neighborhood-station'));
+      put('town-station', rail?.root.getObjectByName('town-station'));
+      put('monorail-ground-links', rail?.pieces.get('station-approaches'));
+    }
     plotDefinitions[0] = {
-      ...chapterTwoPlot,
-      nodes: chapterTwoPlot.nodes.map((node) =>
+      ...combinedPlot!,
+      nodes: combinedPlot!.nodes.map((node) =>
         bind.has(node.id)
           ? {
               ...node,
@@ -333,5 +392,7 @@ export function buildWorld(
     projectAssets,
     legacyAssets,
     plotDefinitions,
+    movingMonorail,
+    cityExpanded,
   };
 }

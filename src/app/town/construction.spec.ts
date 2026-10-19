@@ -29,6 +29,8 @@ it('focuses a selected project in the same lot coordinate system and clamps prog
   expect(end).toMatchObject(focus);
   expect(end.angle).toBeCloseTo(Math.PI / 4);
   expect(projectTransition(from, focus, 2)).toEqual(projectTransition(from, focus, 1));
+  const frontFocus = { ...focus, angle: (Math.PI * 7) / 4 };
+  expect(projectTransition(from, frontFocus, 1).angle).toBeCloseTo((Math.PI * 7) / 4);
 });
 
 it('leaves the camera at a newly unlocked chapter while ordinary projects return home', () => {

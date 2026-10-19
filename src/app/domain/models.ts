@@ -30,9 +30,9 @@ export interface CameraState {
   zoom: number;
   angle: number;
 }
-/** Offsets from the original home camera, sized to keep the Chapter 2 neighborhood reachable. */
-export const CAMERA_X_LIMIT = 60;
-export const CAMERA_Z_LIMIT = 40;
+/** Offsets from the original home camera; bounds cover the current continuous city footprint. */
+export const CAMERA_X_LIMIT = 220;
+export const CAMERA_Z_LIMIT = 100;
 export const CAMERA_MIN_ZOOM = 0.3;
 export const CAMERA_MAX_ZOOM = 2.5;
 export interface Preferences {
@@ -43,6 +43,10 @@ export interface Preferences {
 export interface ChapterNotices {
   neighborhoodSeen: boolean;
   completeSeen: boolean;
+  /** Additive notices; older version-4 saves may omit these flags. */
+  cityCenterSeen?: boolean;
+  cityCompleteSeen?: boolean;
+  monorailSeen?: boolean;
 }
 export interface AppState {
   version: 4;
@@ -78,7 +82,7 @@ export interface Project {
   /** Stable lot region used by the renderer and camera focus. */
   zone?: string;
   /** Chapter metadata used for progression and preview grouping. Older projects default to Chapter 1. */
-  chapter?: 1 | 2;
+  chapter?: 1 | 2 | 3 | 4;
   /** Distinct base footprint for Chapter 2 neighbor homes. */
   lot?: 'compact' | 'l-shaped' | 'two-story' | 'wide-gable';
   /** Legacy projects remain available to migrated profiles only. */

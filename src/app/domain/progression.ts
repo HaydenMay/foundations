@@ -12,6 +12,9 @@ const choice = (
 export const CHAPTER_COMPLETE_THRESHOLD = 100;
 export const CHAPTER_TWO_START_THRESHOLD = 100;
 export const CHAPTER_TWO_COMPLETE_THRESHOLD = 200;
+export const CHAPTER_THREE_START_THRESHOLD = 210;
+export const CHAPTER_THREE_COMPLETE_THRESHOLD = 300;
+export const CHAPTER_FOUR_START_THRESHOLD = 400;
 
 export function chapterLotVisible(
   stars: number,
@@ -624,8 +627,91 @@ export const CHAPTER_TWO_PROJECTS: Project[] = [
   },
 ];
 
+/** Proposed Chapter 3 addition: a compact, connected town center beyond the reserved street end. */
+export const CHAPTER_THREE_PROJECTS: Project[] = [
+  {
+    id: 'city-main-street',
+    name: 'Main Street',
+    threshold: CHAPTER_THREE_START_THRESHOLD,
+    icon: 'home',
+    zone: 'town-center-main-street',
+    chapter: 3,
+    description: 'A small row of welcoming local shops joins the neighborhood street.',
+    choices: [
+      choice('bakery-row', 'Bakery & Tea Room', 'Warm brick, striped awnings, and a bread-shop window.', '#b87459'),
+      choice('bookshop-row', 'Books & Blooms', 'Timber shopfronts with book windows and flower planters.', '#92775b'),
+      choice('market-row', 'Corner Market', 'A cream-painted market with a green canvas awning.', '#829575'),
+    ],
+  },
+  {
+    id: 'city-library',
+    name: 'Community Library',
+    threshold: 235,
+    icon: 'book',
+    zone: 'town-center-library',
+    chapter: 3,
+    description: 'A calm civic building and a direct walk from Main Street.',
+    choices: [
+      choice('brick-library', 'Brick Reading Room', 'Traditional red brick with pale stone trim.', '#a46851'),
+      choice('timber-library', 'Timber Library', 'Warm wood, broad glazing, and a sheltered entry.', '#a1845e'),
+      choice('garden-library', 'Garden Library', 'Soft plaster and deep green details among planted beds.', '#9ba38a'),
+    ],
+  },
+  {
+    id: 'city-plaza',
+    name: 'Town Square',
+    threshold: 260,
+    icon: 'tree',
+    zone: 'town-center-square',
+    chapter: 3,
+    description: 'A public square gives the connected town center a quiet heart.',
+    choices: [
+      choice('square-fountain', 'Stone Fountain', 'A low fountain, seating edge, and generous paving.', '#8caaa6'),
+      choice('square-clock', 'Garden Clock', 'A modest town clock framed by trees and benches.', '#a08c69'),
+      choice('square-pergola', 'Shaded Pergola', 'A timber canopy over a small planted meeting place.', '#987c59'),
+    ],
+  },
+  {
+    id: 'city-greenway',
+    name: 'Town Greenway',
+    threshold: 285,
+    icon: 'leaf',
+    zone: 'town-center-greenway',
+    chapter: 3,
+    description: 'A planted walking route connects the civic sites and neighborhood paths.',
+    choices: [
+      choice('pollinator-walk', 'Pollinator Walk', 'Layered low flowers and a winding stone path.', '#bb9588'),
+      choice('oak-grove', 'Oak Grove', 'A shaded grove with soft understory planting.', '#7e8b68'),
+      choice('rain-garden', 'Rain Garden', 'A shallow planted basin with grasses and stepping stones.', '#8c9d8b'),
+    ],
+  },
+];
+
+/** Proposed late-game Chapter 4 signature project. The route and both stations build together. */
+export const CHAPTER_FOUR_PROJECTS: Project[] = [
+  {
+    id: 'monorail',
+    name: 'Elevated Monorail',
+    threshold: CHAPTER_FOUR_START_THRESHOLD,
+    icon: 'road',
+    zone: 'city-monorail-loop',
+    chapter: 4,
+    description: 'A quiet elevated loop links the neighborhood and town center with two stations.',
+    choices: [
+      choice('timber-brass', 'Timber & Brass', 'Warm station canopies with muted bronze guideway details.', '#a17e54'),
+      choice('sage-stone', 'Sage & Stone', 'Soft green station details and pale stone supports.', '#879581'),
+      choice('cream-copper', 'Cream & Copper', 'Light station walls with restrained copper accents.', '#c09a76'),
+    ],
+  },
+];
+
 /** Complete selectable catalog for unlock, selection, rendering and preview lookups. */
-export const ALL_PROJECTS: Project[] = [...PROJECTS, ...CHAPTER_TWO_PROJECTS];
+export const ALL_PROJECTS: Project[] = [
+  ...PROJECTS,
+  ...CHAPTER_TWO_PROJECTS,
+  ...CHAPTER_THREE_PROJECTS,
+  ...CHAPTER_FOUR_PROJECTS,
+];
 
 /** Previous catalog retained solely for players who had already earned it. */
 export const LEGACY_PROJECTS: Project[] = [

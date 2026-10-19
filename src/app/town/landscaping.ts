@@ -69,7 +69,7 @@ export function plantTree(
         a.mesh(
           g,
           shape,
-          GREENS[(j + tier) % 3],
+          a.foliageMaterial(GREENS[(j + tier) % 3]),
           Math.cos(angle) * width * 0.42,
           y,
           Math.sin(angle) * width * 0.42,
@@ -79,7 +79,7 @@ export function plantTree(
         );
       }
     }
-    a.mesh(g, shape, GREENS[1], 0.03, 4.15, 0, 0.24, 0.6, 0.24);
+    a.mesh(g, shape, a.foliageMaterial(GREENS[1]), 0.03, 4.15, 0, 0.24, 0.6, 0.24);
   } else {
     const count = kind === 'birch' ? 15 : 24;
     for (let i = 0; i < count; i++) {
@@ -99,7 +99,7 @@ export function plantTree(
       const clump = a.mesh(
         g,
         shape,
-        color,
+        a.foliageMaterial(color),
         xx,
         y,
         zz,
@@ -128,7 +128,7 @@ export function shrub(
     a.mesh(
       g,
       foliage(a, 9),
-      GREENS[(i + 1) % 3],
+      a.foliageMaterial(GREENS[(i + 1) % 3]),
       Math.cos(angle) * scale * 0.4,
       radius * 0.8,
       Math.sin(angle) * scale * 0.35,

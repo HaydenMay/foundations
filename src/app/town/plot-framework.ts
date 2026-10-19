@@ -85,6 +85,8 @@ export interface PlotNode {
   renderObject?: T.Object3D;
   renderCoordinateSystem?: 'local' | 'legacy-world-authored';
   buildable?: boolean;
+  /** Optional future pedestrian capacity metadata; it is never simulated or saved as gameplay. */
+  pedestrianCapacity?: number;
   setbacks?: Partial<Record<'north' | 'south' | 'east' | 'west', number>>;
   clearances?: Partial<Record<'north' | 'south' | 'east' | 'west', number>>;
 }
@@ -390,6 +392,11 @@ export function validatePlot(definition: PlotDefinition): PlotDiagnostic[] {
       add('OVERFLOW_REASON_REQUIRED', node.id, `Node "${node.id}" must explain its boundary overflow.`);
     if (node.footprint && ![node.footprint.width, node.footprint.depth].every((v) => Number.isFinite(v) && v > 0))
       add('INVALID_FOOTPRINT', node.id, `Node "${node.id}" has an invalid occupancy footprint.`);
+    if (
+      node.pedestrianCapacity !== undefined &&
+      (!Number.isInteger(node.pedestrianCapacity) || node.pedestrianCapacity < 0)
+    )
+      add('INVALID_DIMENSIONS', node.id, `Node "${node.id}" has invalid pedestrian capacity metadata.`);
     for (const exception of node.overlapExceptions ?? []) {
       if (!exception.nodeId || !exception.reason.trim())
         add('INVALID_OVERLAP_EXCEPTION', node.id, `Node "${node.id}" has an overlap exception without a target and reason.`);

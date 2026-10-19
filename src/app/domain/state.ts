@@ -186,6 +186,10 @@ export function importState(json: string): AppState {
     s.chapterNotices = {
       neighborhoodSeen: stars >= 100,
       completeSeen: stars >= 200,
+      // Existing profiles predate these chapters; only record new flags when that milestone is historical.
+      ...(stars >= 210 ? { cityCenterSeen: true } : {}),
+      ...(stars >= 300 ? { cityCompleteSeen: true } : {}),
+      ...(stars >= 400 ? { monorailSeen: true } : {}),
     };
     s.version = 4;
   } else {
@@ -193,8 +197,22 @@ export function importState(json: string): AppState {
       s.chapterNotices &&
         typeof s.chapterNotices === 'object' &&
         typeof s.chapterNotices.neighborhoodSeen === 'boolean' &&
-        typeof s.chapterNotices.completeSeen === 'boolean',
+        typeof s.chapterNotices.completeSeen === 'boolean' &&
+        (s.chapterNotices.cityCenterSeen === undefined ||
+          typeof s.chapterNotices.cityCenterSeen === 'boolean') &&
+        (s.chapterNotices.cityCompleteSeen === undefined ||
+          typeof s.chapterNotices.cityCompleteSeen === 'boolean') &&
+        (s.chapterNotices.monorailSeen === undefined ||
+          typeof s.chapterNotices.monorailSeen === 'boolean'),
     );
+    const stars = lifetimeStars(s);
+    // Additive v4 fields default according to existing progress, preserving old-save continuity.
+    if (s.chapterNotices.cityCenterSeen === undefined && stars >= 210)
+      s.chapterNotices.cityCenterSeen = true;
+    if (s.chapterNotices.cityCompleteSeen === undefined && stars >= 300)
+      s.chapterNotices.cityCompleteSeen = true;
+    if (s.chapterNotices.monorailSeen === undefined && stars >= 400)
+      s.chapterNotices.monorailSeen = true;
   }
   for (const [id, choice] of Object.entries(s.designs)) selectDesign(s, id, choice);
   // Parse into a fresh object so the caller cannot mutate a previously validated backup.

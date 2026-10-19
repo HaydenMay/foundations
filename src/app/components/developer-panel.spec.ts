@@ -16,7 +16,7 @@ it('emits selected assembly speed and the optional reduced-motion override', () 
   fixture.detectChanges();
   (
     fixture.nativeElement.querySelector(
-      '[aria-label="Preview chapter"] button:nth-child(3)',
+      '[aria-label="Preview chapter"] button:nth-child(5)',
     ) as HTMLButtonElement
   ).click();
   fixture.detectChanges();
@@ -107,6 +107,31 @@ it('groups preview controls by chapter and keeps only the selected chapter visib
   (
     fixture.nativeElement.querySelector(
       '[aria-label="Preview chapter"] button:nth-child(3)',
+    ) as HTMLButtonElement
+  ).click();
+  fixture.detectChanges();
+  expect(
+    [...fixture.nativeElement.querySelectorAll('[data-build-preview]')].map(
+      (button: HTMLButtonElement) => button.dataset['buildPreview'],
+    ),
+  ).toEqual(['city-main-street', 'city-library', 'city-plaza', 'city-greenway']);
+  expect(fixture.nativeElement.querySelector('#preview-light')).toBeNull();
+
+  (
+    fixture.nativeElement.querySelector(
+      '[aria-label="Preview chapter"] button:nth-child(4)',
+    ) as HTMLButtonElement
+  ).click();
+  fixture.detectChanges();
+  expect(
+    [...fixture.nativeElement.querySelectorAll('[data-build-preview]')].map(
+      (button: HTMLButtonElement) => button.dataset['buildPreview'],
+    ),
+  ).toEqual(['monorail']);
+
+  (
+    fixture.nativeElement.querySelector(
+      '[aria-label="Preview chapter"] button:nth-child(5)',
     ) as HTMLButtonElement
   ).click();
   fixture.detectChanges();
@@ -218,7 +243,7 @@ it('emits the chosen locked milestone replay target without changing the genuine
   fixture.detectChanges();
   (
     fixture.nativeElement.querySelector(
-      '[aria-label="Preview chapter"] button:nth-child(3)',
+      '[aria-label="Preview chapter"] button:nth-child(5)',
     ) as HTMLButtonElement
   ).click();
   fixture.detectChanges();

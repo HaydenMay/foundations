@@ -1,0 +1,553 @@
+{
+  "source": "http://127.0.0.1:4200/foundations/",
+  "sourceCommit": "8d0670fd8a199ddd493fb8da1439dc42da8c4e4c",
+  "workingTreeDirty": true,
+  "capturedAt": "2026-10-19T01:09:35.630Z",
+  "environment": "Headless Chromium, production Angular bundle, emulated viewports; no physical-device or Safari testing.",
+  "procedure": "Manual visual evidence only. This script is optional and is not part of automated tests, CI, or deployment.",
+  "errors": [],
+  "warnings": [
+    "1600x1000: [.WebGL-0x6dbc0042fe00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "1600x1000: [.WebGL-0x6dbc0042fe00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "1600x1000: [.WebGL-0x6dbc0042fe00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "1600x1000: [.WebGL-0x6dbc0042fe00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+  ],
+  "captures": [
+    {
+      "name": "town-center-landscape",
+      "file": "docs/evidence/autonomous-city-build/browser-captures/town-center-landscape.jpg",
+      "note": "Chapter 3 Town Center in the same continuous neighborhood world.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 880,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": false
+        }
+      ],
+      "trainWorldPosition": null,
+      "drawCalls": 425,
+      "triangles": 709351,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "town-center-main-street",
+      "file": "docs/evidence/autonomous-city-build/browser-captures/town-center-main-street.jpg",
+      "note": "Front-facing view of all three distinct Main Street storefronts.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 880,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": false
+        }
+      ],
+      "trainWorldPosition": null,
+      "drawCalls": 272,
+      "triangles": 636715,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "town-center-shopfront",
+      "file": "docs/evidence/autonomous-city-build/browser-captures/town-center-shopfront.jpg",
+      "note": "Street-level shop frontage, doors, windows, awning and pedestrian approach.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 880,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": false
+        }
+      ],
+      "trainWorldPosition": null,
+      "drawCalls": 147,
+      "triangles": 420078,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "town-center-library",
+      "file": "docs/evidence/autonomous-city-build/browser-captures/town-center-library.jpg",
+      "note": "Community Library with its direct sidewalk connection.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 880,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": false
+        }
+      ],
+      "trainWorldPosition": null,
+      "drawCalls": 218,
+      "triangles": 500637,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "town-center-square",
+      "file": "docs/evidence/autonomous-city-build/browser-captures/town-center-square.jpg",
+      "note": "Public square with selected fountain, benches and planted edges.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 880,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": false
+        }
+      ],
+      "trainWorldPosition": null,
+      "drawCalls": 129,
+      "triangles": 385932,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "town-center-assembly-mid",
+      "file": "docs/evidence/autonomous-city-build/browser-captures/town-center-assembly-mid.jpg",
+      "note": "Mid-construction state of the Main Street assembly.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 880,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": false
+        }
+      ],
+      "trainWorldPosition": null,
+      "drawCalls": 242,
+      "triangles": 629235,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "town-center-assembly-skipped",
+      "file": "docs/evidence/autonomous-city-build/browser-captures/town-center-assembly-skipped.jpg",
+      "note": "Completed Main Street after skipping its construction animation.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 880,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": false
+        }
+      ],
+      "trainWorldPosition": null,
+      "drawCalls": 242,
+      "triangles": 629235,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "town-center-night",
+      "file": "docs/evidence/autonomous-city-build/browser-captures/town-center-night.jpg",
+      "note": "Night lighting on connected storefronts, lamps and windows.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 880,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": false
+        }
+      ],
+      "trainWorldPosition": null,
+      "drawCalls": 312,
+      "triangles": 690911,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "monorail-city-overview",
+      "file": "docs/evidence/autonomous-city-build/browser-captures/monorail-city-overview.jpg",
+      "note": "The connected city and elevated loop with both integrated stations.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 1110,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": true
+        }
+      ],
+      "trainWorldPosition": {
+        "x": 29.043732548183673,
+        "y": 14,
+        "z": 61.207809773034896
+      },
+      "drawCalls": 829,
+      "triangles": 1081023,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "town-center-chapter-transition",
+      "file": "docs/evidence/autonomous-city-build/browser-captures/town-center-chapter-transition.jpg",
+      "note": "Chapter 3 welcome transition shown over the live city.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 786,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": false
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": false
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": false
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": false
+        }
+      ],
+      "trainWorldPosition": null,
+      "drawCalls": 372,
+      "triangles": 448882,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "mobile-portrait",
+      "file": "docs/evidence/autonomous-city-build/browser-captures/mobile-portrait.jpg",
+      "note": "town-center scene at emulated portrait viewport.",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "documentHeight": 844,
+      "canvasRendered": true,
+      "sceneMeshes": 880,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": false
+        }
+      ],
+      "trainWorldPosition": null,
+      "drawCalls": 291,
+      "triangles": 486804,
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "mobile-landscape-mobile",
+      "file": "docs/evidence/autonomous-city-build/browser-captures/mobile-landscape-mobile.jpg",
+      "note": "monorail-city scene at emulated landscape-mobile viewport.",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "documentWidth": 844,
+      "documentHeight": 390,
+      "canvasRendered": true,
+      "sceneMeshes": 1110,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": true
+        }
+      ],
+      "trainWorldPosition": {
+        "x": 9.598059129493997,
+        "y": 14,
+        "z": 60.22225912617913
+      },
+      "drawCalls": 890,
+      "triangles": 1082735,
+      "webglError": 0,
+      "contextLost": false
+    }
+  ]
+}
