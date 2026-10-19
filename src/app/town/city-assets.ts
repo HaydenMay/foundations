@@ -280,11 +280,25 @@ function buildMainStreet(set: PieceSet, choice: string) {
   part(set, 'shop-bookshop');
   part(set, 'shop-market');
   const beds = part(set, 'frontage-gardens');
-  storefront(set.a, row, -14, 'bakery', choice === 'bakery-row');
-  storefront(set.a, set.pieces.get('shop-bookshop')!, 0, 'bookshop', choice === 'bookshop-row');
-  storefront(set.a, set.pieces.get('shop-market')!, 14, 'market', choice === 'market-row');
-  for (const x of [-19, -10, 10, 19]) {
-    gardenBed(set.a, beds, x, 4.8, 3.2, 0.95, 2001 + x);
+  const [bakeryOffset, bookshopOffset, marketOffset] = CITY_SITE_PLAN.shopOffsets;
+  storefront(set.a, row, bakeryOffset, 'bakery', choice === 'bakery-row');
+  storefront(
+    set.a,
+    set.pieces.get('shop-bookshop')!,
+    bookshopOffset,
+    'bookshop',
+    choice === 'bookshop-row',
+  );
+  storefront(
+    set.a,
+    set.pieces.get('shop-market')!,
+    marketOffset,
+    'market',
+    choice === 'market-row',
+  );
+  // Shared beds and lamps sit between doorways instead of breaking the walks to the street.
+  for (const [index, x] of [-5.5, 5.5].entries()) {
+    gardenBed(set.a, beds, x, 4.8, 2.8, 0.82, 2001 + index);
     set.a.lantern(beds, x, 2.6, 6.7, true, false);
   }
 }
@@ -537,7 +551,27 @@ function pathRibbon(
   mesh.castShadow = false;
 }
 
-/** A small street grid and planted pedestrian links extend the existing road in the same scene. */
+function streetRectangle(
+  a: AssetLibrary,
+  parent: T.Object3D,
+  material: T.Material | string,
+  start: readonly [number, number],
+  end: readonly [number, number],
+  width: number,
+  y: number,
+  height: number,
+) {
+  const dx = end[0] - start[0];
+  const dz = end[1] - start[1];
+  const length = Math.hypot(dx, dz);
+  const group = a.group(parent, (start[0] + end[0]) / 2, 0, (start[1] + end[1]) / 2);
+  group.rotation.y = Math.atan2(-dz, dx);
+  const mesh = a.box(group, material, 0, y, 0, length, height, width);
+  mesh.castShadow = false;
+  return { group, length };
+}
+
+/** A short Main Street and civic lane continue the existing neighborhood road in one scene. */
 export function buildCityInfrastructure(a: AssetLibrary, parent: T.Group): T.Group {
   const root = a.group(
     parent,
@@ -556,7 +590,6 @@ export function buildCityInfrastructure(a: AssetLibrary, parent: T.Group): T.Gro
     'town-center-asphalt',
     () => new T.MeshStandardMaterial({ color: '#777e78', roughness: 0.96 }),
   );
-  const curb = surface(a, 'stone', '#b8b4a2');
   const asphaltConnector = a.mesh(
     roads,
     a.geometry(
@@ -569,51 +602,98 @@ export function buildCityInfrastructure(a: AssetLibrary, parent: T.Group): T.Gro
   );
   asphaltConnector.name = 'chapter-two-road-connector';
   asphaltConnector.castShadow = false;
-  a.box(roads, roadMaterial, 0, 0.245, 0, 6.3, 0.08, 82);
-  a.box(roads, roadMaterial, 21.5, 0.245, -3, 43, 0.08, 6.3);
-  for (const x of [-3.25, 3.25]) a.box(roads, curb, x, 0.27, 0, 0.18, 0.16, 82);
-  for (const x of [-4.02, 4.02]) {
-    a.box(roads, surface(a, 'paving', '#c6c0ad'), x, 0.29, 0, 1.55, 0.14, 82);
-    for (let z = -38; z <= 38; z += 3.5) a.box(roads, '#aaa693', x, 0.365, z, 1.48, 0.012, 0.025);
+  const roadEdge = CITY_SITE_PLAN.streets.roadWidth / 2;
+  for (const segment of CITY_SITE_PLAN.streets.roadSegments) {
+    const { group, length } = streetRectangle(
+      a,
+      roads,
+      roadMaterial,
+      segment.from,
+      segment.to,
+      CITY_SITE_PLAN.streets.roadWidth,
+      0.245,
+      0.08,
+    );
+    const yaw = Math.atan2(-(segment.to[1] - segment.from[1]), segment.to[0] - segment.from[0]);
+    for (const side of [-1, 1]) {
+      const offset = side * (roadEdge + 0.09);
+      const curb = a.box(
+        group,
+        surface(a, 'stone', '#b8b4a2'),
+        0,
+        0.27,
+        offset,
+        length,
+        0.16,
+        0.18,
+      );
+      curb.rotation.y = yaw;
+      const sidewalkOffset = side * CITY_SITE_PLAN.streets.sidewalkOffset;
+      const sidewalk = a.box(
+        group,
+        surface(a, 'paving', '#c6c0ad'),
+        0,
+        0.29,
+        sidewalkOffset,
+        length,
+        0.14,
+        CITY_SITE_PLAN.streets.sidewalkWidth,
+      );
+      sidewalk.rotation.y = yaw;
+      sidewalk.castShadow = false;
+      for (let distance = 3.5; distance < length - 1; distance += 3.5) {
+        const seam = a.box(
+          group,
+          '#aaa693',
+          distance - length / 2,
+          0.365,
+          sidewalkOffset,
+          0.025,
+          0.012,
+          CITY_SITE_PLAN.streets.sidewalkWidth - 0.07,
+        );
+        seam.rotation.y = yaw;
+      }
+    }
   }
-  for (const z of [-6.25, 0.25]) a.box(roads, curb, 21.5, 0.27, z, 43, 0.16, 0.18);
-  for (const z of [-7.02, 1.02]) {
-    a.box(roads, surface(a, 'paving', '#c6c0ad'), 21.5, 0.29, z, 43, 0.14, 1.55);
-    for (let x = 2; x <= 41; x += 3.5) a.box(roads, '#aaa693', x, 0.365, z, 0.025, 0.012, 1.48);
-  }
-  for (let z = -36; z < 37; z += 8) a.box(roads, '#d5d0b9', 0, 0.3, z, 1.25, 0.015, 0.07);
-  for (let x = 4; x < 40; x += 8) a.box(roads, '#d5d0b9', x, 0.3, -3, 0.07, 0.015, 1.25);
-  // A few warm, low-power lamps make the main pedestrian approaches legible after dusk.
+  for (let z = -32; z <= 32; z += 8) a.box(roads, '#d5d0b9', 0, 0.3, z, 1.25, 0.015, 0.07);
+  // Warm, restrained lamps frame the shop approach and the civic-lane entry.
   for (const [x, z] of [
-    [4.9, -22],
-    [4.9, 22],
-    [21.5, -7.7],
-    [36, -7.7],
+    [4.9, -26],
+    [4.9, 24],
+    [18, 8.1],
+    [18, 16],
   ] as const)
     a.lantern(roads, x, 2.8, z);
-  // A few planted edges soften the grid without hiding doors or narrowing public paths.
   const vergeTrees: readonly (readonly [
     number,
     number,
     'oak' | 'birch' | 'evergreen' | 'flowering',
   ])[] = [
-    [-10, 34, 'evergreen'],
-    [9, 34, 'oak'],
-    [35, 22, 'flowering'],
-    [35, -22, 'evergreen'],
-    [-10, -35, 'birch'],
-    [9, -35, 'oak'],
+    [-20, 23, 'evergreen'],
+    [-20, -25, 'birch'],
+    [20, -25, 'oak'],
+    [45, -7, 'flowering'],
+    [45, 20, 'evergreen'],
   ];
   for (const [i, [x, z, kind]] of vergeTrees.entries()) {
     plantTree(a, landscape, x, z, 0.76 + (i % 3) * 0.06, kind, 2551 + i * 9);
     shrub(a, landscape, x + (i % 2 ? 1.7 : -1.7), z + 0.55, 0.45, true, 2611 + i);
   }
-  for (const segment of CITY_SITE_PLAN.pedestrianPaths) pathRibbon(a, paving, segment);
-  // Main Street's north and south ends receive a low, planted landscape transition.
-  for (const x of [-6, 6, 18, 30]) {
-    gardenBed(a, landscape, x, 36, 3.2, 1.15, 2651 + x);
-    gardenBed(a, landscape, x, -38, 3.2, 1.15, 2691 + x);
+  // The transition gardens visually carry the road from the last homes into Main Street.
+  for (const [index, garden] of CITY_SITE_PLAN.transitionGardens.entries()) {
+    plantTree(a, landscape, garden.position[0], garden.position[2], 0.72, garden.kind, garden.seed);
+    gardenBed(
+      a,
+      landscape,
+      garden.position[0] + (index ? -2 : 2),
+      garden.position[2],
+      3.2,
+      0.9,
+      garden.seed + 3,
+    );
   }
+  for (const segment of CITY_SITE_PLAN.pedestrianPaths) pathRibbon(a, paving, segment);
   batchStatic(root, (geometry) => a.geometry(geometry));
   root.userData['staticBatchBoundary'] = true;
   return root;
@@ -624,9 +704,9 @@ export interface MovingMonorail {
   readonly trainCount: 2;
 }
 
-function station(set: PieceSet, stationId: string, choice: string) {
+function station(set: PieceSet, parent: T.Group, stationId: string, choice: string) {
   const stationPlan = CITY_MONORAIL_PLAN.stations.find((entry) => entry.id === stationId)!;
-  const group = set.a.group(set.root, ...stationPlan.position);
+  const group = set.a.group(parent, ...stationPlan.position);
   group.name = stationId;
   const a = set.a;
   const timber = choice === 'sage-stone' ? '#887a62' : '#9a744d';
@@ -749,20 +829,21 @@ export function buildMonorailProject(
   );
   beam.name = 'single-elevated-monorail-guide-beam';
   beam.castShadow = true;
-  for (const stationPlan of CITY_MONORAIL_PLAN.stations) station(set, stationPlan.id, choiceId);
+  for (const stationPlan of CITY_MONORAIL_PLAN.stations)
+    station(set, stations, stationPlan.id, choiceId);
   const approach = part(set, 'station-approaches');
   const stationOne = CITY_MONORAIL_PLAN.stations[0];
   const stationOneStart: [number, number] = [
     stationOne.position[0] + stationOne.entry[0],
     stationOne.position[2] + stationOne.entry[2],
   ];
-  const sidewalkEnd: [number, number] = [-75, 9.02];
+  const sidewalkEnd: [number, number] = [-64, 10.02];
   const stationTwo = CITY_MONORAIL_PLAN.stations[1];
   const stationTwoStart: [number, number] = [
     stationTwo.position[0] + stationTwo.entry[0],
     stationTwo.position[2] + stationTwo.entry[2],
   ];
-  const greenwayEnd: [number, number] = [71, -36];
+  const greenwayEnd: [number, number] = [72, 37];
   for (const [start, end] of [
     [stationOneStart, sidewalkEnd],
     [stationTwoStart, greenwayEnd],

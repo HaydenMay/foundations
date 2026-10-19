@@ -1,8 +1,4 @@
-import {
-  CAMERA_MAX_ZOOM,
-  CAMERA_MIN_ZOOM,
-  CameraState,
-} from '../domain/models';
+import { CAMERA_MAX_ZOOM, CAMERA_MIN_ZOOM, CameraState } from '../domain/models';
 import { MOUSE, OrthographicCamera, TOUCH, Vector3 } from 'three';
 import { MapControls } from 'three/addons/controls/MapControls.js';
 const HOME = new Vector3(-5, 1.8, -4.6);
@@ -14,7 +10,7 @@ export interface CameraBounds {
 }
 export const HOME_CAMERA_BOUNDS: CameraBounds = { minX: -60, maxX: 60, minZ: -40, maxZ: 40 };
 /** City camera state is an offset from HOME and covers the authored continuous terrain. */
-export const CITY_CAMERA_BOUNDS: CameraBounds = { minX: -50, maxX: 170, minZ: -65, maxZ: 75 };
+export const CITY_CAMERA_BOUNDS: CameraBounds = { minX: -36, maxX: 142, minZ: -55, maxZ: 52 };
 export function homeViewHeight(width: number, height: number): number {
   return Math.max(19, (20.5 * height) / Math.max(1, width));
 }

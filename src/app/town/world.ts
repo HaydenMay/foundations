@@ -22,7 +22,11 @@ import {
 } from './plot-proof';
 import type { PlotDefinition } from './plot-framework';
 import { createChapterTwoNeighborhoodPlot } from './chapter-two-site-plan';
-import { buildCityInfrastructure, buildCityProjectForWorld, type MovingMonorail } from './city-assets';
+import {
+  buildCityInfrastructure,
+  buildCityProjectForWorld,
+  type MovingMonorail,
+} from './city-assets';
 import { cityPlotDefinition } from './city-site-plan';
 
 export interface TownWorld {
@@ -178,15 +182,22 @@ export function buildWorld(
   const cityExpanded = cityProjectIds.some((id) => !!designs[id]);
   const chapterTwo = designs['ch2-neighborhood'] === 'reveal' || cityExpanded;
   // A shallow rounded terrain slice keeps the whole environment miniature and replaceable.
-  const worldWidth = cityExpanded ? 220 : chapterTwo ? 120 : 36,
-    worldDepth = cityExpanded ? 140 : chapterTwo ? 88 : 29,
-    worldCenterX = cityExpanded ? 55 : chapterTwo ? 25 : 0,
+  const worldWidth = cityExpanded ? 200 : chapterTwo ? 120 : 36,
+    worldDepth = cityExpanded ? 120 : chapterTwo ? 88 : 29,
+    worldCenterX = cityExpanded ? 46 : chapterTwo ? 25 : 0,
     base = a.geometry(new RoundedBoxGeometry(worldWidth, 0.8, worldDepth, 2, 0.35));
-  a.mesh(group, base, '#b9b79a', worldCenterX, -0.52, cityExpanded ? 0 : chapterTwo ? -4 : -1.5);
+  a.mesh(group, base, '#b9b79a', worldCenterX, -0.52, cityExpanded ? -1 : chapterTwo ? -4 : -1.5);
   const turf = a.geometry(
     new RoundedBoxGeometry(worldWidth - 0.2, 0.22, worldDepth - 0.2, 2, 0.28),
   );
-  a.mesh(group, turf, surface(a, 'grass', '#829456'), worldCenterX, -0.04, cityExpanded ? 0 : chapterTwo ? -4 : -1.5);
+  a.mesh(
+    group,
+    turf,
+    surface(a, 'grass', '#829456'),
+    worldCenterX,
+    -0.04,
+    cityExpanded ? -1 : chapterTwo ? -4 : -1.5,
+  );
   a.box(group, surface(a, 'grass', '#819852'), -6, 0.085, -5.4, 13.8, 0.08, 13.4);
   // Chapter 2 replaces the straight starter street with one connected residential road.
   if (!chapterTwo) {
@@ -286,8 +297,7 @@ export function buildWorld(
         legacy.userData['staticBatchBoundary'] = true;
         legacyAssets.set(id, legacy);
       }
-    }
-    else if (PROJECT_ASSETS[id]) {
+    } else if (PROJECT_ASSETS[id]) {
       const legacy = a.group(group);
       legacy.name = `legacy-project:${id}`;
       PROJECT_ASSETS[id](a, legacy, choice);
@@ -310,9 +320,7 @@ export function buildWorld(
   const combinedPlot =
     cityExpanded && chapterTwoPlot ? cityPlotDefinition(chapterTwoPlot) : chapterTwoPlot;
   const plotDefinitions: PlotDefinition[] = [
-    cityExpanded && chapterTwoPlot
-      ? combinedPlot!
-      : chapterTwoPlot ?? chapterOnePlot,
+    cityExpanded && chapterTwoPlot ? combinedPlot! : (chapterTwoPlot ?? chapterOnePlot),
   ];
   if (chapterTwoPlot) {
     const bind = new Map<string, T.Object3D>();

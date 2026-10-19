@@ -4,7 +4,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 
 const url = process.env.BASE_URL || 'http://127.0.0.1:4200/foundations/';
-const directory = process.env.CAPTURE_DIR || 'docs/evidence/autonomous-city-build/browser-captures';
+const directory = process.env.CAPTURE_DIR || 'docs/evidence/city-composition-pass/browser-captures';
 const browser = await chromium.launch({ headless: true });
 const captures = [];
 const errors = [];
@@ -72,6 +72,7 @@ async function setCamera(page, x, z, zoom, angle = Math.PI / 4, distance = 34) {
       if (!visual?.camera || !visual.scene || !visual.renderer)
         throw new Error('Three.js scene is unavailable for visual capture.');
       const camera = visual.camera;
+      camera.up.set(0, 1, 0);
       camera.position.set(
         x + Math.sin(angle) * distance,
         1.8 + (distance * 28) / 34,
@@ -83,6 +84,25 @@ async function setCamera(page, x, z, zoom, angle = Math.PI / 4, distance = 34) {
       visual.renderer.render(visual.scene, camera);
     },
     { x, z, zoom, angle, distance },
+  );
+  await page.waitForTimeout(150);
+}
+
+async function setOverhead(page, x, z, zoom) {
+  await page.evaluate(
+    ({ x, z, zoom }) => {
+      const visual = window.__visual;
+      if (!visual?.camera || !visual.scene || !visual.renderer)
+        throw new Error('Three.js scene is unavailable for visual capture.');
+      const camera = visual.camera;
+      camera.up.set(0, 0, -1);
+      camera.position.set(x, 100, z);
+      camera.zoom = zoom;
+      camera.lookAt(x, 0, z);
+      camera.updateProjectionMatrix();
+      visual.renderer.render(visual.scene, camera);
+    },
+    { x, z, zoom },
   );
   await page.waitForTimeout(150);
 }
@@ -136,16 +156,59 @@ async function diagnostics(page) {
       })(),
       drawCalls: renderer?.info?.render?.calls ?? null,
       triangles: renderer?.info?.render?.triangles ?? null,
+      webglRenderer: (() => {
+        if (!gl) return null;
+        const extension = gl.getExtension('WEBGL_debug_renderer_info');
+        return extension
+          ? gl.getParameter(extension.UNMASKED_RENDERER_WEBGL)
+          : gl.getParameter(gl.RENDERER);
+      })(),
       webglError: gl?.getError?.() ?? null,
       contextLost: gl?.isContextLost?.() ?? null,
     };
   });
 }
 
-async function capture(page, name, note) {
+async function measureFramePacing(page, durationMs = 1600) {
+  return page.evaluate(
+    (duration) =>
+      new Promise((resolve) => {
+        const frameTimes = [];
+        const startedAt = performance.now();
+        let previousFrame;
+        const sample = (now) => {
+          if (previousFrame !== undefined) frameTimes.push(now - previousFrame);
+          previousFrame = now;
+          if (now - startedAt >= duration) {
+            const sorted = [...frameTimes].sort((a, b) => a - b);
+            const percentile = (value) => sorted[Math.floor((sorted.length - 1) * value)] ?? null;
+            resolve({
+              elapsedMs: Math.round(now - startedAt),
+              frames: frameTimes.length,
+              approximateFps: Math.round((frameTimes.length * 1000) / (now - startedAt)),
+              medianFrameMs: percentile(0.5),
+              p95FrameMs: percentile(0.95),
+            });
+            return;
+          }
+          requestAnimationFrame(sample);
+        };
+        requestAnimationFrame(sample);
+      }),
+    durationMs,
+  );
+}
+
+async function capture(page, name, note, sampleFramePacing = false) {
   const file = `${directory}/${name}.jpg`;
   await page.screenshot({ path: file, type: 'jpeg', quality: 90 });
-  captures.push({ name, file, note, ...(await diagnostics(page)) });
+  captures.push({
+    name,
+    file,
+    note,
+    ...(await diagnostics(page)),
+    ...(sampleFramePacing ? { framePacing: await measureFramePacing(page) } : {}),
+  });
 }
 
 try {
@@ -156,36 +219,52 @@ try {
   await page.locator('#preview-light').selectOption('day');
   await page.waitForTimeout(300);
   await setScenario(page, 'Chapter 3', '#city-scenario', 'town-center');
-  await setCamera(page, 88, -3, 0.42, Math.PI / 4, 34);
+  await setScenario(page, 'Chapter 4', '#rail-scenario', 'monorail-city');
+  await panel(page, false);
+  await setOverhead(page, 46, -1, 0.18);
+  await capture(
+    page,
+    'whole-city-overhead',
+    'Overhead view of the continuous developed city, including the original home, residential neighborhood, Town Center, civic green, and monorail loop.',
+  );
+  await setScenario(page, 'Chapter 3', '#city-scenario', 'town-center');
+  await panel(page, false);
+  await setCamera(page, 46, -1, 0.21, Math.PI / 4, 54);
   await panel(page, false);
   await capture(
     page,
-    'town-center-landscape',
-    'Chapter 3 Town Center in the same continuous neighborhood world.',
+    'whole-city-normal-angle',
+    'The developed continuous town at normal isometric framing, without the elevated loop obscuring the homes and civic spaces.',
   );
-  await setCamera(page, 102, 3, 0.42, (Math.PI * 3) / 2, 34);
+  await setCamera(page, 31, 4, 0.55, (Math.PI * 7) / 4, 34);
+  await capture(
+    page,
+    'chapter-two-residential-street',
+    'The unchanged curved Chapter 2 residential street, separated homes, gardens, and connected frontage.',
+  );
+  await setCamera(page, 88, 3, 0.8, (Math.PI * 3) / 2, 34);
   await capture(
     page,
     'town-center-main-street',
-    'Front-facing view of all three distinct Main Street storefronts.',
+    'Compact Main Street frontage with distinct bakery, bookshop, and market silhouettes beside the connected street.',
   );
-  await setCamera(page, 96.2, -11, 0.8, (Math.PI * 3) / 2, 34);
-  await capture(
-    page,
-    'town-center-shopfront',
-    'Street-level shop frontage, doors, windows, awning and pedestrian approach.',
-  );
-  await setCamera(page, 70, 19, 0.8, Math.PI / 4, 34);
+  await setCamera(page, 66, -8, 0.8, Math.PI / 2, 34);
   await capture(
     page,
     'town-center-library',
-    'Community Library with its direct sidewalk connection.',
+    'Community Library with its short direct sidewalk connection to Main Street.',
   );
-  await setCamera(page, 129, -10, 0.7, Math.PI / 4, 34);
+  await setCamera(page, 107, 9, 0.72, (Math.PI * 3) / 2, 34);
   await capture(
     page,
-    'town-center-square',
-    'Public square with selected fountain, benches and planted edges.',
+    'town-center-civic-plaza',
+    'Civic square terminating a short side street and joining the landscaped greenway.',
+  );
+  await setCamera(page, 107, 28, 0.72, (Math.PI * 3) / 2, 34);
+  await capture(
+    page,
+    'town-center-greenway',
+    'The public green joined directly to the civic plaza.',
   );
 
   await panel(page, true);
@@ -217,13 +296,33 @@ try {
     'town-center-assembly-skipped',
     'Completed Main Street after skipping its construction animation.',
   );
+  await panel(page, true);
+  await selectChapter(page, 'Shared');
+  await page.locator('#assembly-speed').selectOption('1');
+  await selectChapter(page, 'Chapter 3');
+  await page
+    .locator('app-developer-panel details.project-preview')
+    .filter({ has: page.locator('[data-build-preview="city-main-street"]') })
+    .locator('summary')
+    .click();
+  await page.locator('[data-build-preview="city-main-street"]').click();
+  await page.getByRole('button', { name: 'Skip construction' }).waitFor({
+    state: 'hidden',
+    timeout: 12000,
+  });
+  await panel(page, false);
+  await capture(
+    page,
+    'town-center-assembly-complete',
+    'Main Street after the full construction animation completes.',
+  );
 
   await panel(page, true);
   await selectChapter(page, 'Shared');
   await page.locator('#preview-light').selectOption('night');
   await page.waitForTimeout(300);
   await panel(page, false);
-  await setCamera(page, 102, 3, 0.42, (Math.PI * 7) / 4, 34);
+  await setCamera(page, 88, 3, 0.8, (Math.PI * 3) / 2, 34);
   await capture(
     page,
     'town-center-night',
@@ -236,11 +335,11 @@ try {
   await page.locator('#preview-light').selectOption('auto');
   await page.waitForTimeout(250);
   await panel(page, false);
-  await setCamera(page, 58, 0, 0.3, Math.PI / 4, 34);
+  await setOverhead(page, 46, -1, 0.18);
   await capture(
     page,
-    'monorail-city-overview',
-    'The connected city and elevated loop with both integrated stations.',
+    'monorail-full-loop-overhead',
+    'Compact monorail loop framing the continuous neighborhood and Town Center, with both stations near pedestrian destinations.',
   );
 
   await panel(page, true);
@@ -263,7 +362,7 @@ try {
       'town-center',
       '#city-scenario',
       'Chapter 3',
-      [102, 3, 0.46, (Math.PI * 7) / 4],
+      [83, 4, 0.48, (Math.PI * 7) / 4],
     ],
     [
       'landscape-mobile',
@@ -272,17 +371,20 @@ try {
       'monorail-city',
       '#rail-scenario',
       'Chapter 4',
-      [58, 0, 0.3],
+      [46, -1, 0.19],
     ],
   ]) {
     const session = await openPreview(viewport, mobile);
     await setScenario(session.page, chapter, selector, scenario);
-    await setCamera(session.page, ...camera);
+    if (name === 'landscape-mobile')
+      await setOverhead(session.page, camera[0], camera[1], camera[2]);
+    else await setCamera(session.page, ...camera);
     await panel(session.page, false);
     await capture(
       session.page,
       `mobile-${name}`,
       `${scenario} scene at emulated ${name} viewport.`,
+      true,
     );
     await session.context.close();
   }
@@ -309,7 +411,7 @@ try {
     .join('');
   await writeFile(
     `${directory}/index.html`,
-    `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Foundations autonomous city evidence</title><style>body{margin:0;padding:24px;background:#f3f0e7;color:#344239;font:15px system-ui}main{max-width:1500px;margin:auto}h1{font:500 32px Georgia,serif}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}figure{margin:0;padding:8px;background:white;border-radius:12px;box-shadow:0 4px 18px #20302016}img{display:block;width:100%;height:auto;border-radius:8px}figcaption{padding:9px;line-height:1.5}</style><main><h1>Foundations · Autonomous City</h1><p>Production-bundle visual captures for the Town Center, elevated monorail, chapter transition, and emulated mobile viewports. See metrics.json for browser, layout, and WebGL diagnostics. These captures are inspection evidence, not a browser-test gate.</p><div class="grid">${gallery}</div></main></html>`,
+    `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Foundations city composition pass</title><style>body{margin:0;padding:24px;background:#f3f0e7;color:#344239;font:15px system-ui}main{max-width:1500px;margin:auto}h1{font:500 32px Georgia,serif}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}figure{margin:0;padding:8px;background:white;border-radius:12px;box-shadow:0 4px 18px #20302016}img{display:block;width:100%;height:auto;border-radius:8px}figcaption{padding:9px;line-height:1.5}</style><main><h1>Foundations · City Composition Pass</h1><p>Production-bundle visual captures for the compact continuous city, Town Center, monorail, construction, and emulated mobile viewports. See metrics.json for browser, layout, and WebGL diagnostics. These captures are inspection evidence, not a browser-test gate.</p><div class="grid">${gallery}</div></main></html>`,
   );
   console.log(JSON.stringify(result, null, 2));
 } finally {
