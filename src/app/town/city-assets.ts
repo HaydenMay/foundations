@@ -317,9 +317,9 @@ function buildLibrary(set: PieceSet, choice: string) {
     choice === 'brick-library' ? 'brick' : choice === 'timber-library' ? 'wood' : 'siding';
   const wall = surface(a, wallFinish, wallColor);
   a.box(walls, wall, 0, 2.75, 0, 11.8, 4.2, 9.8);
-  gablePanel(a, walls, 11.8, 2.35, 4.72, 4.98, wall);
-  gablePanel(a, walls, 11.8, 2.35, 4.72, -4.98, wall, true);
-  namedWindow(a, walls, 'library-gable-window', 0, 5.68, 5.02, 0.82, 0.72);
+  gablePanel(a, walls, 11.8, 2.35, 4.72, 5.365, wall);
+  gablePanel(a, walls, 11.8, 2.35, 4.72, -5.365, wall, true);
+  namedWindow(a, walls, 'library-gable-window', 0, 5.68, 5.43, 0.82, 0.72);
   a.box(walls, trim, 0, 0.76, 4.96, 11.8, 0.14, 0.18);
   a.box(walls, '#e4ddcd', 0, 4.85, 4.95, 12, 0.16, 0.18);
   for (const x of [-4.25, -1.55, 1.55, 4.25]) a.window(walls, x, 2.62, 4.97, 1.65, 2.05);

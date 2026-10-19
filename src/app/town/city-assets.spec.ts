@@ -57,7 +57,7 @@ describe('Town Center storefront architecture', () => {
 });
 
 describe('Town Center library architecture', () => {
-  it('closes the gable elevations with matching siding and an attic window', () => {
+  it('sets the gable siding and attic window in front of the roof caps', () => {
     const world = buildWorld({
       home: 'sage',
       'ch2-neighborhood': 'reveal',
@@ -67,6 +67,27 @@ describe('Town Center library architecture', () => {
     const walls = library.getObjectByName('library-walls')!;
     const wallBounds = new T.Box3().setFromObject(walls);
     expect(wallBounds.max.y).toBeGreaterThan(7);
+    const gableSiding = [...walls.children]
+      .filter(
+        (object): object is T.Mesh =>
+          object instanceof T.Mesh &&
+          !Array.isArray(object.material) &&
+          object.material.map !== null,
+      )
+      .find((mesh) => {
+        mesh.geometry.computeBoundingBox();
+        return mesh.geometry.boundingBox!.max.y > 7;
+      });
+    expect(gableSiding?.geometry.boundingBox?.max.z).toBeGreaterThan(5.3);
+    const glassBatch = [...walls.children].find(
+      (object) =>
+        object instanceof T.Mesh &&
+        !Array.isArray(object.material) &&
+        object.material.emissiveIntensity !== undefined &&
+        object.material.map === null,
+    ) as T.Mesh;
+    glassBatch.geometry.computeBoundingBox();
+    expect(glassBatch.geometry.boundingBox!.max.z).toBeGreaterThan(5.45);
     const roof = library.getObjectByName('library-roof')!;
     const texturedRoof = [...roof.children].find(
       (object) =>
