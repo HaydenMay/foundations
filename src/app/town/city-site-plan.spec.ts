@@ -74,12 +74,11 @@ describe('continuous city site plan', () => {
   });
 
   it('composes the town around one compact street and a joined civic green', () => {
-    expect(CITY_SITE_PLAN.origin[0]).toBe(76);
+    expect(CITY_SITE_PLAN.origin[0]).toBe(61);
     expect(CITY_SITE_PLAN.streets.roadSegments.map((segment) => segment.id)).toEqual([
       'main-street',
-      'civic-lane',
     ]);
-    expect(CITY_SITE_PLAN.shopOffsets).toEqual([-11, 0, 11]);
+    expect(CITY_SITE_PLAN.shopOffsets).toEqual([-10.2, 0, 10.2]);
     const shopSpacing = CITY_SITE_PLAN.shopOffsets
       .slice(1)
       .map((offset, index) => Math.abs(offset - CITY_SITE_PLAN.shopOffsets[index]));
@@ -90,7 +89,7 @@ describe('continuous city site plan', () => {
     const greenway = site('city-greenway');
     expect(greenway.position[0]).toBe(plaza.position[0]);
     expect(
-      greenway.position[2] - greenway.depth / 2 - (plaza.position[2] + plaza.depth / 2),
+      plaza.position[2] - plaza.depth / 2 - (greenway.position[2] + greenway.depth / 2),
     ).toBeCloseTo(1);
     expect(
       Math.abs(site('city-library').position[0] - site('city-main-street').position[0]),
@@ -126,8 +125,9 @@ describe('continuous city site plan', () => {
         entry.distanceTo(pathEnd),
         `shop ${index + 1} path reaches its front door`,
       ).toBeLessThan(0.05);
-      expect(pathEnd.x - pathStart.x).toBeGreaterThan(3);
-      expect(path.from[1]).toBeCloseTo(6 + offset);
+      expect(pathEnd.distanceTo(pathStart)).toBeLessThan(1.5);
+      expect(path.from[0]).toBeCloseTo(22 + offset);
+      expect(path.from[1]).toBeCloseTo(-4.02);
       expect(path.width).toBeGreaterThanOrEqual(1.4);
     }
     expect(
@@ -143,8 +143,8 @@ describe('continuous city site plan', () => {
     const zs = CITY_MONORAIL_PLAN.points.map(([, z]) => z);
     expect(Math.max(...xs) - Math.min(...xs)).toBeLessThanOrEqual(160);
     expect(Math.max(...zs) - Math.min(...zs)).toBeLessThanOrEqual(92);
-    expect(CITY_MONORAIL_PLAN.stations[0].position[0]).toBe(-76);
-    expect(CITY_MONORAIL_PLAN.stations[1].position[0]).toBe(84);
+    expect(CITY_MONORAIL_PLAN.stations[0].position[0]).toBe(-3.5);
+    expect(CITY_MONORAIL_PLAN.stations[1].position[0]).toBe(82);
   });
 
   it('batches static station architecture while retaining both station scene anchors', () => {

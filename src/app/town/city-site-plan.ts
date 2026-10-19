@@ -1,4 +1,5 @@
 import * as T from 'three';
+import { resolvePlotPoint } from './plot-framework';
 import type { PlotConnection, PlotDefinition, PlotNode, PlotTransform } from './plot-framework';
 import { chapterTwoRoadFrameAtX, CHAPTER_TWO_SITE_PLAN } from './chapter-two-site-plan';
 import { CHAPTER_ONE_PROPERTY_BOUNDS } from './plot-blueprints';
@@ -24,57 +25,45 @@ export interface CityPathSegment {
   width: number;
 }
 
-const CITY_ORIGIN = [76, 0, -3] as const;
-const MONORAIL_ORIGIN = [45, 0, -1] as const;
+const CITY_ORIGIN = [61, 0, 5.2] as const;
+const MONORAIL_ORIGIN = [52, 0, 0] as const;
+const shopOffsets = [-10.2, 0, 10.2] as const;
 
-/** One compact street spine ties the existing homes to Main Street and the civic green. */
+/** Commercial frontage continues the established residential tangent, ending at the civic square. */
 export const CITY_SITE_PLAN = Object.freeze({
   origin: CITY_ORIGIN,
-  district: Object.freeze({
-    id: 'town-center-district',
-    dimensions: Object.freeze({ width: 100, depth: 100, height: 20 }),
-  }),
-  streets: Object.freeze({
+  terrain: { width: 158, depth: 84, center: [50, -1] as const },
+  district: { id: 'town-center-district', dimensions: { width: 136, depth: 100, height: 20 } },
+  streets: {
     nodeId: 'city-road-network',
-    dimensions: Object.freeze({ width: 80, depth: 82, height: 0.6 }),
+    dimensions: { width: 132, depth: 90, height: 0.6 },
     roadWidth: 6.3,
     sidewalkWidth: 1.55,
     sidewalkOffset: 4.02,
-    connectorPoints: Object.freeze([
-      [-15, 8],
-      [-11, 8],
-      [-7, 6.7],
-      [-3, 2.5],
-      [0, -3],
-    ] as const),
-    roadSegments: Object.freeze([
-      { id: 'main-street', from: [0, -38] as const, to: [0, 35] as const },
-      { id: 'civic-lane', from: [0, 12] as const, to: [20, 12] as const },
-    ]),
-    /** Authored access anchors in the town-center district's local frame. */
-    anchors: Object.freeze([
-      { id: 'chapter-two-join', position: [-15, 0, 8] as const },
-      { id: 'shop-bakery-walk', position: [8.58, 0, -5] as const },
-      { id: 'shop-bookshop-walk', position: [8.58, 0, 6] as const },
-      { id: 'shop-market-walk', position: [8.58, 0, 17] as const },
-      { id: 'library-walk', position: [-5.4, 0, -5] as const },
-      { id: 'plaza-walk', position: [20, 0, 12] as const },
-    ]),
-  }),
-  shopOffsets: Object.freeze([-11, 0, 11] as const),
-  transitionGardens: Object.freeze([
-    { position: [-8, 0, 11] as const, kind: 'flowering' as const, seed: 2711 },
-    { position: [-8, 0, -5] as const, kind: 'evergreen' as const, seed: 2719 },
-  ]),
-  projects: Object.freeze([
+    roadSegments: [{ id: 'main-street', from: [0, 0] as const, to: [39, 0] as const }],
+    crossings: [4, 38],
+    lampStations: [4, 14, 25, 36],
+    anchors: [
+      { id: 'chapter-two-join', position: [0, 0, 0] as const },
+      ...shopOffsets.map((offset, index) => ({
+        id: ['shop-bakery-walk', 'shop-bookshop-walk', 'shop-market-walk'][index],
+        position: [22 + offset, 0, -4.78] as const,
+      })),
+      { id: 'library-walk', position: [24, 0, 5] as const },
+      { id: 'plaza-walk', position: [40, 0, 0] as const },
+    ],
+  },
+  shopOffsets,
+  transitionGardens: [{ position: [3, 0, -10] as const, kind: 'flowering' as const, seed: 2711 }],
+  projects: [
     {
       id: 'city-main-street',
       nodeId: 'city-main-street',
       role: 'lot',
-      position: [12, 0, 6],
-      rotation: -Math.PI / 2,
-      width: 38,
-      depth: 14,
+      position: [22, 0, -8.2],
+      rotation: 0,
+      width: 34,
+      depth: 12,
       height: 9,
       pedestrianCapacity: 24,
     },
@@ -82,10 +71,10 @@ export const CITY_SITE_PLAN = Object.freeze({
       id: 'city-library',
       nodeId: 'city-library',
       role: 'lot',
-      position: [-10.2, 0, -5],
-      rotation: Math.PI / 2,
-      width: 16,
-      depth: 18,
+      position: [24, 0, 11.2],
+      rotation: Math.PI,
+      width: 18,
+      depth: 20,
       height: 9,
       pedestrianCapacity: 28,
     },
@@ -93,7 +82,7 @@ export const CITY_SITE_PLAN = Object.freeze({
       id: 'city-plaza',
       nodeId: 'city-plaza',
       role: 'public-space',
-      position: [31, 0, 12],
+      position: [51, 0, 0],
       rotation: 0,
       width: 22,
       depth: 18,
@@ -104,53 +93,133 @@ export const CITY_SITE_PLAN = Object.freeze({
       id: 'city-greenway',
       nodeId: 'city-greenway',
       role: 'public-space',
-      position: [31, 0, 31],
+      position: [51, 0, -19],
       rotation: 0,
       width: 20,
       depth: 18,
       height: 7,
       pedestrianCapacity: 32,
     },
-  ] satisfies readonly CityProjectSite[]),
-  pedestrianPaths: Object.freeze([
-    { id: 'shop-bakery-approach', from: [4.8, -5], to: [8.58, -5], width: 1.5 },
-    { id: 'shop-bookshop-approach', from: [4.8, 6], to: [8.58, 6], width: 1.5 },
-    { id: 'shop-market-approach', from: [4.8, 17], to: [8.58, 17], width: 1.5 },
-    { id: 'library-approach', from: [-4.02, -5], to: [-5.4, -5], width: 1.55 },
-    { id: 'greenway-approach', from: [31, 21], to: [31, 22], width: 1.8 },
-  ] satisfies readonly CityPathSegment[]),
+  ] satisfies readonly CityProjectSite[],
+  /** Named land uses bound the commons; canopy locations follow their edges, not random scattering. */
+  greenSpaces: [
+    {
+      id: 'heritage-common',
+      name: 'Heritage commons',
+      center: [22, -23] as const,
+      width: 32,
+      depth: 13,
+    },
+    {
+      id: 'reading-green',
+      name: 'Library reading green',
+      center: [25, 26] as const,
+      width: 34,
+      depth: 12,
+    },
+    {
+      id: 'arrival-green',
+      name: 'Neighborhood threshold',
+      center: [3, -12] as const,
+      width: 8,
+      depth: 13,
+    },
+  ],
+  canopy: [
+    [9, -28],
+    [20, -28],
+    [31, -28],
+    [37, -18],
+    [9, -18],
+    [7, 21],
+    [7, 30],
+    [19, 31],
+    [31, 31],
+    [40, 26],
+    [40, 17],
+    [60, -24],
+    [62, 19],
+  ] as const,
+  pedestrianPaths: [
+    ...shopOffsets.map((offset, index) => ({
+      id: ['shop-bakery', 'shop-bookshop', 'shop-market'][index] + '-approach',
+      from: [22 + offset, -4.02] as const,
+      to: [22 + offset, -4.78] as const,
+      width: 1.55,
+    })),
+    { id: 'library-approach', from: [24, 4.02], to: [24, 5], width: 2.1 },
+    { id: 'square-arrival', from: [38, 0], to: [40, 0], width: 3.0 },
+    { id: 'greenway-approach', from: [51, -9], to: [51, -10], width: 2.4 },
+    { id: 'heritage-west', from: [-11, -33.2], to: [-11, -26.2], width: 1.8 },
+    { id: 'heritage-promenade', from: [-11, -26.2], to: [41, -26.2], width: 1.8 },
+    { id: 'heritage-east', from: [41, -26.2], to: [41, -19], width: 1.8 },
+    { id: 'reading-west', from: [12, 4.02], to: [12, 26], width: 1.8 },
+    { id: 'reading-promenade', from: [12, 26], to: [51, 26], width: 1.8 },
+    { id: 'reading-east', from: [51, 26], to: [51, 9], width: 1.8 },
+  ] satisfies readonly CityPathSegment[],
 });
 
 export interface CityMonorailStation {
   id: 'neighborhood-station' | 'town-station';
   name: string;
   position: readonly [number, number, number];
+  rotation: number;
   width: number;
   depth: number;
   pedestrianCapacity: number;
   entry: readonly [number, number, number];
   trackAnchor: readonly [number, number, number];
 }
-
+const stations: readonly CityMonorailStation[] = [
+  {
+    id: 'neighborhood-station',
+    name: 'Neighborhood Station',
+    position: [-3.5, 0, -39],
+    rotation: Math.PI / 2,
+    width: 16.4,
+    depth: 22,
+    pedestrianCapacity: 16,
+    entry: [-3, 0, 9.65],
+    trackAnchor: [-3.5, 14, -39],
+  },
+  {
+    id: 'town-station',
+    name: 'Town Center Station',
+    position: [82, 0, 5.2],
+    rotation: 0,
+    width: 16.4,
+    depth: 22,
+    pedestrianCapacity: 20,
+    entry: [-3, 0, 9.65],
+    trackAnchor: [82, 14, 5.2],
+  },
+];
+/** Coordinates are local to the monorail district. Used by renderer and graph without a second offset. */
+const stationApproaches: readonly CityPathSegment[] = [
+  { id: 'neighborhood-station-entry', from: [6.15, -36], to: [17, -36], width: 1.8 },
+  { id: 'neighborhood-station-promenade', from: [17, -36], to: [17, -21], width: 1.8 },
+  { id: 'landmark-east-entry', from: [17, -28], to: [14, -28], width: 1.8 },
+  { id: 'town-station-square', from: [71, 5.2], to: [75, 5.2], width: 2.1 },
+  { id: 'town-station-forecourt', from: [75, 5.2], to: [75, 14.85], width: 2.1 },
+  { id: 'town-station-entry', from: [75, 14.85], to: [79, 14.85], width: 2.1 },
+];
 const monorailPoints = [
-  [-76, 8],
-  [-72, 28],
-  [-56, 41],
-  [-30, 46],
-  [0, 46],
-  [30, 46],
-  [58, 46],
-  [84, 43],
-  [84, 20],
-  [84, -8],
-  [78, -28],
-  [55, -40],
-  [28, -45],
-  [-8, -45],
-  [-42, -38],
-  [-68, -18],
+  [-77, 5.2],
+  [-72, 20],
+  [-42, 27],
+  [-12, 31],
+  [8, 32],
+  [33, 41],
+  [64, 36],
+  [82, 26],
+  [82, 5.2],
+  [82, -16],
+  [61, -33],
+  [28, -39],
+  [-3.5, -39],
+  [-32, -39],
+  [-62, -30],
 ] as const;
-
 const route = new T.CatmullRomCurve3(
   monorailPoints.map(([x, z]) => new T.Vector3(x, 14, z)),
   true,
@@ -158,13 +227,78 @@ const route = new T.CatmullRomCurve3(
   0.5,
 );
 const routeLength = route.getLength();
-const supportCount = Math.ceil(routeLength / 10);
-const measuredSupportSpacing = routeLength / supportCount;
+// Station crossheads replace the free piers inside their footprints.
+function nearestRouteProgress(target: T.Vector3): number {
+  let closest = Infinity,
+    progress = 0;
+  for (let sample = 0; sample < 2400; sample++) {
+    const distance = route.getPointAt(sample / 2400).distanceTo(target);
+    if (distance < closest) {
+      closest = distance;
+      progress = sample / 2400;
+    }
+  }
+  return progress;
+}
+function stationTrackProgresses(offset: number): number[] {
+  return stations.flatMap((station) =>
+    [-offset, offset].map((z) =>
+      nearestRouteProgress(
+        new T.Vector3(
+          station.position[0] + z * Math.sin(station.rotation),
+          14,
+          station.position[2] + z * Math.cos(station.rotation),
+        ),
+      ),
+    ),
+  );
+}
+const boundaryProgresses = stationTrackProgresses(12.5);
+const candidateCount = Math.ceil(routeLength / 9);
+const supportProgresses = [
+  ...Array.from({ length: candidateCount }, (_, index) => index / candidateCount).filter(
+    (progress) => {
+      const point = route.getPointAt(progress);
+      const insideStation = stations.some((station) =>
+        insidePlanRect(
+          point.x,
+          point.z,
+          station.position[0],
+          station.position[2],
+          station.width,
+          station.depth,
+          station.rotation,
+          0.5,
+        ),
+      );
+      const nearBoundary = boundaryProgresses.some(
+        (other) =>
+          Math.min(Math.abs(other - progress), 1 - Math.abs(other - progress)) * routeLength < 3,
+      );
+      return !insideStation && !nearBoundary;
+    },
+  ),
+  ...boundaryProgresses,
+].sort((a, b) => a - b);
+const stationHeadProgresses = stationTrackProgresses(5.5);
+const allSupportProgresses = [...supportProgresses, ...stationHeadProgresses].sort((a, b) => a - b);
+const supportCount = supportProgresses.length;
+/** Maximum physical span, including station crossheads and the closing loop span. */
+const measuredSupportSpacing = Math.max(
+  ...allSupportProgresses.map(
+    (progress, index) =>
+      (allSupportProgresses[(index + 1) % allSupportProgresses.length] +
+        (index === allSupportProgresses.length - 1 ? 1 : 0) -
+        progress) *
+      routeLength,
+  ),
+);
+const SUPPORT_OUTSET = 3.1; // Outside the 1.37 m half-width of the suspended coach.
 
-/** The loop frames the existing homes and civic core, with room for later outward growth. */
 export const CITY_MONORAIL_PLAN = Object.freeze({
   origin: MONORAIL_ORIGIN,
-  dimensions: Object.freeze({ width: 200, depth: 120, height: 18 }),
+  terrain: { width: 176, depth: 96, center: [55, -1] as const },
+  dimensions: { width: 182, depth: 100, height: 18 },
   points: monorailPoints,
   closed: true,
   trackY: 14,
@@ -176,29 +310,21 @@ export const CITY_MONORAIL_PLAN = Object.freeze({
   supportCount,
   measuredSupportSpacing,
   trainLapSeconds: 240,
-  stations: Object.freeze([
-    {
-      id: 'neighborhood-station',
-      name: 'Neighborhood Station',
-      position: [-76, 0, 8],
-      width: 20,
-      depth: 18,
-      pedestrianCapacity: 16,
-      entry: [10, 0, -2],
-      trackAnchor: [-76, 14, 8],
-    },
-    {
-      id: 'town-station',
-      name: 'Town Center Station',
-      position: [84, 0, 43],
-      width: 22,
-      depth: 20,
-      pedestrianCapacity: 20,
-      entry: [-9, 0, -8],
-      trackAnchor: [84, 14, 43],
-    },
-  ] satisfies readonly CityMonorailStation[]),
+  stations,
+  approaches: stationApproaches,
 });
+
+/** Local entry transformed exactly once, shared by the plot graph and rendered forecourt. */
+export function stationEntryPoint(station: CityMonorailStation): readonly [number, number, number] {
+  const [x, y, z] = station.entry;
+  const c = Math.cos(station.rotation),
+    s = Math.sin(station.rotation);
+  return [
+    station.position[0] + x * c + z * s,
+    station.position[1] + y,
+    station.position[2] - x * s + z * c,
+  ];
+}
 
 export interface MonorailPose {
   position: T.Vector3;
@@ -218,10 +344,15 @@ export function monorailPoseAt(progress: number): MonorailPose {
   };
 }
 
-export function monorailSupportPoint(index: number): T.Vector3 {
+export function monorailTrackSupportPoint(index: number): T.Vector3 {
   if (!Number.isInteger(index) || index < 0 || index >= supportCount)
     throw new Error('Choose a monorail support index from the authored route.');
-  return route.getPointAt(index / supportCount);
+  return route.getPointAt(supportProgresses[index]);
+}
+export function monorailSupportPoint(index: number): T.Vector3 {
+  const track = monorailTrackSupportPoint(index),
+    tangent = route.getTangentAt(supportProgresses[index]);
+  return track.add(new T.Vector3(-tangent.z, 0, tangent.x).multiplyScalar(SUPPORT_OUTSET));
 }
 
 function localTransform(position: readonly [number, number, number], rotation = 0): PlotTransform {
@@ -272,6 +403,7 @@ function supportPlacementIssues(): string[] {
     centerZ: CITY_MONORAIL_PLAN.origin[2] + station.position[2],
     width: station.width,
     depth: station.depth,
+    rotation: station.rotation,
   }));
   const citySites = CITY_SITE_PLAN.projects.map((site) => ({
     centerX: CITY_SITE_PLAN.origin[0] + site.position[0],
@@ -291,15 +423,12 @@ function supportPlacementIssues(): string[] {
         CITY_SITE_PLAN.origin[2] + segment.to[1],
       ] as const,
     })),
-    ...CITY_SITE_PLAN.streets.connectorPoints.slice(0, -1).map((point, index) => ({
-      start: [CITY_SITE_PLAN.origin[0] + point[0], CITY_SITE_PLAN.origin[2] + point[1]] as const,
-      end: [
-        CITY_SITE_PLAN.origin[0] + CITY_SITE_PLAN.streets.connectorPoints[index + 1][0],
-        CITY_SITE_PLAN.origin[2] + CITY_SITE_PLAN.streets.connectorPoints[index + 1][1],
-      ] as const,
-    })),
   ];
   const pedestrianPaths = [
+    ...CITY_MONORAIL_PLAN.approaches.map((path) => ({
+      start: [MONORAIL_ORIGIN[0] + path.from[0], MONORAIL_ORIGIN[2] + path.from[1]] as const,
+      end: [MONORAIL_ORIGIN[0] + path.to[0], MONORAIL_ORIGIN[2] + path.to[1]] as const,
+    })),
     ...CITY_SITE_PLAN.pedestrianPaths.map((path) => ({
       start: [
         CITY_SITE_PLAN.origin[0] + path.from[0],
@@ -335,7 +464,16 @@ function supportPlacementIssues(): string[] {
     const z = CITY_MONORAIL_PLAN.origin[2] + support.z;
     if (
       stationBounds.some((station) =>
-        insidePlanRect(x, z, station.centerX, station.centerZ, station.width, station.depth, 0, 0),
+        insidePlanRect(
+          x,
+          z,
+          station.centerX,
+          station.centerZ,
+          station.width,
+          station.depth,
+          station.rotation,
+          0,
+        ),
       )
     )
       continue;
@@ -472,13 +610,25 @@ function cityProjectNodes(): PlotNode[] {
       id: 'city-public-paths',
       role: 'public-space',
       parentId: CITY_SITE_PLAN.district.id,
-      dimensions: { width: 88, depth: 90, height: 0.2 },
+      dimensions: { width: 132, depth: 90, height: 0.2 },
       localTransform: { position: [0, 0, 0] },
       occupancy: 'shared',
-      anchors: [],
+      anchors: [
+        { id: 'station-promenade', type: 'access', position: [8, 0, -26.2] },
+        { id: 'greenway-west', type: 'access', position: [41, 0, -19] },
+      ],
     },
   ];
 
+  for (const green of CITY_SITE_PLAN.greenSpaces)
+    nodes.push({
+      id: green.id,
+      role: 'public-space',
+      parentId: CITY_SITE_PLAN.district.id,
+      dimensions: { width: green.width, depth: green.depth, height: 5 },
+      localTransform: { position: [green.center[0], 0, green.center[1]] },
+      occupancy: 'shared',
+    });
   for (const site of CITY_SITE_PLAN.projects) {
     const project: PlotNode = {
       id: site.nodeId,
@@ -498,13 +648,14 @@ function cityProjectNodes(): PlotNode[] {
     if (site.id === 'city-plaza') {
       project.anchors = [
         { id: 'west-entry', type: 'access', position: [-11, 0, 0], requiresConnection: true },
-        { id: 'north-entry', type: 'access', position: [0, 0, 9], requiresConnection: true },
+        { id: 'north-entry', type: 'access', position: [0, 0, -9], requiresConnection: true },
+        { id: 'east-entry', type: 'access', position: [11, 0, 0], requiresConnection: true },
       ];
     }
     if (site.id === 'city-greenway') {
       project.anchors = [
-        { id: 'south-entry', type: 'access', position: [0, 0, -9], requiresConnection: true },
-        { id: 'station-approach', type: 'access', position: [10, 0, 8], requiresConnection: true },
+        { id: 'south-entry', type: 'access', position: [0, 0, 9], requiresConnection: true },
+        { id: 'station-approach', type: 'access', position: [-10, 0, 0], requiresConnection: true },
       ];
     }
     nodes.push(project);
@@ -515,10 +666,10 @@ function cityProjectNodes(): PlotNode[] {
           id: `city-shop-${index + 1}`,
           role: 'structure',
           parentId: site.id,
-          dimensions: { width: 10, depth: 12, height: 8 },
+          dimensions: { width: 10, depth: 8, height: 8 },
           localTransform: { position: [offset, 0, 0] },
           occupancy: 'exclusive',
-          footprint: { width: 10, depth: 12 },
+          footprint: { width: 10, depth: 8 },
           pedestrianCapacity: 8,
           anchors: [
             { id: 'front-entry', type: 'access', position: [0, 0, 3.42], requiresConnection: true },
@@ -530,13 +681,13 @@ function cityProjectNodes(): PlotNode[] {
         id: 'city-library-building',
         role: 'structure',
         parentId: site.id,
-        dimensions: { width: 10, depth: 10, height: 8.5 },
+        dimensions: { width: 13.2, depth: 14, height: 8.5 },
         localTransform: { position: [0, 0, 0] },
         occupancy: 'exclusive',
-        footprint: { width: 10, depth: 10 },
+        footprint: { width: 13.2, depth: 14 },
         pedestrianCapacity: site.pedestrianCapacity,
         anchors: [
-          { id: 'front-entry', type: 'access', position: [0, 0, 4.8], requiresConnection: true },
+          { id: 'front-entry', type: 'access', position: [0, 0, 6.2], requiresConnection: true },
         ],
       });
     }
@@ -573,7 +724,7 @@ function monorailNodes(): PlotNode[] {
     role: 'lot' as const,
     parentId: 'monorail',
     dimensions: { width: station.width, depth: station.depth, height: 16 },
-    localTransform: { position: station.position },
+    localTransform: localTransform(station.position, station.rotation),
     occupancy: 'exclusive' as const,
     footprint: { width: station.width, depth: station.depth },
     pedestrianCapacity: station.pedestrianCapacity,
@@ -592,13 +743,9 @@ function monorailNodes(): PlotNode[] {
       },
     ],
   }));
-  const approach = (station: CityMonorailStation) => {
-    const [sx, sy, sz] = station.position;
-    const [ex, ey, ez] = station.entry;
-    return [sx + ex, sy + ey, sz + ez] as const;
-  };
-  const stationOneEntry = approach(CITY_MONORAIL_PLAN.stations[0]);
-  const stationTwoEntry = approach(CITY_MONORAIL_PLAN.stations[1]);
+  const stationOneEntry = stationEntryPoint(CITY_MONORAIL_PLAN.stations[0]);
+  const stationTwoEntry = stationEntryPoint(CITY_MONORAIL_PLAN.stations[1]);
+
   return [
     {
       id: 'monorail-district',
@@ -639,11 +786,11 @@ function monorailNodes(): PlotNode[] {
         {
           id: 'neighborhood-sidewalk',
           type: 'access',
-          position: [-64, 0, 10.02],
+          position: [17, 0, -21],
           requiresConnection: true,
         },
         { id: 'town-entry', type: 'access', position: stationTwoEntry, requiresConnection: true },
-        { id: 'greenway-entry', type: 'access', position: [72, 0, 37], requiresConnection: true },
+        { id: 'greenway-entry', type: 'access', position: [71, 0, 5.2], requiresConnection: true },
       ],
     },
   ];
@@ -689,6 +836,7 @@ export function cityPlotDefinition(base?: PlotDefinition): PlotDefinition {
     ),
     access('city-plaza', 'west-entry', CITY_SITE_PLAN.streets.nodeId, 'plaza-walk', 0.25),
     access('city-plaza', 'north-entry', 'city-greenway', 'south-entry', 1.1),
+    access('city-greenway', 'station-approach', 'city-public-paths', 'greenway-west', 0.1),
     access(
       'neighborhood-station',
       'ground-entry',
@@ -699,12 +847,12 @@ export function cityPlotDefinition(base?: PlotDefinition): PlotDefinition {
     access(
       'monorail-ground-links',
       'neighborhood-sidewalk',
-      'ch2-sidewalk-north',
-      'monorail-neighborhood-access',
+      'city-public-paths',
+      'station-promenade',
       0.1,
     ),
     access('town-station', 'ground-entry', 'monorail-ground-links', 'town-entry', 0.1),
-    access('monorail-ground-links', 'greenway-entry', 'city-greenway', 'station-approach', 6),
+    access('monorail-ground-links', 'greenway-entry', 'city-plaza', 'east-entry', 0.1),
     access(
       'neighborhood-station',
       'platform-track',
@@ -721,6 +869,37 @@ export function cityPlotDefinition(base?: PlotDefinition): PlotDefinition {
 /** Structural clearance checks for authored rail height, station alignment and support intervals. */
 export function validateCityClearances(): string[] {
   const issues = supportPlacementIssues();
+  // Shared road occupancy must still clear the actual structural envelopes.
+  const definition = cityPlotDefinition();
+  for (const node of definition.nodes.filter(
+    (node) => node.role === 'structure' && node.id.startsWith('city-'),
+  )) {
+    const center = resolvePlotPoint(definition, node.id, [0, 0, 0]);
+    const parent = CITY_SITE_PLAN.projects.find((site) => site.id === node.parentId)!;
+    for (const road of CITY_SITE_PLAN.streets.roadSegments) {
+      const length = Math.hypot(road.to[0] - road.from[0], road.to[1] - road.from[1]);
+      for (let sample = 0; sample <= Math.ceil(length * 2); sample++) {
+        const t = sample / Math.ceil(length * 2);
+        const x = CITY_ORIGIN[0] + road.from[0] + (road.to[0] - road.from[0]) * t;
+        const z = CITY_ORIGIN[2] + road.from[1] + (road.to[1] - road.from[1]) * t;
+        if (
+          insidePlanRect(
+            x,
+            z,
+            center.x,
+            center.z,
+            node.dimensions.width,
+            node.dimensions.depth,
+            parent.rotation,
+            CITY_SITE_PLAN.streets.roadWidth / 2,
+          )
+        ) {
+          issues.push(road.id + ' enters ' + node.id);
+          break;
+        }
+      }
+    }
+  }
   if (
     CITY_MONORAIL_PLAN.minimumTrackY - CITY_MONORAIL_PLAN.maximumStructureY <
     CITY_MONORAIL_PLAN.minimumStructureClearance
@@ -733,10 +912,121 @@ export function validateCityClearances(): string[] {
   for (const station of CITY_MONORAIL_PLAN.stations) {
     const platform = new T.Vector3(...station.trackAnchor);
     let closest = Number.POSITIVE_INFINITY;
+    let closestProgress = 0;
     for (let index = 0; index <= 500; index++) {
-      closest = Math.min(closest, route.getPointAt(index / 500).distanceTo(platform));
+      const distance = route.getPointAt(index / 500).distanceTo(platform);
+      if (distance < closest) {
+        closest = distance;
+        closestProgress = index / 500;
+      }
     }
-    if (closest > 9) issues.push(`${station.id} is too far from the monorail guideway.`);
+    const axis = new T.Vector3(Math.sin(station.rotation), 0, Math.cos(station.rotation));
+    if (Math.abs(axis.dot(route.getTangentAt(closestProgress))) < 0.99)
+      issues.push(station.id + ' platform is not aligned with the track tangent.');
+    if (closest > 0.8) issues.push(`${station.id} is too far from the monorail guideway.`);
   }
+  return issues;
+}
+
+/** Authored walking centerlines in world coordinates, including paved square interiors. */
+export function cityPedestrianSegments(): CityPathSegment[] {
+  const local: CityPathSegment[] = [
+    ...CITY_SITE_PLAN.pedestrianPaths,
+    ...[-1, 1].map((side) => ({
+      id: 'sidewalk-' + side,
+      from: [0, side * 4.02] as const,
+      to: [39, side * 4.02] as const,
+      width: 1.55,
+    })),
+    ...CITY_SITE_PLAN.streets.crossings.map((x) => ({
+      id: 'crossing-' + x,
+      from: [x, -4.02] as const,
+      to: [x, 4.02] as const,
+      width: 1.8,
+    })),
+    { id: 'square-interior', from: [40, 0], to: [62, 0], width: 3 },
+    { id: 'square-north-south', from: [51, -9], to: [51, 9], width: 3 },
+    { id: 'greenway-interior', from: [51, -28], to: [51, -10], width: 2.4 },
+    { id: 'greenway-crosswalk', from: [41, -19], to: [61, -19], width: 2.4 },
+  ];
+  const world = (
+    path: CityPathSegment,
+    origin: readonly [number, number, number],
+  ): CityPathSegment => ({
+    ...path,
+    from: [path.from[0] + origin[0], path.from[1] + origin[2]],
+    to: [path.to[0] + origin[0], path.to[1] + origin[2]],
+  });
+  return [
+    ...local.map((path) => world(path, CITY_ORIGIN)),
+    ...CITY_MONORAIL_PLAN.approaches.map((path) => world(path, MONORAIL_ORIGIN)),
+    { id: 'existing-park-promenade', from: [37, -28], to: [54, -28], width: 1.4 },
+  ];
+}
+
+/** Checks real ground-entry reachability, rather than accepting a pair of matching floating anchors. */
+export function validateCityPedestrianNetwork(
+  paths: readonly CityPathSegment[] = cityPedestrianSegments(),
+): string[] {
+  const issues: string[] = [];
+  const connected = new Set<number>();
+  const root = paths.findIndex((path) => path.id === 'sidewalk--1');
+  if (root < 0) return ['Missing residential sidewalk connection.'];
+  connected.add(root);
+  const touches = (a: CityPathSegment, b: CityPathSegment) => {
+    const ax = a.to[0] - a.from[0],
+      az = a.to[1] - a.from[1],
+      bx = b.to[0] - b.from[0],
+      bz = b.to[1] - b.from[1];
+    const cross = ax * bz - az * bx;
+    if (Math.abs(cross) > 1e-8) {
+      const dx = b.from[0] - a.from[0],
+        dz = b.from[1] - a.from[1];
+      const t = (dx * bz - dz * bx) / cross,
+        u = (dx * az - dz * ax) / cross;
+      if (t >= 0 && t <= 1 && u >= 0 && u <= 1) return true;
+    }
+    return (
+      [a.from, a.to].some(
+        (p) => pointToSegmentDistance(p[0], p[1], b.from, b.to) <= (a.width + b.width) / 2 + 0.05,
+      ) ||
+      [b.from, b.to].some(
+        (p) => pointToSegmentDistance(p[0], p[1], a.from, a.to) <= (a.width + b.width) / 2 + 0.05,
+      )
+    );
+  };
+  let changed = true;
+  while (changed) {
+    changed = false;
+    paths.forEach((path, index) => {
+      if (!connected.has(index) && [...connected].some((other) => touches(path, paths[other]))) {
+        connected.add(index);
+        changed = true;
+      }
+    });
+  }
+  const definition = cityPlotDefinition();
+  for (const node of definition.nodes.filter(
+    (node) =>
+      node.id.startsWith('city-') ||
+      node.id === 'town-station' ||
+      node.id === 'neighborhood-station',
+  )) {
+    for (const anchor of node.anchors ?? []) {
+      if (!anchor.requiresConnection || anchor.position[1] !== 0) continue;
+      const point = resolvePlotPoint(definition, node.id, anchor.position);
+      if (
+        !paths.some(
+          (path, index) =>
+            connected.has(index) &&
+            pointToSegmentDistance(point.x, point.z, path.from, path.to) <= path.width / 2 + 0.1,
+        )
+      )
+        issues.push(node.id + '/' + anchor.id + ' has no connected paved approach.');
+    }
+  }
+  for (const [index, path] of paths.entries())
+    if (!connected.has(index))
+      issues.push(path.id + ' is disconnected from the residential sidewalk.');
   return issues;
 }

@@ -1,0 +1,837 @@
+{
+  "source": "http://127.0.0.1:4200/foundations/",
+  "sourceCommit": "42659f33b1572afe299aa1d1a6063b8ecd66c547",
+  "workingTreeDirty": false,
+  "capturedAt": "2026-10-19T03:42:01.962Z",
+  "environment": "Production Angular bundle in headless Chromium. Desktop static views respect reduced motion; mobile views enable ambient motion. No physical-device or Safari testing.",
+  "procedure": "Optional manual visual evidence, not an E2E test or CI/deployment gate. Fixed world cameras except station-local targets.",
+  "errors": [],
+  "warnings": [
+    "1600x1000: [.WebGL-0x2d540042b600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "1600x1000: [.WebGL-0x2d540042b600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "1600x1000: [.WebGL-0x2d540042b600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "1600x1000: [.WebGL-0x2d540042b600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+  ],
+  "observations": {
+    "desktopCamera": {
+      "mousePan": true,
+      "wheelZoom": true,
+      "rotate": true
+    },
+    "skipAvailable": true,
+    "skipClicked": true,
+    "reducedMotionCompleted": true,
+    "portrait": {
+      "touchPan": true,
+      "pinchZoom": true,
+      "homeReset": true
+    },
+    "landscape": {
+      "touchPan": true,
+      "pinchZoom": true,
+      "homeReset": true
+    },
+    "trainMoves": true
+  },
+  "captures": [
+    {
+      "name": "city-normal",
+      "file": "docs/evidence/urban-cohesion/after/city-normal.jpg",
+      "note": "Chapter 3 only, fixed comparison camera, afternoon, reduced motion.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 877,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": false
+        }
+      ],
+      "trainWorldPosition": null,
+      "drawCalls": 877,
+      "triangles": 931123,
+      "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "residential-transition",
+      "file": "docs/evidence/urban-cohesion/after/residential-transition.jpg",
+      "note": "Chapter 3 only, fixed comparison camera, afternoon, reduced motion.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 877,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": false
+        }
+      ],
+      "trainWorldPosition": null,
+      "drawCalls": 409,
+      "triangles": 596471,
+      "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "main-street-gameplay",
+      "file": "docs/evidence/urban-cohesion/after/main-street-gameplay.jpg",
+      "note": "Chapter 3 only, fixed comparison camera, afternoon, reduced motion.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 877,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": false
+        }
+      ],
+      "trainWorldPosition": null,
+      "drawCalls": 305,
+      "triangles": 512485,
+      "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "civic-greenway",
+      "file": "docs/evidence/urban-cohesion/after/civic-greenway.jpg",
+      "note": "Chapter 3 only, fixed comparison camera, afternoon, reduced motion.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 877,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": false
+        }
+      ],
+      "trainWorldPosition": null,
+      "drawCalls": 238,
+      "triangles": 452777,
+      "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "city-overhead",
+      "file": "docs/evidence/urban-cohesion/after/city-overhead.jpg",
+      "note": "Chapter 3 only, fixed overhead, afternoon.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 877,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": false
+        }
+      ],
+      "trainWorldPosition": null,
+      "drawCalls": 877,
+      "triangles": 931123,
+      "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "main-street-night",
+      "file": "docs/evidence/urban-cohesion/after/main-street-night.jpg",
+      "note": "Same Main Street camera at night.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 877,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": false
+        }
+      ],
+      "trainWorldPosition": null,
+      "drawCalls": 305,
+      "triangles": 512485,
+      "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "neighborhood-station",
+      "file": "docs/evidence/urban-cohesion/after/neighborhood-station.jpg",
+      "note": "Station-local comparison camera, same angle and zoom, afternoon.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 936,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": true
+        }
+      ],
+      "trainWorldPosition": {
+        "x": 8.009669318118021,
+        "y": 14,
+        "z": 26.664566134980515
+      },
+      "drawCalls": 182,
+      "triangles": 343178,
+      "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "town-station",
+      "file": "docs/evidence/urban-cohesion/after/town-station.jpg",
+      "note": "Station-local comparison camera, same angle and zoom, afternoon.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 936,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": true
+        }
+      ],
+      "trainWorldPosition": {
+        "x": 8.009669318118021,
+        "y": 14,
+        "z": 26.664566134980515
+      },
+      "drawCalls": 97,
+      "triangles": 194026,
+      "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "full-rail-loop",
+      "file": "docs/evidence/urban-cohesion/after/full-rail-loop.jpg",
+      "note": "Chapter 4 complete, fixed overhead, afternoon.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 936,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": true
+        }
+      ],
+      "trainWorldPosition": {
+        "x": 8.009669318118021,
+        "y": 14,
+        "z": 26.664566134980515
+      },
+      "drawCalls": 936,
+      "triangles": 938651,
+      "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "rail-city-normal",
+      "file": "docs/evidence/urban-cohesion/after/rail-city-normal.jpg",
+      "note": "Chapter 4 complete, fixed normal camera, afternoon.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 936,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": true
+        }
+      ],
+      "trainWorldPosition": {
+        "x": 8.009669318118021,
+        "y": 14,
+        "z": 26.664566134980515
+      },
+      "drawCalls": 936,
+      "triangles": 938651,
+      "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "assembly-mid",
+      "file": "docs/evidence/urban-cohesion/after/assembly-mid.jpg",
+      "note": "Main Street at slow assembly speed before skip.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 877,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": false
+        }
+      ],
+      "trainWorldPosition": null,
+      "drawCalls": 360,
+      "triangles": 528429,
+      "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "assembly-skipped",
+      "file": "docs/evidence/urban-cohesion/after/assembly-skipped.jpg",
+      "note": "Completed Main Street after Skip.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 877,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": false
+        }
+      ],
+      "trainWorldPosition": null,
+      "drawCalls": 360,
+      "triangles": 528429,
+      "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "assembly-complete",
+      "file": "docs/evidence/urban-cohesion/after/assembly-complete.jpg",
+      "note": "Main Street after normal-speed assembly.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 877,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": false
+        }
+      ],
+      "trainWorldPosition": null,
+      "drawCalls": 360,
+      "triangles": 528429,
+      "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "assembly-reduced-motion",
+      "file": "docs/evidence/urban-cohesion/after/assembly-reduced-motion.jpg",
+      "note": "Completed Main Street with reduced motion.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 877,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": false
+        }
+      ],
+      "trainWorldPosition": null,
+      "drawCalls": 360,
+      "triangles": 528429,
+      "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "chapter-transition",
+      "file": "docs/evidence/urban-cohesion/after/chapter-transition.jpg",
+      "note": "Existing chapter welcome over the recomposed town.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "documentWidth": 1600,
+      "documentHeight": 1000,
+      "canvasRendered": true,
+      "sceneMeshes": 781,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": false
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": false
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": false
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": false
+        }
+      ],
+      "trainWorldPosition": null,
+      "drawCalls": 808,
+      "triangles": 923550,
+      "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "webglError": 0,
+      "contextLost": false
+    },
+    {
+      "name": "mobile-portrait",
+      "file": "docs/evidence/urban-cohesion/after/mobile-portrait.jpg",
+      "note": "Fixed gameplay comparison camera; emulated mobile viewport, afternoon, ambient motion enabled.",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "documentHeight": 844,
+      "canvasRendered": true,
+      "sceneMeshes": 877,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": false
+        }
+      ],
+      "trainWorldPosition": null,
+      "drawCalls": 330,
+      "triangles": 499405,
+      "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "webglError": 0,
+      "contextLost": false,
+      "framePacing": {
+        "elapsedMs": 1685,
+        "frames": 8,
+        "approximateFps": 5,
+        "medianFrameMs": 216.59999999999854,
+        "p95FrameMs": 216.70000000000073
+      }
+    },
+    {
+      "name": "mobile-landscape",
+      "file": "docs/evidence/urban-cohesion/after/mobile-landscape.jpg",
+      "note": "Fixed gameplay comparison camera; emulated mobile viewport, afternoon, ambient motion enabled.",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "documentWidth": 844,
+      "documentHeight": 390,
+      "canvasRendered": true,
+      "sceneMeshes": 936,
+      "cityAssets": [
+        {
+          "name": "town-center-infrastructure",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-main-street",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-library",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-plaza",
+          "present": true
+        },
+        {
+          "name": "project-asset:city-greenway",
+          "present": true
+        },
+        {
+          "name": "project-asset:monorail",
+          "present": true
+        }
+      ],
+      "trainWorldPosition": {
+        "x": 24.999277853980637,
+        "y": 14,
+        "z": 29.32700706784311
+      },
+      "drawCalls": 647,
+      "triangles": 826240,
+      "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "webglError": 0,
+      "contextLost": false,
+      "framePacing": {
+        "elapsedMs": 1678,
+        "frames": 4,
+        "approximateFps": 2,
+        "medianFrameMs": 416.7000000000007,
+        "p95FrameMs": 416.7000000000007
+      }
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import * as T from 'three';
 import { TownScene } from './scene';
+import { monorailPoseAt } from './city-site-plan';
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -19,7 +20,11 @@ function sceneWithAmbientAssets() {
   Object.assign(scene, {
     world: {
       assets: { animatedWater: [water], foliageTimeUniforms: [foliageTime] },
-      movingMonorail: { root: train, trainCount: 2 },
+      movingMonorail: {
+        root: train,
+        trainCount: 2,
+        update: (progress: number) => train.position.copy(monorailPoseAt(progress).position),
+      },
     },
     active: true,
     frameRequest: 0,
