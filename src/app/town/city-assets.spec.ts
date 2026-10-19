@@ -55,3 +55,26 @@ describe('Town Center storefront architecture', () => {
     world.assets.dispose();
   });
 });
+
+describe('Town Center library architecture', () => {
+  it('closes the gable elevations with matching siding and an attic window', () => {
+    const world = buildWorld({
+      home: 'sage',
+      'ch2-neighborhood': 'reveal',
+      'city-library': 'garden-library',
+    });
+    const library = world.projectAssets.get('city-library')!.root;
+    const walls = library.getObjectByName('library-walls')!;
+    const wallBounds = new T.Box3().setFromObject(walls);
+    expect(wallBounds.max.y).toBeGreaterThan(7);
+    const roof = library.getObjectByName('library-roof')!;
+    const texturedRoof = [...roof.children].find(
+      (object) =>
+        object instanceof T.Mesh &&
+        !Array.isArray(object.material) &&
+        object.material.map !== null,
+    );
+    expect(texturedRoof).toBeDefined();
+    world.assets.dispose();
+  });
+});

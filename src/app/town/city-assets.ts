@@ -313,7 +313,13 @@ function buildLibrary(set: PieceSet, choice: string) {
     choice === 'brick-library' ? '#9f6954' : choice === 'timber-library' ? '#a58661' : '#c8c5ad';
   const trim = choice === 'garden-library' ? '#e6dfce' : '#e2d7c1';
   a.box(foundation, surface(a, 'stone', '#928d7f'), 0, 0.32, 0, 12.4, 0.64, 10.4);
-  a.box(walls, wallColor, 0, 2.75, 0, 11.8, 4.2, 9.8);
+  const wallFinish =
+    choice === 'brick-library' ? 'brick' : choice === 'timber-library' ? 'wood' : 'siding';
+  const wall = surface(a, wallFinish, wallColor);
+  a.box(walls, wall, 0, 2.75, 0, 11.8, 4.2, 9.8);
+  gablePanel(a, walls, 11.8, 2.35, 4.72, 4.98, wall);
+  gablePanel(a, walls, 11.8, 2.35, 4.72, -4.98, wall, true);
+  namedWindow(a, walls, 'library-gable-window', 0, 5.68, 5.02, 0.82, 0.72);
   a.box(walls, trim, 0, 0.76, 4.96, 11.8, 0.14, 0.18);
   a.box(walls, '#e4ddcd', 0, 4.85, 4.95, 12, 0.16, 0.18);
   for (const x of [-4.25, -1.55, 1.55, 4.25]) a.window(walls, x, 2.62, 4.97, 1.65, 2.05);
@@ -321,7 +327,7 @@ function buildLibrary(set: PieceSet, choice: string) {
   a.box(walls, a.glass(), 0, 2.0, 5.18, 0.87, 1.8, 0.035);
   for (const x of [-2.5, 2.5]) a.box(walls, '#eee7d9', x, 1.55, 6.1, 0.18, 3.0, 0.18);
   a.box(walls, '#d9ceb8', 0, 3.45, 5.45, 6.0, 0.2, 2.15);
-  a.roof(roof, 13.1, 10.7, 2.35, 4.72, '#565e59');
+  a.roof(roof, 13.1, 10.7, 2.35, 4.72, surface(a, 'shingles', '#565e59'));
   a.box(roof, '#d0c4aa', 0, 4.8, -4.9, 11.8, 0.13, 0.15);
   for (const x of [-1.1, 1.1]) {
     a.box(roof, '#776b56', x, 5.45, 5.2, 0.18, 0.82, 0.18);
