@@ -145,13 +145,22 @@ describe('walkable urban composition', () => {
         true,
       );
       expect(hits[0]?.point.y).toBeCloseTo(10.525, 2);
-      const headroom = new T.Vector3(2.7, 2.5, 1.4)
-        .applyAxisAngle(new T.Vector3(0, 1, 0), station.rotation)
-        .add(new T.Vector3(...station.position))
-        .add(new T.Vector3(...CITY_MONORAIL_PLAN.origin));
-      expect(
-        new T.Raycaster(headroom, new T.Vector3(0, 1, 0), 0, 2).intersectObject(stations, true),
-      ).toHaveLength(0);
+      for (let flight = 0; flight < 4; flight++)
+        for (let step = 1; step < 11; step++) {
+          const reverse = flight % 2 === 1;
+          const headroom = new T.Vector3(
+            reverse ? 6.5 : 5,
+            flight * 2.625 + ((step + 0.5) * 2.625) / 12 + 0.15,
+            reverse ? 0.4 + step * 0.5 : 6.4 - step * 0.5,
+          )
+            .applyAxisAngle(new T.Vector3(0, 1, 0), station.rotation)
+            .add(new T.Vector3(...station.position))
+            .add(new T.Vector3(...CITY_MONORAIL_PLAN.origin));
+          expect(
+            new T.Raycaster(headroom, new T.Vector3(0, 1, 0), 0, 2).intersectObject(stations, true),
+            `${station.id} flight ${flight} step ${step}`,
+          ).toHaveLength(0);
+        }
     }
     world.assets.dispose();
   });

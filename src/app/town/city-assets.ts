@@ -715,7 +715,7 @@ function station(set: PieceSet, parent: T.Group, stationId: string, choice: stri
       a.box(
         group,
         '#b8aa91',
-        reverse ? 4.25 : 2.7,
+        reverse ? 6.5 : 5,
         flight * flightRise + ((step + 0.5) * flightRise) / 12,
         z,
         1.2,
@@ -723,16 +723,18 @@ function station(set: PieceSet, parent: T.Group, stationId: string, choice: stri
         0.5,
       );
     }
-    a.box(group, wall, 3.475, (flight + 1) * flightRise, reverse ? 6.9 : 0.4, 2.95, 0.2, 1);
+    a.box(group, wall, 5.75, (flight + 1) * flightRise, reverse ? 6.9 : 0.4, 3.1, 0.2, 1);
   }
-  a.box(group, surface(a, 'paving', '#bdb7a4'), 0, 0.2, 10, 8.5, 0.15, 2);
-  a.box(group, surface(a, 'paving', '#bdb7a4'), 3, 0.2, 8, 1.8, 0.15, 3.2);
+  a.box(group, surface(a, 'paving', '#bdb7a4'), 1.5, 0.2, 10, 12, 0.15, 2);
+  a.box(group, surface(a, 'paving', '#bdb7a4'), 5, 0.2, 8, 1.8, 0.15, 3.2);
   for (const z of [-5.5, 5.5]) {
-    for (const x of [-5.5, 5.5]) a.box(group, wall, x, 6.79, z, 0.45, 13.58, 0.45);
-    a.box(group, wall, 0, 13.58, z, 12.2, 0.55, 1.15);
+    for (const x of [-5.5, 7.5]) a.box(group, wall, x, 6.79, z, 0.45, 13.58, 0.45);
+    a.box(group, wall, 1, 13.58, z, 14.2, 0.55, 1.15);
   }
   for (const z of [-6.4, 6.4]) a.box(group, timber, 0, 15.15, z, 9.6, 0.18, 0.22);
-  for (const side of [-1, 1]) a.box(group, metal, side * 4.15, 11.25, 0, 0.08, 0.08, 16);
+  a.box(group, metal, -4.15, 11.25, 0, 0.08, 0.08, 16);
+  // Leave the stair landing entrance open in the platform guardrail.
+  a.box(group, metal, 4.15, 11.25, -1, 0.08, 0.08, 14);
 }
 
 function trainCoach(a: AssetLibrary, parent: T.Group, body: string, trim: string) {
