@@ -30,6 +30,11 @@ function foliage(a: AssetLibrary, sprays = 23) {
     return geometry;
   });
 }
+
+/** The same organic leaf language with fewer sprays for repeated civic-edge trees. */
+export function civicFoliage(a: AssetLibrary) {
+  return foliage(a, 9);
+}
 function branch(a: AssetLibrary, p: T.Object3D, from: T.Vector3, to: T.Vector3, radius: number) {
   const delta = to.clone().sub(from),
     center = from.clone().add(to).multiplyScalar(0.5);

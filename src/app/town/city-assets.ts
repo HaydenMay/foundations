@@ -5,12 +5,13 @@ import { batchStatic } from './batching';
 import type { AssemblyPieceRecipe, AssemblyRecipe } from './assembly';
 import type { AssetLibrary } from './assets';
 import type { MilestoneAsset } from './milestone-assets';
-import { gardenBed, plantTree, shrub } from './landscaping';
+import { civicFoliage, gardenBed, plantTree, shrub } from './landscaping';
 import {
   CITY_MONORAIL_PLAN,
   CITY_SITE_PLAN,
   monorailPoseAt,
   monorailSupportPoint,
+  monorailTrackSupportPoint,
   type CityPathSegment,
   type CityProjectId,
 } from './city-site-plan';
@@ -176,8 +177,8 @@ function storefront(a: AssetLibrary, parent: T.Group, x: number, id: StorefrontI
   a.box(g, wall, 0, 2.25, 0, 8.9, 3.7, 6.35);
   a.box(g, trim, 0, 0.56, 3.18, 9.0, 0.16, 0.16);
   for (const side of [-1, 1]) {
-    a.box(g, trim, side * 4.37, 2.22, 0, 0.15, 3.45, 6.42);
-    a.box(g, trim, side * 4.37, 0.72, 0, 0.18, 0.18, 6.5);
+    a.box(g, trim, side * 3.07, 2.22, 0, 0.15, 3.45, 6.42);
+    a.box(g, trim, side * 3.07, 0.72, 0, 0.18, 0.18, 6.5);
   }
   const roof = a.group(g);
   roof.name = 'roof-shell';
@@ -297,9 +298,9 @@ function buildMainStreet(set: PieceSet, choice: string) {
     choice === 'market-row',
   );
   // Shared beds and lamps sit between doorways instead of breaking the walks to the street.
-  for (const [index, x] of [-5.5, 5.5].entries()) {
-    gardenBed(set.a, beds, x, 4.8, 2.8, 0.82, 2001 + index);
-    set.a.lantern(beds, x, 2.6, 6.7, true, false);
+  for (const [index, x] of [-5.1, 5.1].entries()) {
+    gardenBed(set.a, beds, x, 4.1, 2.0, 0.55, 2001 + index);
+    set.a.lantern(beds, x, 2.1, 4.1, true, false);
   }
 }
 
@@ -323,6 +324,11 @@ function buildLibrary(set: PieceSet, choice: string) {
   a.box(walls, trim, 0, 0.76, 4.96, 11.8, 0.14, 0.18);
   a.box(walls, '#e4ddcd', 0, 4.85, 4.95, 12, 0.16, 0.18);
   for (const x of [-4.25, -1.55, 1.55, 4.25]) a.window(walls, x, 2.62, 4.97, 1.65, 2.05);
+  for (const x of [-4.25, 0, 4.25]) a.window(walls, x, 2.62, -4.97, 1.65, 2.05, Math.PI);
+  for (const side of [-1, 1])
+    for (const z of [-2.6, 2.6])
+      a.window(walls, side * 5.97, 2.62, z, 1.5, 1.85, (side * Math.PI) / 2);
+  namedWindow(a, walls, 'library-rear-gable-window', 0, 5.68, -5.43, 0.82, 0.72, Math.PI);
   a.box(walls, '#5c564b', 0, 1.75, 5.03, 1.36, 3.25, 0.22);
   a.box(walls, a.glass(), 0, 2.0, 5.18, 0.87, 1.8, 0.035);
   for (const x of [-2.5, 2.5]) a.box(walls, '#eee7d9', x, 1.55, 6.1, 0.18, 3.0, 0.18);
@@ -424,7 +430,8 @@ function buildGreenway(set: PieceSet, choice: string) {
   const beds = part(set, 'greenway-garden-beds');
   const a = set.a;
   a.box(path, surface(a, 'grass', '#78875e'), 0, 0.08, 0, 20, 0.1, 18);
-  a.box(path, surface(a, 'paving', '#beb8a6'), 0, 0.16, 0, 2.4, 0.1, 17.2);
+  a.box(path, surface(a, 'paving', '#beb8a6'), 0, 0.16, 0, 2.4, 0.1, 18.2);
+  a.box(path, surface(a, 'paving', '#beb8a6'), 0, 0.16, 0, 20, 0.1, 2.4);
   for (let z = -7; z <= 7; z += 2.4) a.box(path, '#d0cab8', 0, 0.23, z, 2.1, 0.035, 0.08);
   const types =
     choice === 'oak-grove'
@@ -503,88 +510,53 @@ export function buildCityProject(
   return finish(set, focus, 3300);
 }
 
-function roadRibbonGeometry(points: readonly (readonly [number, number])[], width: number) {
-  const curve = new T.CatmullRomCurve3(
-    points.map(([x, z]) => new T.Vector3(x, 0, z)),
-    false,
-    'centripetal',
-    0.5,
-  );
-  const vertices: number[] = [];
-  const indices: number[] = [];
-  const segments = 110;
-  for (let index = 0; index <= segments; index++) {
-    const point = curve.getPointAt(index / segments);
-    const tangent = curve.getTangentAt(index / segments);
-    const nx = tangent.z;
-    const nz = -tangent.x;
-    vertices.push(point.x - (nx * width) / 2, point.y, point.z - (nz * width) / 2);
-    vertices.push(point.x + (nx * width) / 2, point.y, point.z + (nz * width) / 2);
-    if (index < segments) {
-      const start = index * 2;
-      indices.push(start, start + 1, start + 2, start + 1, start + 3, start + 2);
-    }
-  }
-  const geometry = new T.BufferGeometry();
-  geometry.setAttribute('position', new T.Float32BufferAttribute(vertices, 3));
-  geometry.setIndex(indices);
-  geometry.computeVertexNormals();
-  return geometry;
-}
-
-function pathRibbon(
-  a: AssetLibrary,
-  parent: T.Group,
-  segment: CityPathSegment,
-  originX = 0,
-  originZ = 0,
-) {
-  const [x1, z1] = segment.from;
-  const [x2, z2] = segment.to;
-  const dx = x2 - x1;
-  const dz = z2 - z1;
-  const length = Math.hypot(dx, dz);
-  const geometry = new T.BoxGeometry(length, 0.12, segment.width);
-  const mesh = a.mesh(
+/** Shared paving uses the asset library's owned cube and material, with one local transform. */
+function pathRibbon(a: AssetLibrary, parent: T.Group, segment: CityPathSegment) {
+  const [x1, z1] = segment.from,
+    [x2, z2] = segment.to;
+  const mesh = a.box(
     parent,
-    geometry,
     surface(a, 'paving', '#bdb7a4'),
-    originX + (x1 + x2) / 2,
-    0.14,
-    originZ + (z1 + z2) / 2,
+    (x1 + x2) / 2,
+    0.24,
+    (z1 + z2) / 2,
+    Math.hypot(x2 - x1, z2 - z1),
+    0.12,
+    segment.width,
   );
-  mesh.rotation.y = Math.atan2(-dz, dx);
+  mesh.rotation.y = Math.atan2(-(z2 - z1), x2 - x1);
   mesh.castShadow = false;
 }
 
-function streetRectangle(
-  a: AssetLibrary,
-  parent: T.Object3D,
-  material: T.Material | string,
-  start: readonly [number, number],
-  end: readonly [number, number],
-  width: number,
-  y: number,
-  height: number,
-) {
-  const dx = end[0] - start[0];
-  const dz = end[1] - start[1];
-  const length = Math.hypot(dx, dz);
-  const group = a.group(parent, (start[0] + end[0]) / 2, 0, (start[1] + end[1]) / 2);
-  group.rotation.y = Math.atan2(-dz, dx);
-  const mesh = a.box(group, material, 0, y, 0, length, height, width);
-  mesh.castShadow = false;
-  return { group, length };
+/** A lightweight civic canopy: shared geometry/materials, roughly 950 triangles per tree. */
+function civicCanopy(a: AssetLibrary, parent: T.Group, x: number, z: number, index: number) {
+  const tree = a.group(parent, x, 0, z, index * 1.73);
+  a.cylinder(tree, '#79654a', 0, 1.35, 0, 0.13, 2.7);
+  const crown = civicFoliage(a);
+  for (const [i, [dx, dy, dz, r]] of [
+    [0, 3.2, 0, 1.1],
+    [-0.8, 2.8, 0.1, 0.85],
+    [0.7, 2.9, 0.5, 0.9],
+    [0.2, 2.9, -0.75, 0.86],
+    [0.3, 3.8, 0, 0.8],
+  ].entries()) {
+    a.mesh(
+      tree,
+      crown,
+      a.foliageMaterial(i % 2 ? '#607b43' : '#526c3d'),
+      dx,
+      dy,
+      dz,
+      r * 1.3,
+      r * 1.1,
+      r * 1.3,
+    );
+  }
 }
 
-/** A short Main Street and civic lane continue the existing neighborhood road in one scene. */
+/** A single street, continuous pedestrian edges, and bounded public greens. */
 export function buildCityInfrastructure(a: AssetLibrary, parent: T.Group): T.Group {
-  const root = a.group(
-    parent,
-    CITY_SITE_PLAN.origin[0],
-    CITY_SITE_PLAN.origin[1],
-    CITY_SITE_PLAN.origin[2],
-  );
+  const root = a.group(parent, ...CITY_SITE_PLAN.origin);
   root.name = 'town-center-infrastructure';
   const roads = a.group(root);
   roads.name = 'connected-road-and-sidewalk-grid';
@@ -592,114 +564,113 @@ export function buildCityInfrastructure(a: AssetLibrary, parent: T.Group): T.Gro
   paving.name = 'public-pedestrian-links';
   const landscape = a.group(root);
   landscape.name = 'town-center-verge-gardens';
-  const roadMaterial = a.namedMaterial(
+  const asphalt = a.namedMaterial(
     'town-center-asphalt',
-    () => new T.MeshStandardMaterial({ color: '#777e78', roughness: 0.96 }),
+    () => new T.MeshStandardMaterial({ color: '#555c5b', roughness: 0.96 }),
   );
-  const asphaltConnector = a.mesh(
-    roads,
-    a.geometry(
-      roadRibbonGeometry(CITY_SITE_PLAN.streets.connectorPoints, CITY_SITE_PLAN.streets.roadWidth),
-    ),
-    roadMaterial,
-    0,
-    0.245,
-    0,
-  );
-  asphaltConnector.name = 'chapter-two-road-connector';
-  asphaltConnector.castShadow = false;
-  const roadEdge = CITY_SITE_PLAN.streets.roadWidth / 2;
   for (const segment of CITY_SITE_PLAN.streets.roadSegments) {
-    const { group, length } = streetRectangle(
-      a,
+    const dx = segment.to[0] - segment.from[0],
+      dz = segment.to[1] - segment.from[1],
+      length = Math.hypot(dx, dz);
+    const street = a.group(
       roads,
-      roadMaterial,
-      segment.from,
-      segment.to,
-      CITY_SITE_PLAN.streets.roadWidth,
-      0.245,
-      0.08,
+      (segment.from[0] + segment.to[0]) / 2,
+      0,
+      (segment.from[1] + segment.to[1]) / 2,
+      Math.atan2(-dz, dx),
     );
-    const yaw = Math.atan2(-(segment.to[1] - segment.from[1]), segment.to[0] - segment.from[0]);
+    const road = a.box(
+      street,
+      asphalt,
+      0,
+      0.205,
+      0,
+      length,
+      0.08,
+      CITY_SITE_PLAN.streets.roadWidth,
+    );
+    road.castShadow = false;
     for (const side of [-1, 1]) {
-      const offset = side * (roadEdge + 0.09);
-      const curb = a.box(
-        group,
-        surface(a, 'stone', '#b8b4a2'),
+      const walk = a.box(
+        street,
+        surface(a, 'paving', '#d1cebd'),
         0,
-        0.27,
-        offset,
-        length,
-        0.16,
-        0.18,
-      );
-      curb.rotation.y = yaw;
-      const sidewalkOffset = side * CITY_SITE_PLAN.streets.sidewalkOffset;
-      const sidewalk = a.box(
-        group,
-        surface(a, 'paving', '#c6c0ad'),
-        0,
-        0.29,
-        sidewalkOffset,
+        0.25,
+        side * CITY_SITE_PLAN.streets.sidewalkOffset,
         length,
         0.14,
         CITY_SITE_PLAN.streets.sidewalkWidth,
       );
-      sidewalk.rotation.y = yaw;
-      sidewalk.castShadow = false;
-      for (let distance = 3.5; distance < length - 1; distance += 3.5) {
-        const seam = a.box(
-          group,
-          '#aaa693',
-          distance - length / 2,
-          0.365,
-          sidewalkOffset,
-          0.025,
-          0.012,
-          CITY_SITE_PLAN.streets.sidewalkWidth - 0.07,
-        );
-        seam.rotation.y = yaw;
+      walk.castShadow = false;
+      // Curbs stop at crossing openings; every child is already in the street's frame.
+      let cursor = 0;
+      for (const crossing of [...CITY_SITE_PLAN.streets.crossings, length + 1]) {
+        const next = Math.min(length, crossing - 1);
+        if (next > cursor)
+          a.box(
+            street,
+            surface(a, 'stone', '#b8b7a9'),
+            (cursor + next - length) / 2,
+            0.27,
+            side * 3.24,
+            next - cursor,
+            0.16,
+            0.18,
+          );
+        cursor = crossing + 1;
       }
+      for (let d = 2; d < length; d += 3.5)
+        a.box(street, '#aaa693', d - length / 2, 0.325, side * 4.02, 0.025, 0.012, 1.48);
     }
+    for (let d = 7; d < length - 3; d += 7)
+      a.box(street, '#d5d0b9', d - length / 2, 0.255, 0, 2, 0.015, 0.08);
+    for (const crossing of CITY_SITE_PLAN.streets.crossings)
+      for (let z = -2.5; z <= 2.5; z += 1)
+        a.box(street, '#dfdac6', crossing - length / 2, 0.3, z, 1.8, 0.015, 0.5);
   }
-  for (let z = -32; z <= 32; z += 8) a.box(roads, '#d5d0b9', 0, 0.3, z, 1.25, 0.015, 0.07);
-  // Warm, restrained lamps frame the shop approach and the civic-lane entry.
-  for (const [x, z] of [
-    [4.9, -26],
-    [4.9, 24],
-    [18, 8.1],
-    [18, 16],
-  ] as const)
-    a.lantern(roads, x, 2.8, z);
-  const vergeTrees: readonly (readonly [
-    number,
-    number,
-    'oak' | 'birch' | 'evergreen' | 'flowering',
-  ])[] = [
-    [-20, 23, 'evergreen'],
-    [-20, -25, 'birch'],
-    [20, -25, 'oak'],
-    [45, -7, 'flowering'],
-    [45, 20, 'evergreen'],
-  ];
-  for (const [i, [x, z, kind]] of vergeTrees.entries()) {
-    plantTree(a, landscape, x, z, 0.76 + (i % 3) * 0.06, kind, 2551 + i * 9);
-    shrub(a, landscape, x + (i % 2 ? 1.7 : -1.7), z + 0.55, 0.45, true, 2611 + i);
-  }
-  // The transition gardens visually carry the road from the last homes into Main Street.
-  for (const [index, garden] of CITY_SITE_PLAN.transitionGardens.entries()) {
-    plantTree(a, landscape, garden.position[0], garden.position[2], 0.72, garden.kind, garden.seed);
-    gardenBed(
-      a,
-      landscape,
-      garden.position[0] + (index ? -2 : 2),
-      garden.position[2],
-      3.2,
-      0.9,
-      garden.seed + 3,
-    );
-  }
+  // Paved apron binds the three independent shop pieces into one commercial frontage.
+  a.box(paving, surface(a, 'paving', '#d1cebd'), 22, 0.26, -4.7, 32, 0.12, 1.35);
   for (const segment of CITY_SITE_PLAN.pedestrianPaths) pathRibbon(a, paving, segment);
+  for (const crossing of CITY_SITE_PLAN.streets.crossings)
+    pathRibbon(a, paving, {
+      id: 'crossing',
+      from: [crossing, -4.02],
+      to: [crossing, 4.02],
+      width: 1.8,
+    });
+  for (const green of CITY_SITE_PLAN.greenSpaces) {
+    const lawn = a.group(landscape, ...[green.center[0], 0, green.center[1]]);
+    lawn.name = green.id;
+    a.box(lawn, surface(a, 'grass', '#78875e'), 0, 0.035, 0, green.width, 0.06, green.depth);
+    // Low stone edging establishes a deliberate public lawn, leaving walking entries open.
+    for (const side of [-1, 1])
+      a.box(
+        lawn,
+        surface(a, 'stone', '#a59d8c'),
+        0,
+        0.12,
+        (side * green.depth) / 2,
+        green.width,
+        0.14,
+        0.12,
+      );
+  }
+  for (const [index, [x, z]] of CITY_SITE_PLAN.canopy.entries())
+    civicCanopy(a, landscape, x, z, index);
+  // A consistent lamp rhythm, using just the existing four local light sources.
+  for (const x of CITY_SITE_PLAN.streets.lampStations)
+    for (const side of [-1, 1]) a.lantern(roads, x, 2.6, side * 5.2, true, side === 1);
+  for (const [x, z, rotation] of [
+    [15, -17, 0],
+    [29, -17, 0],
+    [19, 29, Math.PI],
+    [32, 29, Math.PI],
+  ] as const)
+    a.bench(landscape, x, z, rotation);
+  for (const [i, garden] of CITY_SITE_PLAN.transitionGardens.entries()) {
+    civicCanopy(a, landscape, garden.position[0], garden.position[2], i + 30);
+    gardenBed(a, landscape, garden.position[0] + 2, garden.position[2], 2.4, 0.8, garden.seed);
+  }
   batchStatic(root, (geometry) => a.geometry(geometry));
   root.userData['staticBatchBoundary'] = true;
   return root;
@@ -712,7 +683,7 @@ export interface MovingMonorail {
 
 function station(set: PieceSet, parent: T.Group, stationId: string, choice: string) {
   const stationPlan = CITY_MONORAIL_PLAN.stations.find((entry) => entry.id === stationId)!;
-  const group = set.a.group(parent, ...stationPlan.position);
+  const group = set.a.group(parent, ...stationPlan.position, stationPlan.rotation);
   group.name = stationId;
   const a = set.a;
   const timber = choice === 'sage-stone' ? '#887a62' : '#9a744d';
@@ -721,32 +692,36 @@ function station(set: PieceSet, parent: T.Group, stationId: string, choice: stri
     choice === 'timber-brass' ? '#ad8958' : choice === 'sage-stone' ? '#777f74' : '#b37c5c';
   // The platform is paired so the single central guide beam remains clearly visible.
   for (const side of [-1, 1]) {
-    a.box(group, surface(a, 'stone', '#bcb5a3'), side * 2.45, 12.0, 0, 17, 0.5, 2.4);
-    a.box(group, wall, side * 2.45, 12.32, 0, 17.2, 0.1, 2.55);
+    a.box(group, surface(a, 'stone', '#bcb5a3'), side * 3, 12.0, 0, 2.4, 0.5, 17);
+    a.box(group, wall, side * 3, 12.32, 0, 2.55, 0.1, 17.2);
     for (const z of [-6.4, -2.2, 2.2, 6.4])
-      a.box(group, timber, side * 5.25, 13.55, z, 0.14, 3.1, 0.14);
-    a.box(group, metal, side * 5.25, 15.1, 0, 0.34, 0.13, 14.2);
-    a.box(group, wall, side * 5.25, 15.45, 0, 3.8, 0.42, 15.4);
-    a.box(group, wall, side * 5.25, 15.68, 0, 3.2, 0.08, 14.8);
-    for (const z of [-4.6, 0, 4.6]) a.lantern(group, side * 4.3, 14.3, z, false, false);
+      a.box(group, timber, side * 3.45, 13.55, z, 0.14, 3.1, 0.14);
+    a.box(group, metal, side * 3.45, 15.1, 0, 0.34, 0.13, 14.2);
+    a.box(group, wall, side * 3, 15.45, 0, 3.6, 0.42, 15.4);
+    a.box(group, wall, side * 3, 15.68, 0, 3.3, 0.08, 14.8);
+    for (const z of [-4.6, 0, 4.6]) a.lantern(group, side * 3.0, 14.3, z, false, false);
   }
   // Lift core plus switchback stairs form a readable ground entrance without passenger simulation.
-  a.box(group, wall, 0, 6.1, 8.25, 2.5, 12.2, 2.5);
-  a.box(group, '#78918c', 0, 6.0, 9.53, 1.4, 10.8, 0.08);
-  a.box(group, metal, 0, 12.25, 8.25, 3.1, 0.23, 3.1);
+  a.box(group, wall, -3, 6.1, 8.25, 2.5, 12.2, 2.5);
+  a.box(group, '#78918c', -3, 6.0, 9.53, 1.4, 10.8, 0.08);
+  a.box(group, metal, -3, 12.25, 8.25, 3.1, 0.23, 3.1);
+  // Four connected flights stack beside the right platform, away from the train channel.
   for (let flight = 0; flight < 4; flight++) {
-    const side = flight % 2 ? 1 : -1;
-    const yStart = flight * 2.95;
-    const z = 4.2 - flight * 2.65;
-    const run = a.box(group, timber, side * 3.2, yStart + 1.45, z, 1.15, 0.26, 5.5);
-    run.rotation.x = -0.48;
+    const reverse = flight % 2 === 1;
     for (let step = 0; step < 12; step++) {
-      const stepZ = z - 2.55 + step * 0.46;
-      a.box(group, '#b8aa91', side * 3.2, yStart + 0.2 + step * 0.22, stepZ, 1.25, 0.07, 0.4);
+      const z = reverse ? 0.4 + step * 0.5 : 6.4 - step * 0.5;
+      a.box(group, '#b8aa91', 3, flight * 3 + (step + 0.5) * 0.25, z, 1.4, 0.12, 0.5);
     }
-    a.box(group, wall, side * 3.2, yStart + 2.95, z, 1.45, 0.2, 1.4);
+    a.box(group, wall, 3, (flight + 1) * 3, reverse ? 6.4 : 0.4, 1.7, 0.2, 1.4);
   }
-  a.box(group, '#78674f', 0, 15.96, 0, 1.0, 0.12, 15.5);
+  a.box(group, surface(a, 'paving', '#bdb7a4'), 0, 0.2, 10, 8.5, 0.15, 2);
+  a.box(group, surface(a, 'paving', '#bdb7a4'), 3, 0.2, 8, 1.8, 0.15, 3.2);
+  for (const z of [-5.5, 5.5]) {
+    for (const x of [-4.5, 4.5]) a.box(group, wall, x, 6.79, z, 0.45, 13.58, 0.45);
+    a.box(group, wall, 0, 13.58, z, 10.2, 0.55, 1.15);
+  }
+  for (const z of [-6.4, 6.4]) a.box(group, timber, 0, 15.15, z, 9.6, 0.18, 0.22);
+  for (const side of [-1, 1]) a.box(group, metal, side * 4.15, 13.0, 0, 0.08, 0.08, 16);
 }
 
 function trainCoach(a: AssetLibrary, parent: T.Group, body: string, trim: string) {
@@ -788,12 +763,12 @@ export function buildMonorailProject(
   const beamColor = choiceId === 'cream-copper' ? '#a58a70' : '#858b83';
   for (let index = 0; index < CITY_MONORAIL_PLAN.supportCount; index++) {
     const point = monorailSupportPoint(index);
-    const frame = monorailPoseAt(index / CITY_MONORAIL_PLAN.supportCount);
+    const track = monorailTrackSupportPoint(index);
     a.box(
       supports,
       supportColor,
       point.x,
-      CITY_MONORAIL_PLAN.trackY / 2,
+      (CITY_MONORAIL_PLAN.trackY - 0.42) / 2,
       point.z,
       0.55,
       CITY_MONORAIL_PLAN.trackY - 0.42,
@@ -802,14 +777,14 @@ export function buildMonorailProject(
     const cap = a.box(
       supports,
       '#a5a395',
-      point.x,
+      (point.x + track.x) / 2,
       CITY_MONORAIL_PLAN.trackY - 0.42,
-      point.z,
-      1.62,
+      (point.z + track.z) / 2,
+      point.distanceTo(track) + 1,
       0.55,
       1.48,
     );
-    cap.rotation.y = Math.atan2(frame.tangent.x, frame.tangent.z);
+    cap.rotation.y = Math.atan2(-(point.z - track.z), point.x - track.x);
   }
   const curve = new T.CatmullRomCurve3(
     CITY_MONORAIL_PLAN.points.map(([x, z]) => new T.Vector3(x, CITY_MONORAIL_PLAN.trackY, z)),
@@ -838,30 +813,7 @@ export function buildMonorailProject(
   for (const stationPlan of CITY_MONORAIL_PLAN.stations)
     station(set, stations, stationPlan.id, choiceId);
   const approach = part(set, 'station-approaches');
-  const stationOne = CITY_MONORAIL_PLAN.stations[0];
-  const stationOneStart: [number, number] = [
-    stationOne.position[0] + stationOne.entry[0],
-    stationOne.position[2] + stationOne.entry[2],
-  ];
-  const sidewalkEnd: [number, number] = [-64, 10.02];
-  const stationTwo = CITY_MONORAIL_PLAN.stations[1];
-  const stationTwoStart: [number, number] = [
-    stationTwo.position[0] + stationTwo.entry[0],
-    stationTwo.position[2] + stationTwo.entry[2],
-  ];
-  const greenwayEnd: [number, number] = [72, 37];
-  for (const [start, end] of [
-    [stationOneStart, sidewalkEnd],
-    [stationTwoStart, greenwayEnd],
-  ] as const) {
-    const segment: CityPathSegment = {
-      id: 'station-approach',
-      from: start,
-      to: end,
-      width: 1.7,
-    };
-    pathRibbon(a, approach, segment, CITY_MONORAIL_PLAN.origin[0], CITY_MONORAIL_PLAN.origin[2]);
-  }
+  for (const segment of CITY_MONORAIL_PLAN.approaches) pathRibbon(a, approach, segment);
   const body =
     choiceId === 'timber-brass' ? '#a77756' : choiceId === 'sage-stone' ? '#9eaa9a' : '#d2c7af';
   const trim = choiceId === 'cream-copper' ? '#a97859' : '#d6c6a2';

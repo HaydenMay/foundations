@@ -27,7 +27,7 @@ import {
   buildCityProjectForWorld,
   type MovingMonorail,
 } from './city-assets';
-import { cityPlotDefinition } from './city-site-plan';
+import { CITY_SITE_PLAN, CITY_MONORAIL_PLAN, cityPlotDefinition } from './city-site-plan';
 
 export interface TownWorld {
   group: T.Group;
@@ -183,10 +183,11 @@ export function buildWorld(
   const monorailExpanded = !!designs['monorail'];
   const chapterTwo = designs['ch2-neighborhood'] === 'reveal' || cityExpanded;
   // A shallow rounded terrain slice keeps the whole environment miniature and replaceable.
-  const worldWidth = monorailExpanded ? 200 : cityExpanded ? 170 : chapterTwo ? 120 : 36,
-    worldDepth = monorailExpanded ? 120 : cityExpanded ? 100 : chapterTwo ? 88 : 29,
-    worldCenterX = cityExpanded ? 46 : chapterTwo ? 25 : 0,
-    worldCenterZ = monorailExpanded ? -1 : cityExpanded ? 4 : chapterTwo ? -4 : -1.5,
+  const cityTerrain = monorailExpanded ? CITY_MONORAIL_PLAN.terrain : CITY_SITE_PLAN.terrain;
+  const worldWidth = cityExpanded ? cityTerrain.width : chapterTwo ? 120 : 36,
+    worldDepth = cityExpanded ? cityTerrain.depth : chapterTwo ? 88 : 29,
+    worldCenterX = cityExpanded ? cityTerrain.center[0] : chapterTwo ? 25 : 0,
+    worldCenterZ = cityExpanded ? cityTerrain.center[1] : chapterTwo ? -4 : -1.5,
     base = a.geometry(new RoundedBoxGeometry(worldWidth, 0.8, worldDepth, 2, 0.35));
   a.mesh(group, base, '#b9b79a', worldCenterX, -0.52, worldCenterZ);
   const turf = a.geometry(
